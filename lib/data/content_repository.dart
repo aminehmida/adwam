@@ -45,8 +45,7 @@ class ContentRepository {
     if (userOrder.isEmpty) return defaults;
     final byId = {for (final d in defaults) d.id: d};
     final result = <Dhikr>[
-      for (final id in userOrder)
-        if (byId.remove(id) case final d?) d,
+      for (final id in userOrder) ?byId.remove(id),
     ];
     return result..addAll(byId.values);
   }

@@ -7,7 +7,7 @@ String dateStampOf(DateTime now) =>
     '${now.month.toString().padLeft(2, '0')}-'
     '${now.day.toString().padLeft(2, '0')}';
 
-/// Today's counters and done-marks. Keys are '<session>.<dhikrId>' so the same
+/// Today's counters and done-marks. Keys are `<session>.<dhikrId>` so the same
 /// dhikr counts separately in each context it appears in.
 class DailyProgress {
   final String dateStamp;
