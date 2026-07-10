@@ -15,6 +15,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get editList => 'Edit list';
 
   @override
+  String get doneEditing => 'Done';
+
+  @override
   String get virtue => 'Virtue';
 
   @override

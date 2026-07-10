@@ -110,6 +110,12 @@ abstract class AppLocalizations {
   /// **'Edit list'**
   String get editList;
 
+  /// No description provided for @doneEditing.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get doneEditing;
+
   /// No description provided for @virtue.
   ///
   /// In en, this message translates to:

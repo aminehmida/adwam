@@ -15,6 +15,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get editList => 'تعديل القائمة';
 
   @override
+  String get doneEditing => 'تم';
+
+  @override
   String get virtue => 'الفضل';
 
   @override

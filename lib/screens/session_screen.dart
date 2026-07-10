@@ -23,6 +23,10 @@ class _SessionScreenState extends State<SessionScreen> {
   final Map<String, GlobalKey> _itemKeys = {};
   bool _editing = false;
 
+  /// Hidden dhikrs the user tapped to read. Cleared on scroll — a peek is
+  /// temporary; unhiding permanently happens in edit mode.
+  final Set<String> _peeked = {};
+
   GlobalKey _keyFor(String id) => _itemKeys.putIfAbsent(id, GlobalKey.new);
 
   void _onTap(Dhikr dhikr) {
@@ -61,8 +65,13 @@ class _SessionScreenState extends State<SessionScreen> {
     final dhikrs = config.listFor(widget.session);
     final l10n = AppLocalizations.of(context)!;
 
-    return Scaffold(
-      appBar: AppBar(
+    return PopScope(
+      canPop: !_editing,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) setState(() => _editing = false);
+      },
+      child: Scaffold(
+        appBar: AppBar(
         title: Text(
           sessionTitlesAr[widget.session]!,
           style: const TextStyle(fontFamily: 'Amiri'),
@@ -93,43 +102,68 @@ class _SessionScreenState extends State<SessionScreen> {
                 ),
               ],
       ),
-      body: _editing ? _editList(config, dhikrs) : _countList(config, dhikrs),
+        body:
+            _editing ? _editList(config, dhikrs) : _countList(config, dhikrs),
+      ),
     );
   }
 
   Widget _countList(ListConfigController config, List<Dhikr> dhikrs) {
     final progress = context.watch<ProgressController>();
-    return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(14, 4, 14, 32),
-      itemCount: dhikrs.length,
-      itemBuilder: (context, index) {
-        final dhikr = dhikrs[index];
-        final hidden = config.isHidden(widget.session, dhikr.id);
-        final newSection = index == 0 || dhikrs[index - 1].tier != dhikr.tier;
-        final card = DhikrCard(
-          dhikr: dhikr,
-          count: progress.countFor(widget.session, dhikr.id),
-          done: progress.isDone(widget.session, dhikr.id),
-          collapsed: hidden,
-          onTap: hidden
-              ? () => config.setHidden(widget.session, dhikr.id, false)
-              : () => _onTap(dhikr),
-          onLongPress: hidden
-              ? null
-              : () {
-                  HapticFeedback.mediumImpact();
-                  context
-                      .read<ProgressController>()
-                      .markDone(widget.session, dhikr);
-                },
-        );
-        return KeyedSubtree(
-          key: _keyFor(dhikr.id),
-          child: newSection
-              ? Column(children: [TierHeader(tier: dhikr.tier), card])
-              : card,
-        );
+    return NotificationListener<ScrollStartNotification>(
+      onNotification: (_) {
+        if (_peeked.isNotEmpty) setState(_peeked.clear);
+        return false;
       },
+      child: ListView.builder(
+        padding: const EdgeInsets.fromLTRB(14, 4, 14, 32),
+        itemCount: dhikrs.length,
+        itemBuilder: (context, index) {
+          final dhikr = dhikrs[index];
+          final hidden = config.isHidden(widget.session, dhikr.id);
+          final peeking = hidden && _peeked.contains(dhikr.id);
+          final newSection =
+              index == 0 || dhikrs[index - 1].tier != dhikr.tier;
+          final Widget card;
+          if (peeking) {
+            // Temporary read-only look at a hidden dhikr; collapses again
+            // on scroll or tap. Unhide permanently via edit mode.
+            card = Opacity(
+              opacity: 0.6,
+              child: DhikrCard(
+                dhikr: dhikr,
+                count: progress.countFor(widget.session, dhikr.id),
+                done: progress.isDone(widget.session, dhikr.id),
+                onTap: () => setState(() => _peeked.remove(dhikr.id)),
+              ),
+            );
+          } else {
+            card = DhikrCard(
+              dhikr: dhikr,
+              count: progress.countFor(widget.session, dhikr.id),
+              done: progress.isDone(widget.session, dhikr.id),
+              collapsed: hidden,
+              onTap: hidden
+                  ? () => setState(() => _peeked.add(dhikr.id))
+                  : () => _onTap(dhikr),
+              onLongPress: hidden
+                  ? null
+                  : () {
+                      HapticFeedback.mediumImpact();
+                      context
+                          .read<ProgressController>()
+                          .markDone(widget.session, dhikr);
+                    },
+            );
+          }
+          return KeyedSubtree(
+            key: _keyFor(dhikr.id),
+            child: newSection
+                ? Column(children: [TierHeader(tier: dhikr.tier), card])
+                : card,
+          );
+        },
+      ),
     );
   }
 
