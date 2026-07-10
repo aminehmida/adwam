@@ -6,6 +6,7 @@ import '../l10n/app_localizations.dart';
 import '../models/dhikr.dart';
 import '../state/list_config_controller.dart';
 import '../state/progress_controller.dart';
+import '../state/settings_controller.dart';
 import '../widgets/context_card.dart' show sessionTitle;
 import '../widgets/dhikr_card.dart';
 import '../widgets/tier_header.dart';
@@ -117,8 +118,9 @@ class _SessionScreenState extends State<SessionScreen> {
       },
       child: ListView.builder(
         padding: const EdgeInsets.fromLTRB(14, 4, 14, 32),
-        itemCount: dhikrs.length,
+        itemCount: dhikrs.length + 1,
         itemBuilder: (context, index) {
+          if (index == dhikrs.length) return _languageSelector(context);
           final dhikr = dhikrs[index];
           final hidden = config.isHidden(widget.session, dhikr.id);
           final peeking = hidden && _peeked.contains(dhikr.id);
@@ -222,6 +224,38 @@ class _SessionScreenState extends State<SessionScreen> {
               : card,
         );
       },
+    );
+  }
+
+  /// Quick UI-language toggle at the end of the list; same override as the
+  /// language setting in SettingsScreen.
+  Widget _languageSelector(BuildContext context) {
+    final settings = context.watch<SettingsController>();
+    final colors = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.only(top: 28),
+      child: Center(
+        child: SegmentedButton<String>(
+          segments: const [
+            ButtonSegment(
+              value: 'ar',
+              label: Text('العربية', style: TextStyle(fontFamily: 'Amiri')),
+            ),
+            ButtonSegment(value: 'en', label: Text('English')),
+          ],
+          selected: {Localizations.localeOf(context).languageCode},
+          showSelectedIcon: false,
+          onSelectionChanged: (selection) =>
+              settings.setLocale(Locale(selection.first)),
+          style: SegmentedButton.styleFrom(
+            visualDensity: VisualDensity.compact,
+            side: BorderSide(color: colors.outlineVariant),
+            foregroundColor: colors.onSurfaceVariant,
+            selectedForegroundColor: colors.onPrimaryContainer,
+            selectedBackgroundColor: colors.primaryContainer,
+          ),
+        ),
+      ),
     );
   }
 
