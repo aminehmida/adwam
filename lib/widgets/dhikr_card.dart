@@ -9,6 +9,21 @@ const arabicTextStyle = TextStyle(
   height: 1.9,
 );
 
+// Temporary review aid: surfaces the curation classification on each card
+// so it can be checked against content/REVIEW.md. Remove after review.
+const _formLabelsAr = {
+  DhikrForm.quran: 'قرآن',
+  DhikrForm.short: 'قصير',
+  DhikrForm.long: 'طويل',
+};
+
+const _tierLabelsAr = {
+  BenefitTier.protection: 'حماية',
+  BenefitTier.reward: 'ثواب',
+  BenefitTier.otherBenefit: 'فضل آخر',
+  BenefitTier.none: 'بدون فضل مأثور',
+};
+
 /// Tap-to-count card. Renders a thin greyed title-only row when [collapsed].
 class DhikrCard extends StatelessWidget {
   final Dhikr dhikr;
@@ -62,6 +77,8 @@ class DhikrCard extends StatelessWidget {
               ],
               const SizedBox(height: 8),
               _counterRow(colors),
+              const SizedBox(height: 6),
+              _reviewInfoRow(colors),
             ],
           ),
         ),
@@ -136,6 +153,30 @@ class DhikrCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _reviewInfoRow(ColorScheme colors) {
+    final style = TextStyle(fontSize: 11, color: colors.outline);
+    return Row(
+      children: [
+        Text(dhikr.id, style: style.copyWith(fontFamily: 'monospace')),
+        const SizedBox(width: 8),
+        Text('${_formLabelsAr[dhikr.form]} · ${_tierLabelsAr[dhikr.tier]}',
+            style: style),
+        if (dhikr.benefitSource != null) ...[
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              dhikr.benefitSource!,
+              style: style,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textDirection: TextDirection.rtl,
+            ),
+          ),
+        ],
+      ],
     );
   }
 
