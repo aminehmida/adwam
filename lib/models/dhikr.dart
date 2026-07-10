@@ -45,6 +45,9 @@ class Dhikr {
     this.sortHint = noSortHint,
   });
 
+  /// Final sort tiebreak: shorter text first among otherwise equal dhikrs.
+  int get wordCount => arabic.trim().split(RegExp(r'\s+')).length;
+
   factory Dhikr.fromJson(Map<String, dynamic> json) => Dhikr(
         id: json['id'] as String,
         arabic: json['arabic'] as String,

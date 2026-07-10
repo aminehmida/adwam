@@ -13,7 +13,9 @@ Within each session:
    (a long reward dua outranks every no-benefit dhikr)
 3. **Repetition count** ascending (1, 3, 4, 7, 10, … 100)
 4. **Form**: short before long, breaking ties at the same count
-5. Curated `sort_hint` for manual fine ordering (e.g. the أصبحنا cluster)
+5. Curated `sort_hint` — cluster members share one value (e.g. the
+   أصبحنا/أمسينا dhikrs) so they stay together ahead of their group
+6. **Word count** ascending as the final tiebreak
 
 Drag-to-reorder and hide (collapse-in-place) override the defaults per session;
 "reset to default order" brings them back.

@@ -89,12 +89,14 @@ def build():
 
 def default_sort_key(d):
     # Quran always first; then benefit tier; then repetitions ascending;
-    # short-before-long only breaks ties at the same count.
+    # short-before-long at the same count; then cluster hint; least rule:
+    # fewer words first.
     return (0 if d["form"] == "quran" else 1,
             TIER_ORDER[d["benefit_tier"]],
             d["repetitions"],
             FORM_ORDER[d["form"]],
-            d.get("sort_hint", NO_HINT))
+            d.get("sort_hint", NO_HINT),
+            len(d["arabic"].split()))
 
 
 def write_review(dhikrs, curation):

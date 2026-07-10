@@ -9,10 +9,11 @@ Dhikr d(
   int reps = 1,
   BenefitTier tier = BenefitTier.none,
   int hint = noSortHint,
+  String? arabic,
 }) =>
     Dhikr(
       id: id,
-      arabic: id,
+      arabic: arabic ?? id,
       repetitions: reps,
       form: form,
       tier: tier,
@@ -60,16 +61,25 @@ void main() {
     );
   });
 
-  test('sort_hint clusters equal dhikrs, hinted before unhinted', () {
+  test('shared sort_hint keeps a cluster together ahead of its group, '
+      'ordered inside by word count', () {
     expect(
       sortedIds([
-        d('plain-a'),
-        d('asbahna-3', hint: 3),
-        d('plain-b'),
-        d('asbahna-1', hint: 1),
-        d('asbahna-2', hint: 2),
+        d('plain', arabic: 'ذكر'),
+        d('asbahna-long', hint: 1, arabic: 'أصبحنا وأصبح الملك لله والحمد لله'),
+        d('asbahna-short', hint: 1, arabic: 'اللهم بك أصبحنا'),
       ]),
-      ['asbahna-1', 'asbahna-2', 'asbahna-3', 'plain-a', 'plain-b'],
+      ['asbahna-short', 'asbahna-long', 'plain'],
+    );
+  });
+
+  test('least rule: fewer words first among otherwise equal dhikrs', () {
+    expect(
+      sortedIds([
+        d('three-words', arabic: 'سبحان الله وبحمده'),
+        d('two-words', arabic: 'سبحان الله'),
+      ]),
+      ['two-words', 'three-words'],
     );
   });
 

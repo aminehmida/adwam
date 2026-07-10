@@ -15,15 +15,21 @@
   },
   "me-04": {
     "form": "quran",
-    "benefit_tier": "protection"
+    "benefit_tier": "protection",
+    "sort_hint": 1,
+    "note": "ترتيب المصحف: الإخلاص ثم الفلق ثم الناس (sort_hint)"
   },
   "me-05": {
     "form": "quran",
-    "benefit_tier": "protection"
+    "benefit_tier": "protection",
+    "sort_hint": 2,
+    "note": "ترتيب المصحف: الإخلاص ثم الفلق ثم الناس (sort_hint)"
   },
   "me-06": {
     "form": "quran",
-    "benefit_tier": "protection"
+    "benefit_tier": "protection",
+    "sort_hint": 3,
+    "note": "ترتيب المصحف: الإخلاص ثم الفلق ثم الناس (sort_hint)"
   },
   "me-07": {
     "form": "short",
@@ -38,12 +44,12 @@
   "me-09": {
     "form": "short",
     "benefit_tier": "none",
-    "sort_hint": 2
+    "sort_hint": 1
   },
   "me-10": {
     "form": "short",
     "benefit_tier": "none",
-    "sort_hint": 2
+    "sort_hint": 1
   },
   "me-11": {
     "form": "long",
@@ -111,12 +117,12 @@
   "me-25": {
     "form": "short",
     "benefit_tier": "none",
-    "sort_hint": 3
+    "sort_hint": 1
   },
   "me-26": {
     "form": "short",
     "benefit_tier": "none",
-    "sort_hint": 3
+    "sort_hint": 1
   },
   "me-27": {
     "form": "short",
