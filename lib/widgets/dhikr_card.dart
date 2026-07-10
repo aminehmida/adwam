@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
 import '../models/dhikr.dart';
 
 const arabicTextStyle = TextStyle(
@@ -112,7 +113,7 @@ class DhikrCard extends StatelessWidget {
           dense: true,
           leading: Icon(Icons.auto_awesome, size: 18, color: colors.tertiary),
           title: Text(
-            'الفضل',
+            AppLocalizations.of(context)!.virtue,
             style: TextStyle(fontSize: 14, color: colors.tertiary),
           ),
           children: [

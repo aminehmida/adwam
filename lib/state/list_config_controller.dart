@@ -59,6 +59,14 @@ class ListConfigController extends ChangeNotifier {
     _update(session, const UserListConfig());
   }
 
+  void resetAll() {
+    for (final s in SessionType.values) {
+      _configs[s] = const UserListConfig();
+    }
+    _store.clearAllConfigs();
+    notifyListeners();
+  }
+
   void _update(SessionType session, UserListConfig config) {
     _configs[session] = config;
     _store.saveConfig(session, config);

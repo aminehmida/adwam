@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 
 import 'data/content_repository.dart';
 import 'data/prefs_store.dart';
+import 'l10n/app_localizations.dart';
 import 'screens/home_screen.dart';
 import 'state/list_config_controller.dart';
 import 'state/progress_controller.dart';
+import 'state/settings_controller.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,6 +31,7 @@ class _DhikrAppState extends State<DhikrApp> with WidgetsBindingObserver {
   late final ProgressController _progress = ProgressController(widget.store);
   late final ListConfigController _config =
       ListConfigController(widget.store, widget.repo);
+  late final SettingsController _settings = SettingsController(widget.store);
 
   @override
   void initState() {
@@ -54,19 +58,31 @@ class _DhikrAppState extends State<DhikrApp> with WidgetsBindingObserver {
       providers: [
         ChangeNotifierProvider.value(value: _progress),
         ChangeNotifierProvider.value(value: _config),
+        ChangeNotifierProvider.value(value: _settings),
       ],
-      child: MaterialApp(
-        title: 'Dhikr',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF2E7D64)),
-        ),
-        darkTheme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color(0xFF2E7D64),
-            brightness: Brightness.dark,
+      child: Consumer<SettingsController>(
+        builder: (context, settings, _) => MaterialApp(
+          title: 'Dhikr',
+          locale: settings.locale,
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('ar'), Locale('en')],
+          theme: ThemeData(
+            colorScheme:
+                ColorScheme.fromSeed(seedColor: const Color(0xFF2E7D64)),
           ),
+          darkTheme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: const Color(0xFF2E7D64),
+              brightness: Brightness.dark,
+            ),
+          ),
+          home: const HomeScreen(),
         ),
-        home: const HomeScreen(),
       ),
     );
   }

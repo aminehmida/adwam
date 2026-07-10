@@ -1,0 +1,21 @@
+{
+  "@@locale": "en",
+  "appTitle": "Adhkar",
+  "editList": "Edit list",
+  "virtue": "Virtue",
+  "resetOrderTitle": "Reset to default order?",
+  "resetOrderBody": "This list will be reordered and all adhkar shown again.",
+  "cancel": "Cancel",
+  "reset": "Reset",
+  "settings": "Settings",
+  "language": "Language",
+  "languageSystem": "System",
+  "languageArabic": "العربية",
+  "languageEnglish": "English",
+  "resetTodayProgress": "Reset today's progress",
+  "resetTodayBody": "All of today's counters will start over.",
+  "resetCustomizations": "Reset all customizations",
+  "resetCustomizationsBody": "Order and hidden adhkar in every list will return to the defaults.",
+  "about": "About",
+  "aboutBody": "Daily adhkar. Sources: Hisn al-Muslim (hisnmuslim.com) and the Seen-Arabic Morning & Evening Adhkar database."
+}

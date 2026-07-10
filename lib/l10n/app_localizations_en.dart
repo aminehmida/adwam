@@ -1,0 +1,67 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
+import 'app_localizations.dart';
+
+// ignore_for_file: type=lint
+
+/// The translations for English (`en`).
+class AppLocalizationsEn extends AppLocalizations {
+  AppLocalizationsEn([String locale = 'en']) : super(locale);
+
+  @override
+  String get appTitle => 'Adhkar';
+
+  @override
+  String get editList => 'Edit list';
+
+  @override
+  String get virtue => 'Virtue';
+
+  @override
+  String get resetOrderTitle => 'Reset to default order?';
+
+  @override
+  String get resetOrderBody =>
+      'This list will be reordered and all adhkar shown again.';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get reset => 'Reset';
+
+  @override
+  String get settings => 'Settings';
+
+  @override
+  String get language => 'Language';
+
+  @override
+  String get languageSystem => 'System';
+
+  @override
+  String get languageArabic => 'العربية';
+
+  @override
+  String get languageEnglish => 'English';
+
+  @override
+  String get resetTodayProgress => 'Reset today\'s progress';
+
+  @override
+  String get resetTodayBody => 'All of today\'s counters will start over.';
+
+  @override
+  String get resetCustomizations => 'Reset all customizations';
+
+  @override
+  String get resetCustomizationsBody =>
+      'Order and hidden adhkar in every list will return to the defaults.';
+
+  @override
+  String get about => 'About';
+
+  @override
+  String get aboutBody =>
+      'Daily adhkar. Sources: Hisn al-Muslim (hisnmuslim.com) and the Seen-Arabic Morning & Evening Adhkar database.';
+}

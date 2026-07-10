@@ -1,0 +1,21 @@
+{
+  "@@locale": "ar",
+  "appTitle": "الأذكار",
+  "editList": "تعديل القائمة",
+  "virtue": "الفضل",
+  "resetOrderTitle": "استعادة الترتيب الافتراضي؟",
+  "resetOrderBody": "سيُعاد ترتيب هذه القائمة وإظهار جميع الأذكار.",
+  "cancel": "إلغاء",
+  "reset": "استعادة",
+  "settings": "الإعدادات",
+  "language": "اللغة",
+  "languageSystem": "لغة الجهاز",
+  "languageArabic": "العربية",
+  "languageEnglish": "English",
+  "resetTodayProgress": "تصفير عدّادات اليوم",
+  "resetTodayBody": "ستبدأ جميع عدّادات اليوم من جديد.",
+  "resetCustomizations": "استعادة جميع التخصيصات",
+  "resetCustomizationsBody": "سيعود ترتيب القوائم والأذكار المخفية إلى الوضع الافتراضي.",
+  "about": "حول التطبيق",
+  "aboutBody": "أذكار اليوم والليلة. المصادر: حصن المسلم (hisnmuslim.com) وقاعدة بيانات أذكار الصباح والمساء (Seen-Arabic)."
+}

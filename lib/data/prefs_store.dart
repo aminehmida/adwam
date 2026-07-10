@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/daily_progress.dart';
@@ -32,4 +34,19 @@ class PrefsStore {
 
   Future<void> saveProgress(DailyProgress progress) =>
       _prefs.setString('progress', progress.toJsonString());
+
+  Locale? loadLocaleOverride() {
+    final code = _prefs.getString('locale');
+    return code == null ? null : Locale(code);
+  }
+
+  Future<void> saveLocaleOverride(Locale? locale) => locale == null
+      ? _prefs.remove('locale')
+      : _prefs.setString('locale', locale.languageCode);
+
+  Future<void> clearAllConfigs() async {
+    for (final s in SessionType.values) {
+      await _prefs.remove(_configKey(s));
+    }
+  }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../l10n/app_localizations.dart';
 import '../models/dhikr.dart';
 import '../state/list_config_controller.dart';
 import '../widgets/context_card.dart' show sessionTitlesAr;
@@ -27,10 +28,10 @@ class EditSessionScreen extends StatelessWidget {
         actions: [
           PopupMenuButton<String>(
             onSelected: (_) => _confirmReset(context),
-            itemBuilder: (_) => const [
+            itemBuilder: (menuContext) => [
               PopupMenuItem(
                 value: 'reset',
-                child: Text('استعادة الترتيب الافتراضي'),
+                child: Text(AppLocalizations.of(menuContext)!.resetOrderTitle),
               ),
             ],
           ),
@@ -85,19 +86,20 @@ class EditSessionScreen extends StatelessWidget {
   }
 
   Future<void> _confirmReset(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('استعادة الترتيب الافتراضي؟'),
-        content: const Text('سيُعاد ترتيب هذه القائمة وإظهار جميع الأذكار.'),
+        title: Text(l10n.resetOrderTitle),
+        content: Text(l10n.resetOrderBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('إلغاء'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text('استعادة'),
+            child: Text(l10n.reset),
           ),
         ],
       ),

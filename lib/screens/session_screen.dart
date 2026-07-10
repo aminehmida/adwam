@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
+import '../l10n/app_localizations.dart';
 import '../models/dhikr.dart';
 import '../state/list_config_controller.dart';
 import '../state/progress_controller.dart';
@@ -73,7 +74,7 @@ class _SessionScreenState extends State<SessionScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.tune),
-            tooltip: 'Edit list',
+            tooltip: AppLocalizations.of(context)!.editList,
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (_) => EditSessionScreen(session: widget.session),
