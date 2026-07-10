@@ -12,6 +12,18 @@ class AppLocalizationsAr extends AppLocalizations {
   String get appTitle => 'الأذكار';
 
   @override
+  String get sessionMorning => 'أذكار الصباح';
+
+  @override
+  String get sessionEvening => 'أذكار المساء';
+
+  @override
+  String get sessionPostPrayer => 'أذكار بعد الصلاة';
+
+  @override
+  String get sessionSleep => 'أذكار النوم';
+
+  @override
   String get editList => 'تعديل القائمة';
 
   @override

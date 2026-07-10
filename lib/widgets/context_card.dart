@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
 import '../models/dhikr.dart';
 
-const sessionTitlesAr = {
-  SessionType.morning: 'أذكار الصباح',
-  SessionType.evening: 'أذكار المساء',
-  SessionType.postPrayer: 'أذكار بعد الصلاة',
-  SessionType.sleep: 'أذكار النوم',
-};
+String sessionTitle(BuildContext context, SessionType session) {
+  final l10n = AppLocalizations.of(context)!;
+  return switch (session) {
+    SessionType.morning => l10n.sessionMorning,
+    SessionType.evening => l10n.sessionEvening,
+    SessionType.postPrayer => l10n.sessionPostPrayer,
+    SessionType.sleep => l10n.sessionSleep,
+  };
+}
 
 const sessionIcons = {
   SessionType.morning: Icons.wb_sunny_outlined,
@@ -75,7 +79,7 @@ class ContextCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      sessionTitlesAr[session]!,
+                      sessionTitle(context, session),
                       style: const TextStyle(
                         fontFamily: 'Amiri',
                         fontSize: 21,

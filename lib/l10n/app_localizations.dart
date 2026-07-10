@@ -104,6 +104,30 @@ abstract class AppLocalizations {
   /// **'Adhkar'**
   String get appTitle;
 
+  /// No description provided for @sessionMorning.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning adhkar'**
+  String get sessionMorning;
+
+  /// No description provided for @sessionEvening.
+  ///
+  /// In en, this message translates to:
+  /// **'Evening adhkar'**
+  String get sessionEvening;
+
+  /// No description provided for @sessionPostPrayer.
+  ///
+  /// In en, this message translates to:
+  /// **'After-prayer adhkar'**
+  String get sessionPostPrayer;
+
+  /// No description provided for @sessionSleep.
+  ///
+  /// In en, this message translates to:
+  /// **'Bedtime adhkar'**
+  String get sessionSleep;
+
   /// No description provided for @editList.
   ///
   /// In en, this message translates to:

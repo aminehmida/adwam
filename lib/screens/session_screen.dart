@@ -6,7 +6,7 @@ import '../l10n/app_localizations.dart';
 import '../models/dhikr.dart';
 import '../state/list_config_controller.dart';
 import '../state/progress_controller.dart';
-import '../widgets/context_card.dart' show sessionTitlesAr;
+import '../widgets/context_card.dart' show sessionTitle;
 import '../widgets/dhikr_card.dart';
 import '../widgets/tier_header.dart';
 
@@ -73,7 +73,7 @@ class _SessionScreenState extends State<SessionScreen> {
       child: Scaffold(
         appBar: AppBar(
         title: Text(
-          sessionTitlesAr[widget.session]!,
+          sessionTitle(context, widget.session),
           style: const TextStyle(fontFamily: 'Amiri'),
         ),
         actions: _editing

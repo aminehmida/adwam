@@ -1,6 +1,10 @@
 {
   "@@locale": "ar",
   "appTitle": "الأذكار",
+  "sessionMorning": "أذكار الصباح",
+  "sessionEvening": "أذكار المساء",
+  "sessionPostPrayer": "أذكار بعد الصلاة",
+  "sessionSleep": "أذكار النوم",
   "editList": "تعديل القائمة",
   "doneEditing": "تم",
   "virtue": "الفضل",

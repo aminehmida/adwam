@@ -28,8 +28,8 @@ void main() {
     // Home shows 0/2 badges for every context.
     expect(find.text('0 / 2'), findsNWidgets(SessionType.values.length));
 
-    // Open morning session.
-    await tester.tap(find.text('أذكار الصباح'));
+    // Open morning session (tests run under the English locale).
+    await tester.tap(find.text('Morning adhkar'));
     await tester.pumpAndSettle();
 
     // Two taps complete the first dhikr (target 2).

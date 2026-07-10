@@ -12,6 +12,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appTitle => 'Adhkar';
 
   @override
+  String get sessionMorning => 'Morning adhkar';
+
+  @override
+  String get sessionEvening => 'Evening adhkar';
+
+  @override
+  String get sessionPostPrayer => 'After-prayer adhkar';
+
+  @override
+  String get sessionSleep => 'Bedtime adhkar';
+
+  @override
   String get editList => 'Edit list';
 
   @override
