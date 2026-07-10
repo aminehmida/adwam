@@ -2,26 +2,14 @@ import 'package:flutter/material.dart';
 
 import '../l10n/app_localizations.dart';
 import '../models/dhikr.dart';
+import '../theme.dart';
+import 'tier_header.dart' show tierLabel;
 
 const arabicTextStyle = TextStyle(
   fontFamily: 'Amiri',
   fontSize: 24,
   height: 1.9,
 );
-
-// Temporary review aid: surfaces the curation classification on each card
-// so it can be checked against content/REVIEW.md. Remove after review.
-const _formLabelsAr = {
-  DhikrForm.quran: 'قرآن',
-  DhikrForm.short: 'قصير',
-  DhikrForm.long: 'طويل',
-};
-
-const _tierLabelsAr = {
-  BenefitTier.protection: 'حماية',
-  BenefitTier.reward: 'ثواب',
-  BenefitTier.none: 'بدون فضل مأثور',
-};
 
 /// Tap-to-count card. Renders a thin greyed title-only row when [collapsed].
 class DhikrCard extends StatelessWidget {
@@ -46,18 +34,23 @@ class DhikrCard extends StatelessWidget {
   Widget build(BuildContext context) {
     if (collapsed) return _collapsedRow(context);
 
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
+    final colors = Theme.of(context).colorScheme;
+    final accent = tierColor(context, dhikr.tier);
 
     return Card(
-      elevation: done ? 0 : 1,
-      color: done ? colors.surfaceContainerHighest : null,
+      color: done ? colors.primaryContainer.withValues(alpha: .45) : null,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(
+          color: done ? colors.primary.withValues(alpha: .35) : colors.outlineVariant,
+        ),
+      ),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
         onLongPress: onLongPress,
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(18, 18, 18, 12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -66,7 +59,9 @@ class DhikrCard extends StatelessWidget {
                 child: Text(
                   dhikr.arabic,
                   style: arabicTextStyle.copyWith(
-                    color: done ? colors.outline : colors.onSurface,
+                    color: done
+                        ? colors.onSurfaceVariant.withValues(alpha: .75)
+                        : colors.onSurface,
                   ),
                 ),
               ),
@@ -74,8 +69,8 @@ class DhikrCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 _benefitExpander(context),
               ],
-              const SizedBox(height: 8),
-              _counterRow(colors),
+              const SizedBox(height: 10),
+              _counterRow(context, colors, accent),
               const SizedBox(height: 6),
               _reviewInfoRow(colors),
             ],
@@ -90,11 +85,13 @@ class DhikrCard extends StatelessWidget {
     final title = dhikr.arabic.split('\n').first;
     return InkWell(
       onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
         child: Row(
           children: [
-            Icon(Icons.visibility_off_outlined, size: 16, color: colors.outline),
+            Icon(Icons.visibility_off_outlined,
+                size: 15, color: colors.outline),
             const SizedBox(width: 12),
             Expanded(
               child: Directionality(
@@ -127,10 +124,14 @@ class DhikrCard extends StatelessWidget {
           tilePadding: EdgeInsets.zero,
           childrenPadding: const EdgeInsets.only(bottom: 8),
           dense: true,
-          leading: Icon(Icons.auto_awesome, size: 18, color: colors.tertiary),
+          leading: Icon(Icons.auto_awesome, size: 16, color: colors.tertiary),
           title: Text(
             AppLocalizations.of(context)!.virtue,
-            style: TextStyle(fontSize: 14, color: colors.tertiary),
+            style: TextStyle(
+              fontFamily: 'Amiri',
+              fontSize: 15,
+              color: colors.tertiary,
+            ),
           ),
           children: [
             Text(
@@ -155,42 +156,20 @@ class DhikrCard extends StatelessWidget {
     );
   }
 
-  Widget _reviewInfoRow(ColorScheme colors) {
-    final style = TextStyle(fontSize: 11, color: colors.outline);
-    return Row(
-      children: [
-        Text(dhikr.id, style: style.copyWith(fontFamily: 'monospace')),
-        const SizedBox(width: 8),
-        Text('${_formLabelsAr[dhikr.form]} · ${_tierLabelsAr[dhikr.tier]}',
-            style: style),
-        if (dhikr.benefitSource != null) ...[
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              dhikr.benefitSource!,
-              style: style,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              textDirection: TextDirection.rtl,
-            ),
-          ),
-        ],
-      ],
-    );
-  }
-
-  Widget _counterRow(ColorScheme colors) {
+  Widget _counterRow(BuildContext context, ColorScheme colors, Color accent) {
     return Row(
       children: [
         if (done)
-          Icon(Icons.check_circle, color: colors.primary)
+          Icon(Icons.check_circle_rounded, size: 26, color: colors.primary)
         else
           SizedBox(
-            width: 24,
-            height: 24,
+            width: 26,
+            height: 26,
             child: CircularProgressIndicator(
               value: dhikr.repetitions == 0 ? 1 : count / dhikr.repetitions,
               strokeWidth: 3,
+              strokeCap: StrokeCap.round,
+              color: accent,
               backgroundColor: colors.surfaceContainerHighest,
             ),
           ),
@@ -204,6 +183,40 @@ class DhikrCard extends StatelessWidget {
             fontWeight: FontWeight.w600,
           ),
         ),
+        const Spacer(),
+        Container(
+          width: 7,
+          height: 7,
+          decoration: BoxDecoration(color: accent, shape: BoxShape.circle),
+        ),
+        const SizedBox(width: 6),
+        Text(
+          tierLabel(context, dhikr.tier),
+          style: TextStyle(fontSize: 12, color: colors.onSurfaceVariant),
+        ),
+      ],
+    );
+  }
+
+  // Temporary review aid: surfaces the curation id + source on each card so
+  // it can be checked against content/REVIEW.md. Remove after review.
+  Widget _reviewInfoRow(ColorScheme colors) {
+    final style = TextStyle(fontSize: 11, color: colors.outline);
+    return Row(
+      children: [
+        Text(dhikr.id, style: style.copyWith(fontFamily: 'monospace')),
+        if (dhikr.benefitSource != null) ...[
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              dhikr.benefitSource!,
+              style: style,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textDirection: TextDirection.rtl,
+            ),
+          ),
+        ],
       ],
     );
   }

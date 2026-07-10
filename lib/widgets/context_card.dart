@@ -16,6 +16,7 @@ const sessionIcons = {
   SessionType.sleep: Icons.bedtime_outlined,
 };
 
+/// Full-width session card: icon medallion, Arabic title, progress bar.
 class ContextCard extends StatelessWidget {
   final SessionType session;
   final int done;
@@ -34,38 +35,75 @@ class ContextCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final complete = total > 0 && done >= total;
+    final accent = complete ? colors.primary : colors.secondary;
 
     return Card(
-      color: complete ? colors.primaryContainer : null,
+      margin: const EdgeInsets.symmetric(vertical: 7),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(
+          color: complete
+              ? colors.primary.withValues(alpha: .4)
+              : colors.outlineVariant,
+        ),
+      ),
+      color: complete ? colors.primaryContainer.withValues(alpha: .45) : null,
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          padding: const EdgeInsets.all(18),
+          child: Row(
             children: [
-              Icon(
-                complete ? Icons.check_circle : sessionIcons[session],
-                size: 32,
-                color: complete ? colors.primary : colors.onSurfaceVariant,
-              ),
-              const Spacer(),
-              Text(
-                sessionTitlesAr[session]!,
-                style: const TextStyle(
-                  fontFamily: 'Amiri',
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
+              Container(
+                width: 52,
+                height: 52,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: accent.withValues(alpha: .14),
+                  border: Border.all(color: accent.withValues(alpha: .35)),
+                ),
+                child: Icon(
+                  complete ? Icons.check_rounded : sessionIcons[session],
+                  size: 26,
+                  color: accent,
                 ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      sessionTitlesAr[session]!,
+                      style: const TextStyle(
+                        fontFamily: 'Amiri',
+                        fontSize: 21,
+                        fontWeight: FontWeight.w700,
+                        height: 1.3,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: LinearProgressIndicator(
+                        value: total == 0 ? 0 : done / total,
+                        minHeight: 5,
+                        color: accent,
+                        backgroundColor: colors.surfaceContainerHighest,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 16),
               Text(
                 '$done / $total',
                 style: TextStyle(
-                  fontSize: 14,
-                  color: colors.onSurfaceVariant,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                  color: complete ? colors.primary : colors.onSurfaceVariant,
                 ),
               ),
             ],

@@ -8,6 +8,7 @@ import '../state/list_config_controller.dart';
 import '../state/progress_controller.dart';
 import '../widgets/context_card.dart' show sessionTitlesAr;
 import '../widgets/dhikr_card.dart';
+import '../widgets/tier_header.dart';
 import 'edit_session_screen.dart';
 
 class SessionScreen extends StatefulWidget {
@@ -84,28 +85,34 @@ class _SessionScreenState extends State<SessionScreen> {
         ],
       ),
       body: ListView.builder(
-        padding: const EdgeInsets.fromLTRB(12, 8, 12, 32),
+        padding: const EdgeInsets.fromLTRB(14, 4, 14, 32),
         itemCount: dhikrs.length,
         itemBuilder: (context, index) {
           final dhikr = dhikrs[index];
           final hidden = config.isHidden(widget.session, dhikr.id);
+          // Mushaf-style band wherever the benefit tier changes.
+          final newSection =
+              index == 0 || dhikrs[index - 1].tier != dhikr.tier;
+          final card = DhikrCard(
+            dhikr: dhikr,
+            count: progress.countFor(widget.session, dhikr.id),
+            done: progress.isDone(widget.session, dhikr.id),
+            collapsed: hidden,
+            onTap: hidden ? () => _confirmUnhide(dhikr) : () => _onTap(dhikr),
+            onLongPress: hidden
+                ? null
+                : () {
+                    HapticFeedback.mediumImpact();
+                    context
+                        .read<ProgressController>()
+                        .markDone(widget.session, dhikr);
+                  },
+          );
           return KeyedSubtree(
             key: _keyFor(dhikr.id),
-            child: DhikrCard(
-              dhikr: dhikr,
-              count: progress.countFor(widget.session, dhikr.id),
-              done: progress.isDone(widget.session, dhikr.id),
-              collapsed: hidden,
-              onTap: hidden ? () => _confirmUnhide(dhikr) : () => _onTap(dhikr),
-              onLongPress: hidden
-                  ? null
-                  : () {
-                      HapticFeedback.mediumImpact();
-                      context
-                          .read<ProgressController>()
-                          .markDone(widget.session, dhikr);
-                    },
-            ),
+            child: newSection
+                ? Column(children: [TierHeader(tier: dhikr.tier), card])
+                : card,
           );
         },
       ),

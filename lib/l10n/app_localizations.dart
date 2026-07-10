@@ -116,6 +116,24 @@ abstract class AppLocalizations {
   /// **'Virtue'**
   String get virtue;
 
+  /// No description provided for @tierProtection.
+  ///
+  /// In en, this message translates to:
+  /// **'Protection'**
+  String get tierProtection;
+
+  /// No description provided for @tierReward.
+  ///
+  /// In en, this message translates to:
+  /// **'Reward'**
+  String get tierReward;
+
+  /// No description provided for @tierOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other benefits'**
+  String get tierOther;
+
   /// No description provided for @resetOrderTitle.
   ///
   /// In en, this message translates to:

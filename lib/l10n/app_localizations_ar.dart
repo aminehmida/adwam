@@ -18,6 +18,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get virtue => 'الفضل';
 
   @override
+  String get tierProtection => 'الحماية';
+
+  @override
+  String get tierReward => 'الثواب';
+
+  @override
+  String get tierOther => 'فضائل أخرى';
+
+  @override
   String get resetOrderTitle => 'استعادة الترتيب الافتراضي؟';
 
   @override

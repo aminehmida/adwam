@@ -9,6 +9,7 @@ import 'screens/home_screen.dart';
 import 'state/list_config_controller.dart';
 import 'state/progress_controller.dart';
 import 'state/settings_controller.dart';
+import 'theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -71,16 +72,8 @@ class _DhikrAppState extends State<DhikrApp> with WidgetsBindingObserver {
             GlobalCupertinoLocalizations.delegate,
           ],
           supportedLocales: const [Locale('ar'), Locale('en')],
-          theme: ThemeData(
-            colorScheme:
-                ColorScheme.fromSeed(seedColor: const Color(0xFF2E7D64)),
-          ),
-          darkTheme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(
-              seedColor: const Color(0xFF2E7D64),
-              brightness: Brightness.dark,
-            ),
-          ),
+          theme: buildTheme(Brightness.light),
+          darkTheme: buildTheme(Brightness.dark),
           home: const HomeScreen(),
         ),
       ),

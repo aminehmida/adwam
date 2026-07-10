@@ -19,7 +19,7 @@ SRC = ROOT / "content" / "sources"
 
 FORM_ORDER = {"quran": 0, "short": 1, "long": 2}
 TIER_ORDER = {"protection": 0, "reward": 1, "none": 2}
-TIER_AR = {"protection": "حماية", "reward": "ثواب", "none": "—"}
+TIER_AR = {"protection": "حماية", "reward": "ثواب", "none": "فضائل أخرى"}
 FORM_AR = {"quran": "قرآن", "short": "قصير", "long": "طويل"}
 NO_HINT = 1 << 20
 

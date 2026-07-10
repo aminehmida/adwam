@@ -18,6 +18,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get virtue => 'Virtue';
 
   @override
+  String get tierProtection => 'Protection';
+
+  @override
+  String get tierReward => 'Reward';
+
+  @override
+  String get tierOther => 'Other benefits';
+
+  @override
   String get resetOrderTitle => 'Reset to default order?';
 
   @override
