@@ -73,6 +73,17 @@ void main() {
     );
   });
 
+  test('full surahs always last, even with a protection benefit', () {
+    expect(
+      sortedIds([
+        d('surah-mulk', form: DhikrForm.surah, tier: BenefitTier.protection),
+        d('plain-none'),
+        d('long-none', form: DhikrForm.long),
+      ]),
+      ['plain-none', 'long-none', 'surah-mulk'],
+    );
+  });
+
   test('least rule: fewer words first among otherwise equal dhikrs', () {
     expect(
       sortedIds([

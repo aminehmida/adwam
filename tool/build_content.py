@@ -17,11 +17,15 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "content" / "sources"
 
-FORM_ORDER = {"quran": 0, "short": 1, "long": 2}
+FORM_ORDER = {"quran": 0, "short": 1, "long": 2, "surah": 3}
 TIER_ORDER = {"protection": 0, "reward": 1, "none": 2}
 TIER_AR = {"protection": "حماية", "reward": "ثواب", "none": "فضائل أخرى"}
-FORM_AR = {"quran": "قرآن", "short": "قصير", "long": "طويل"}
+FORM_AR = {"quran": "قرآن", "short": "قصير", "long": "طويل", "surah": "سورة كاملة"}
 NO_HINT = 1 << 20
+
+# Cards synthesized from a split source item: shown by surah name, read in
+# full from the mushaf. Their id must have a full entry in curation.json.
+SPLIT = {"sl-110": [("sl-110a", "sleep"), ("sl-110b", "sleep")]}
 
 
 def load(path):
@@ -64,6 +68,22 @@ def build():
         chapter = next(iter(load(SRC / fname).values()))
         for item in chapter:
             did = f"{prefix}-{item['ID']}"
+            if did in SPLIT:
+                for split_id, ctx in SPLIT[did]:
+                    cur = curation[split_id]
+                    dhikrs.append({
+                        "id": split_id,
+                        "contexts": [ctx],
+                        "arabic": cur["arabic"],
+                        "repetitions": cur["repetitions"],
+                        "form": cur["form"],
+                        "benefit_tier": cur["benefit_tier"],
+                        "benefit_text": cur.get("benefit_text"),
+                        "benefit_source": cur.get("benefit_source"),
+                        **({"sort_hint": cur["sort_hint"]}
+                           if "sort_hint" in cur else {}),
+                    })
+                continue
             cur = curation[did]
             dhikrs.append({
                 "id": did,
@@ -88,10 +108,11 @@ def build():
 
 
 def default_sort_key(d):
-    # Quran always first; then benefit tier; then repetitions ascending;
-    # short-before-long at the same count; then cluster hint; least rule:
-    # fewer words first.
-    return (0 if d["form"] == "quran" else 1,
+    # Quran passages always first, full surahs always last; then benefit
+    # tier; then repetitions ascending; short-before-long at the same
+    # count; then cluster hint; least rule: fewer words first.
+    band = {"quran": 0, "surah": 2}.get(d["form"], 1)
+    return (band,
             TIER_ORDER[d["benefit_tier"]],
             d["repetitions"],
             FORM_ORDER[d["form"]],

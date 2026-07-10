@@ -30,6 +30,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get tierOther => 'فضائل أخرى';
 
   @override
+  String get fullSurahs => 'سور كاملة';
+
+  @override
   String get resetOrderTitle => 'استعادة الترتيب الافتراضي؟';
 
   @override

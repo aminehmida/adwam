@@ -140,6 +140,12 @@ abstract class AppLocalizations {
   /// **'Other benefits'**
   String get tierOther;
 
+  /// No description provided for @fullSurahs.
+  ///
+  /// In en, this message translates to:
+  /// **'Full surahs'**
+  String get fullSurahs;
+
   /// No description provided for @resetOrderTitle.
   ///
   /// In en, this message translates to:

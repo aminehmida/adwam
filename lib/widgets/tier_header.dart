@@ -13,23 +13,48 @@ String tierLabel(BuildContext context, BenefitTier tier) {
   };
 }
 
-/// Mushaf-style section band separating the benefit tiers:
-/// ─────── ✦ الحماية ✦ ───────
-class TierHeader extends StatelessWidget {
-  final BenefitTier tier;
+/// Section band for a list run. Tier runs are labeled by tier; the full-surah
+/// band at the end of a session gets its own label.
+Widget sectionBandFor(BuildContext context, Dhikr dhikr) {
+  if (dhikr.form == DhikrForm.surah) {
+    return SectionBand(
+      label: AppLocalizations.of(context)!.fullSurahs,
+      color: Theme.of(context).colorScheme.tertiary,
+    );
+  }
+  return SectionBand(
+    label: tierLabel(context, dhikr.tier),
+    color: tierColor(context, dhikr.tier),
+  );
+}
 
-  const TierHeader({super.key, required this.tier});
+/// Whether a section band belongs above [index] — the start of the list or
+/// any change of tier / full-surah band.
+bool startsSection(List<Dhikr> dhikrs, int index) {
+  if (index == 0) return true;
+  final prev = dhikrs[index - 1];
+  final curr = dhikrs[index];
+  return prev.tier != curr.tier ||
+      (prev.form == DhikrForm.surah) != (curr.form == DhikrForm.surah);
+}
+
+/// Mushaf-style section band: ─────── ✦ الحماية ✦ ───────
+class SectionBand extends StatelessWidget {
+  final String label;
+  final Color color;
+
+  const SectionBand({super.key, required this.label, required this.color});
 
   @override
   Widget build(BuildContext context) {
-    final color = tierColor(context, tier);
-
-    Widget line() => Expanded(
+    Widget line(bool fadeOut) => Expanded(
           child: Container(
             height: 1,
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [color.withValues(alpha: 0), color.withValues(alpha: .5)],
+                colors: fadeOut
+                    ? [color.withValues(alpha: .5), color.withValues(alpha: 0)]
+                    : [color.withValues(alpha: 0), color.withValues(alpha: .5)],
               ),
             ),
           ),
@@ -39,13 +64,13 @@ class TierHeader extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(20, 22, 20, 10),
       child: Row(
         children: [
-          line(),
+          line(false),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),
             child: Text('✦', style: TextStyle(fontSize: 9, color: color)),
           ),
           Text(
-            tierLabel(context, tier),
+            label,
             style: TextStyle(
               fontFamily: 'Amiri',
               fontSize: 18,
@@ -57,19 +82,7 @@ class TierHeader extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 10),
             child: Text('✦', style: TextStyle(fontSize: 9, color: color)),
           ),
-          Expanded(
-            child: Container(
-              height: 1,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    color.withValues(alpha: .5),
-                    color.withValues(alpha: 0),
-                  ],
-                ),
-              ),
-            ),
-          ),
+          line(true),
         ],
       ),
     );

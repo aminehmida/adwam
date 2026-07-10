@@ -1,10 +1,17 @@
-enum DhikrForm { quran, short, long }
+/// `surah` = a full surah referenced by name (e.g. سورة الملك before
+/// sleep), read from the mushaf — always sorted to the end of a session.
+enum DhikrForm { quran, short, long, surah }
 
 enum BenefitTier { protection, reward, none }
 
 enum SessionType { morning, evening, postPrayer, sleep }
 
-const _formNames = {'quran': DhikrForm.quran, 'short': DhikrForm.short, 'long': DhikrForm.long};
+const _formNames = {
+  'quran': DhikrForm.quran,
+  'short': DhikrForm.short,
+  'long': DhikrForm.long,
+  'surah': DhikrForm.surah,
+};
 
 const _tierNames = {
   'protection': BenefitTier.protection,

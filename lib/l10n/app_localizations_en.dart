@@ -30,6 +30,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tierOther => 'Other benefits';
 
   @override
+  String get fullSurahs => 'Full surahs';
+
+  @override
   String get resetOrderTitle => 'Reset to default order?';
 
   @override

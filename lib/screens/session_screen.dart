@@ -122,8 +122,7 @@ class _SessionScreenState extends State<SessionScreen> {
           final dhikr = dhikrs[index];
           final hidden = config.isHidden(widget.session, dhikr.id);
           final peeking = hidden && _peeked.contains(dhikr.id);
-          final newSection =
-              index == 0 || dhikrs[index - 1].tier != dhikr.tier;
+          final newSection = startsSection(dhikrs, index);
           final Widget card;
           if (peeking) {
             // Temporary read-only look at a hidden dhikr; collapses again
@@ -159,7 +158,7 @@ class _SessionScreenState extends State<SessionScreen> {
           return KeyedSubtree(
             key: _keyFor(dhikr.id),
             child: newSection
-                ? Column(children: [TierHeader(tier: dhikr.tier), card])
+                ? Column(children: [sectionBandFor(context, dhikr), card])
                 : card,
           );
         },
@@ -183,7 +182,7 @@ class _SessionScreenState extends State<SessionScreen> {
       itemBuilder: (context, index) {
         final dhikr = dhikrs[index];
         final hidden = config.isHidden(widget.session, dhikr.id);
-        final newSection = index == 0 || dhikrs[index - 1].tier != dhikr.tier;
+        final newSection = startsSection(dhikrs, index);
         final card = Opacity(
           opacity: hidden ? 0.5 : 1,
           child: DhikrCard(
@@ -219,7 +218,7 @@ class _SessionScreenState extends State<SessionScreen> {
         return KeyedSubtree(
           key: ValueKey(dhikr.id),
           child: newSection
-              ? Column(children: [TierHeader(tier: dhikr.tier), card])
+              ? Column(children: [sectionBandFor(context, dhikr), card])
               : card,
         );
       },

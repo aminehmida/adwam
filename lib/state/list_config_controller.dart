@@ -54,13 +54,15 @@ class ListConfigController extends ChangeNotifier {
   /// session's category bands keep meaning something.
   void reorder(SessionType session, int oldIndex, int newIndex) {
     final list = listFor(session);
-    final tier = list[oldIndex].tier;
+    (BenefitTier, bool) sectionOf(Dhikr d) =>
+        (d.tier, d.form == DhikrForm.surah);
+    final section = sectionOf(list[oldIndex]);
     var start = oldIndex;
-    while (start > 0 && list[start - 1].tier == tier) {
+    while (start > 0 && sectionOf(list[start - 1]) == section) {
       start--;
     }
     var end = oldIndex;
-    while (end < list.length - 1 && list[end + 1].tier == tier) {
+    while (end < list.length - 1 && sectionOf(list[end + 1]) == section) {
       end++;
     }
     final ids = list.map((d) => d.id).toList();

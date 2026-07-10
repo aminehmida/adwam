@@ -4,15 +4,22 @@ import 'package:flutter/services.dart' show rootBundle;
 
 import '../models/dhikr.dart';
 
-/// Default sort: Quran always first; then benefit tier (protection, reward,
-/// none); then repetition count ascending; short before long at the same
-/// count; then the curated sort_hint (cluster members share one value, e.g.
-/// the أصبحنا/أمسينا dhikrs, so they stay together ahead of their group);
-/// and as the least rule, fewer words first.
+/// Quran passages pin to the top of a session, full surahs to the bottom.
+int _band(DhikrForm form) => switch (form) {
+      DhikrForm.quran => 0,
+      DhikrForm.surah => 2,
+      _ => 1,
+    };
+
+/// Default sort: Quran passages always first and full surahs always last;
+/// then benefit tier (protection, reward, none); then repetition count
+/// ascending; short before long at the same count; then the curated
+/// sort_hint (cluster members share one value, e.g. the أصبحنا/أمسينا
+/// dhikrs, so they stay together ahead of their group); and as the least
+/// rule, fewer words first.
 int compareDhikrs(Dhikr a, Dhikr b) {
-  final byQuran = (a.form == DhikrForm.quran ? 0 : 1)
-      .compareTo(b.form == DhikrForm.quran ? 0 : 1);
-  if (byQuran != 0) return byQuran;
+  final byBand = _band(a.form).compareTo(_band(b.form));
+  if (byBand != 0) return byBand;
   final byTier = a.tier.index.compareTo(b.tier.index);
   if (byTier != 0) return byTier;
   final byCount = a.repetitions.compareTo(b.repetitions);
