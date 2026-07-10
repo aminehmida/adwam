@@ -6,11 +6,14 @@ per-session customization.
 
 ## Default ordering
 
-Within each session, three-level sort:
+Within each session:
 
-1. **Form**: Quran passages → short dhikrs → long duas
-2. **Benefit tier** from the virtue hadith: protection → reward → other benefit → none
-3. **Repetition count** ascending (1, 3, 4, 7, 10, … 100)
+1. **Quran passages** always first
+2. **Benefit tier** from the virtue hadith: protection → reward → none
+   (a long reward dua outranks every no-benefit dhikr)
+3. **Form**: short dhikrs before long duas
+4. **Repetition count** ascending (1, 3, 4, 7, 10, … 100)
+5. Curated `sort_hint` for manual fine ordering (e.g. the أصبحنا cluster)
 
 Drag-to-reorder and hide (collapse-in-place) override the defaults per session;
 "reset to default order" brings them back.

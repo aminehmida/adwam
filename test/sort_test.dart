@@ -8,6 +8,7 @@ Dhikr d(
   DhikrForm form = DhikrForm.short,
   int reps = 1,
   BenefitTier tier = BenefitTier.none,
+  int hint = noSortHint,
 }) =>
     Dhikr(
       id: id,
@@ -16,54 +17,58 @@ Dhikr d(
       form: form,
       tier: tier,
       contexts: const {SessionType.morning},
+      sortHint: hint,
     );
 
 List<String> sortedIds(List<Dhikr> input) =>
     (input..sort(compareDhikrs)).map((x) => x.id).toList();
 
 void main() {
-  test('form bands: quran before short before long, regardless of reps', () {
+  test('quran always first, even without a benefit hadith', () {
     expect(
       sortedIds([
-        d('long-1x', form: DhikrForm.long, reps: 1),
-        d('short-100x', reps: 100),
-        d('quran-3x', form: DhikrForm.quran, reps: 3),
+        d('short-protection', tier: BenefitTier.protection),
+        d('quran-none', form: DhikrForm.quran, tier: BenefitTier.none),
       ]),
-      ['quran-3x', 'short-100x', 'long-1x'],
+      ['quran-none', 'short-protection'],
     );
   });
 
-  test('within a band, benefit tier first: protection leads even at 100x', () {
+  test('benefit tier outranks the short/long split: '
+      'long reward dua before every no-benefit dhikr', () {
     expect(
       sortedIds([
-        d('none-1x', reps: 1, tier: BenefitTier.none),
-        d('reward-3x', reps: 3, tier: BenefitTier.reward),
-        d('protection-100x', reps: 100, tier: BenefitTier.protection),
-        d('other-1x', reps: 1, tier: BenefitTier.otherBenefit),
+        d('none-short-1x', reps: 1),
+        d('reward-long-1x', form: DhikrForm.long, tier: BenefitTier.reward),
+        d('protection-short-100x', reps: 100, tier: BenefitTier.protection),
+        d('none-long', form: DhikrForm.long),
       ]),
-      ['protection-100x', 'reward-3x', 'other-1x', 'none-1x'],
+      ['protection-short-100x', 'reward-long-1x', 'none-short-1x', 'none-long'],
     );
   });
 
-  test('same band and tier: repetition count ascending', () {
+  test('within a tier: short before long, then repetitions ascending', () {
     expect(
       sortedIds([
-        d('x100', reps: 100),
-        d('x1', reps: 1),
-        d('x7', reps: 7),
-        d('x3', reps: 3),
+        d('long-1x', form: DhikrForm.long, reps: 1, tier: BenefitTier.reward),
+        d('short-x100', reps: 100, tier: BenefitTier.reward),
+        d('short-x1', reps: 1, tier: BenefitTier.reward),
+        d('short-x7', reps: 7, tier: BenefitTier.reward),
       ]),
-      ['x1', 'x3', 'x7', 'x100'],
+      ['short-x1', 'short-x7', 'short-x100', 'long-1x'],
     );
   });
 
-  test('long dua with 3 reps stays in the long band', () {
+  test('sort_hint clusters equal dhikrs, hinted before unhinted', () {
     expect(
       sortedIds([
-        d('long-3x', form: DhikrForm.long, reps: 3, tier: BenefitTier.protection),
-        d('short-100x', reps: 100),
+        d('plain-a'),
+        d('asbahna-3', hint: 3),
+        d('plain-b'),
+        d('asbahna-1', hint: 1),
+        d('asbahna-2', hint: 2),
       ]),
-      ['short-100x', 'long-3x'],
+      ['asbahna-1', 'asbahna-2', 'asbahna-3', 'plain-a', 'plain-b'],
     );
   });
 

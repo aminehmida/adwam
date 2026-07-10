@@ -20,7 +20,6 @@ const _formLabelsAr = {
 const _tierLabelsAr = {
   BenefitTier.protection: 'حماية',
   BenefitTier.reward: 'ثواب',
-  BenefitTier.otherBenefit: 'فضل آخر',
   BenefitTier.none: 'بدون فضل مأثور',
 };
 

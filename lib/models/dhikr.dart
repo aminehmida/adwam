@@ -1,6 +1,6 @@
 enum DhikrForm { quran, short, long }
 
-enum BenefitTier { protection, reward, otherBenefit, none }
+enum BenefitTier { protection, reward, none }
 
 enum SessionType { morning, evening, postPrayer, sleep }
 
@@ -9,9 +9,11 @@ const _formNames = {'quran': DhikrForm.quran, 'short': DhikrForm.short, 'long': 
 const _tierNames = {
   'protection': BenefitTier.protection,
   'reward': BenefitTier.reward,
-  'other_benefit': BenefitTier.otherBenefit,
   'none': BenefitTier.none,
 };
+
+/// Dhikrs without an explicit sort_hint sort after hinted ones.
+const noSortHint = 1 << 20;
 
 const _sessionNames = {
   'morning': SessionType.morning,
@@ -29,6 +31,7 @@ class Dhikr {
   final String? benefit;
   final String? benefitSource;
   final Set<SessionType> contexts;
+  final int sortHint;
 
   const Dhikr({
     required this.id,
@@ -39,6 +42,7 @@ class Dhikr {
     this.benefit,
     this.benefitSource,
     required this.contexts,
+    this.sortHint = noSortHint,
   });
 
   factory Dhikr.fromJson(Map<String, dynamic> json) => Dhikr(
@@ -52,5 +56,6 @@ class Dhikr {
         contexts: (json['contexts'] as List)
             .map((c) => _sessionNames[c]!)
             .toSet(),
+        sortHint: json['sort_hint'] as int? ?? noSortHint,
       );
 }

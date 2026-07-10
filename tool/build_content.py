@@ -18,9 +18,10 @@ ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "content" / "sources"
 
 FORM_ORDER = {"quran": 0, "short": 1, "long": 2}
-TIER_ORDER = {"protection": 0, "reward": 1, "other_benefit": 2, "none": 3}
-TIER_AR = {"protection": "حماية", "reward": "ثواب", "other_benefit": "فضل آخر", "none": "—"}
+TIER_ORDER = {"protection": 0, "reward": 1, "none": 2}
+TIER_AR = {"protection": "حماية", "reward": "ثواب", "none": "—"}
 FORM_AR = {"quran": "قرآن", "short": "قصير", "long": "طويل"}
+NO_HINT = 1 << 20
 
 
 def load(path):
@@ -54,6 +55,7 @@ def build():
             "benefit_tier": cur["benefit_tier"],
             "benefit_text": cur.get("benefit_text_override") or (item.get("fadl") or "").strip() or None,
             "benefit_source": cur.get("benefit_source_override") or (item.get("source") or "").strip() or None,
+            **({"sort_hint": cur["sort_hint"]} if "sort_hint" in cur else {}),
         })
 
     # Post-prayer + sleep (hisnmuslim.com)
@@ -72,6 +74,7 @@ def build():
                 "benefit_tier": cur["benefit_tier"],
                 "benefit_text": cur.get("benefit_text"),
                 "benefit_source": cur.get("benefit_source"),
+                **({"sort_hint": cur["sort_hint"]} if "sort_hint" in cur else {}),
             })
 
     out = {"version": 1, "dhikrs": dhikrs}
@@ -85,7 +88,13 @@ def build():
 
 
 def default_sort_key(d):
-    return (FORM_ORDER[d["form"]], TIER_ORDER[d["benefit_tier"]], d["repetitions"])
+    # Quran always first; then benefit tier dominates the short/long split,
+    # so e.g. a long reward dua outranks every no-benefit dhikr.
+    return (0 if d["form"] == "quran" else 1,
+            TIER_ORDER[d["benefit_tier"]],
+            FORM_ORDER[d["form"]],
+            d["repetitions"],
+            d.get("sort_hint", NO_HINT))
 
 
 def write_review(dhikrs, curation):
@@ -93,7 +102,7 @@ def write_review(dhikrs, curation):
         "# مراجعة تصنيف الأذكار — Content Review",
         "",
         "Draft classification by Claude — **please review**, especially rows with a ملاحظة.",
-        "Sort shown is the app's default order per context: (قرآن → قصير → طويل) → (حماية → ثواب → فضل آخر → بدون) → التكرار تصاعديًا.",
+        "Sort shown is the app's default order per context: القرآن أولًا → (حماية → ثواب → بدون) → (قصير → طويل) → التكرار تصاعديًا → ترتيب يدوي (sort_hint).",
         "",
         "To correct: edit `content/curation.json`, then rerun `python3 tool/build_content.py`.",
         "",
