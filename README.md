@@ -1,17 +1,43 @@
-# dhikr
+# Dhikr — أذكار اليوم والليلة
 
-A new Flutter project.
+Offline daily adhkar app (Flutter, Android). Four sessions — morning, evening,
+post-prayer, before-sleep — with a principled default ordering and full
+per-session customization.
 
-## Getting Started
+## Default ordering
 
-This project is a starting point for a Flutter application.
+Within each session, three-level sort:
 
-A few resources to get you started if this is your first Flutter project:
+1. **Form**: Quran passages → short dhikrs → long duas
+2. **Repetition count** ascending (1, 3, 4, 7, 10, … 100)
+3. **Benefit tier** from the virtue hadith: protection → reward → other benefit → none
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+Drag-to-reorder and hide (collapse-in-place) override the defaults per session;
+"reset to default order" brings them back.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Content
+
+55 adhkar compiled by `tool/build_content.py` into `assets/adhkar.json` from:
+
+- [Seen-Arabic Morning-And-Evening-Adhkar-DB](https://github.com/Seen-Arabic/Morning-And-Evening-Adhkar-DB) (MIT) — morning/evening, incl. virtue text + hadith sources
+- [hisnmuslim.com API](http://www.hisnmuslim.com) — post-prayer (ch. 25) and sleep (ch. 28)
+
+Form and benefit-tier classification lives in `content/curation.json`
+(drafted by Claude, human-reviewed — see `content/REVIEW.md`). To change
+content or classification, edit those inputs and rerun the script.
+
+## Development
+
+Toolchain is pinned via [mise](https://mise.jdx.dev) (`mise.toml`: Java 17,
+Flutter). Android SDK via `brew install --cask android-commandlinetools`
+(`sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0"`).
+
+```sh
+flutter pub get
+flutter test          # sort logic, daily rollover, counting flow
+flutter run           # on a USB device
+flutter build apk --release --split-per-abi
+```
+
+Daily progress persists via shared_preferences and resets at local midnight
+(date-stamp comparison — no timers).
