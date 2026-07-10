@@ -5,6 +5,7 @@ import '../l10n/app_localizations.dart';
 import '../models/dhikr.dart';
 import '../state/list_config_controller.dart';
 import '../widgets/context_card.dart' show sessionTitlesAr;
+import '../widgets/tier_header.dart';
 
 /// Reorder (drag handles) and hide/show dhikrs for one session.
 /// Separate from SessionScreen so drag gestures never fight tap-to-count.
@@ -50,8 +51,9 @@ class EditSessionScreen extends StatelessWidget {
         itemBuilder: (context, index) {
           final dhikr = dhikrs[index];
           final hidden = config.isHidden(session, dhikr.id);
-          return ListTile(
-            key: ValueKey(dhikr.id),
+          final newSection =
+              index == 0 || dhikrs[index - 1].tier != dhikr.tier;
+          final tile = ListTile(
             leading: ReorderableDragStartListener(
               index: index,
               child: const Icon(Icons.drag_handle),
@@ -79,6 +81,12 @@ class EditSessionScreen extends StatelessWidget {
                   .read<ListConfigController>()
                   .setHidden(session, dhikr.id, !hidden),
             ),
+          );
+          return KeyedSubtree(
+            key: ValueKey(dhikr.id),
+            child: newSection
+                ? Column(children: [TierHeader(tier: dhikr.tier), tile])
+                : tile,
           );
         },
       ),
