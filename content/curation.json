@@ -107,12 +107,16 @@
     "benefit_tier": "none"
   },
   "me-23": {
-    "form": "long",
-    "benefit_tier": "none"
+    "form": "short",
+    "benefit_tier": "none",
+    "sort_hint": 1,
+    "note": "ضُمّت إلى مجموعة أصبحنا/أمسينا بطلب أمين (كانت مصنفة طويلة)"
   },
   "me-24": {
-    "form": "long",
-    "benefit_tier": "none"
+    "form": "short",
+    "benefit_tier": "none",
+    "sort_hint": 1,
+    "note": "ضُمّت إلى مجموعة أصبحنا/أمسينا بطلب أمين (كانت مصنفة طويلة)"
   },
   "me-25": {
     "form": "short",
