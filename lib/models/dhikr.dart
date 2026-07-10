@@ -37,6 +37,8 @@ class Dhikr {
   final BenefitTier tier;
   final String? benefit;
   final String? benefitSource;
+  final String? benefitEn;
+  final String? benefitSourceEn;
   final Set<SessionType> contexts;
   final int sortHint;
 
@@ -48,6 +50,8 @@ class Dhikr {
     required this.tier,
     this.benefit,
     this.benefitSource,
+    this.benefitEn,
+    this.benefitSourceEn,
     required this.contexts,
     this.sortHint = noSortHint,
   });
@@ -63,6 +67,8 @@ class Dhikr {
         tier: _tierNames[json['benefit_tier']]!,
         benefit: json['benefit_text'] as String?,
         benefitSource: json['benefit_source'] as String?,
+        benefitEn: json['benefit_text_en'] as String?,
+        benefitSourceEn: json['benefit_source_en'] as String?,
         contexts: (json['contexts'] as List)
             .map((c) => _sessionNames[c]!)
             .toSet(),

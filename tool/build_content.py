@@ -27,6 +27,21 @@ NO_HINT = 1 << 20
 # full from the mushaf. Their id must have a full entry in curation.json.
 SPLIT = {"sl-110": [("sl-110a", "sleep"), ("sl-110b", "sleep")]}
 
+# English rendering of the short hadith citations used for pp-*/sl-* sources,
+# applied when curation carries no explicit benefit_source_en.
+SOURCE_EN = [("البخاري", "Al-Bukhari"), ("مسلم", "Muslim"),
+             ("أبو داود", "Abu Dawud"), ("الترمذي", "At-Tirmidhi"),
+             ("ابن ماجه", "Ibn Majah"), ("النسائي في الكبرى", "An-Nasa'i (Al-Kubra)"),
+             ("صححه الألباني", "graded authentic by Al-Albani"), ("،", ",")]
+
+
+def source_en(ar):
+    if not ar:
+        return None
+    for a, b in SOURCE_EN:
+        ar = ar.replace(a, b)
+    return ar
+
 
 def load(path):
     return json.loads(path.read_text(encoding="utf-8-sig"))
@@ -45,11 +60,14 @@ def build():
                 if not k.startswith("_")}
     dhikrs = []
 
-    # Morning/evening (Seen-Arabic)
+    # Morning/evening (Seen-Arabic); en.json carries the translated virtues.
     type_contexts = {0: ["morning", "evening"], 1: ["morning"], 2: ["evening"]}
+    en_by_order = {x["order"]: x for x in load(SRC / "seen_arabic_en.json")}
     for item in load(SRC / "seen_arabic_ar.json"):
         did = f"me-{item['order']:02d}"
         cur = curation[did]
+        en = en_by_order.get(item["order"], {})
+        benefit = cur.get("benefit_text_override") or (item.get("fadl") or "").strip() or None
         dhikrs.append({
             "id": did,
             "contexts": type_contexts[item["type"]],
@@ -57,8 +75,12 @@ def build():
             "repetitions": item["count"],
             "form": cur["form"],
             "benefit_tier": cur["benefit_tier"],
-            "benefit_text": cur.get("benefit_text_override") or (item.get("fadl") or "").strip() or None,
+            "benefit_text": benefit,
             "benefit_source": cur.get("benefit_source_override") or (item.get("source") or "").strip() or None,
+            "benefit_text_en": (cur.get("benefit_text_override_en")
+                                or ((en.get("fadl") or "").strip() or None if benefit else None)),
+            "benefit_source_en": (cur.get("benefit_source_override_en")
+                                  or (en.get("source") or "").strip() or None),
             **({"sort_hint": cur["sort_hint"]} if "sort_hint" in cur else {}),
         })
 
@@ -71,31 +93,11 @@ def build():
             if did in SPLIT:
                 for split_id, ctx in SPLIT[did]:
                     cur = curation[split_id]
-                    dhikrs.append({
-                        "id": split_id,
-                        "contexts": [ctx],
-                        "arabic": cur["arabic"],
-                        "repetitions": cur["repetitions"],
-                        "form": cur["form"],
-                        "benefit_tier": cur["benefit_tier"],
-                        "benefit_text": cur.get("benefit_text"),
-                        "benefit_source": cur.get("benefit_source"),
-                        **({"sort_hint": cur["sort_hint"]}
-                           if "sort_hint" in cur else {}),
-                    })
+                    dhikrs.append(_hisn_entry(split_id, [ctx], cur["arabic"], cur))
                 continue
             cur = curation[did]
-            dhikrs.append({
-                "id": did,
-                "contexts": [context],
-                "arabic": clean_hisn(item["ARABIC_TEXT"]),
-                "repetitions": cur["repetitions"],
-                "form": cur["form"],
-                "benefit_tier": cur["benefit_tier"],
-                "benefit_text": cur.get("benefit_text"),
-                "benefit_source": cur.get("benefit_source"),
-                **({"sort_hint": cur["sort_hint"]} if "sort_hint" in cur else {}),
-            })
+            dhikrs.append(_hisn_entry(
+                did, [context], clean_hisn(item["ARABIC_TEXT"]), cur))
 
     out = {"version": 1, "dhikrs": dhikrs}
     assets = ROOT / "assets"
@@ -105,6 +107,23 @@ def build():
 
     write_review(dhikrs, curation)
     print(f"Wrote {len(dhikrs)} dhikrs -> assets/adhkar.json + content/REVIEW.md")
+
+
+def _hisn_entry(did, contexts, arabic, cur):
+    return {
+        "id": did,
+        "contexts": contexts,
+        "arabic": arabic,
+        "repetitions": cur["repetitions"],
+        "form": cur["form"],
+        "benefit_tier": cur["benefit_tier"],
+        "benefit_text": cur.get("benefit_text"),
+        "benefit_source": cur.get("benefit_source"),
+        "benefit_text_en": cur.get("benefit_text_en"),
+        "benefit_source_en": (cur.get("benefit_source_en")
+                              or source_en(cur.get("benefit_source"))),
+        **({"sort_hint": cur["sort_hint"]} if "sort_hint" in cur else {}),
+    }
 
 
 def default_sort_key(d):

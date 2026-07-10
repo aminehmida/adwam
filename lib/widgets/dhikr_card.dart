@@ -125,10 +125,20 @@ class DhikrCard extends StatelessWidget {
 
   Widget _benefitExpander(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    // Virtue text follows the UI language (falling back to Arabic when no
+    // translation exists); the dhikr text itself always stays Arabic.
+    final arabicUi = Localizations.localeOf(context).languageCode == 'ar';
+    final text =
+        arabicUi ? dhikr.benefit! : (dhikr.benefitEn ?? dhikr.benefit!);
+    final source = arabicUi
+        ? dhikr.benefitSource
+        : (dhikr.benefitSourceEn ?? dhikr.benefitSource);
+    final showingArabic = arabicUi || dhikr.benefitEn == null;
     return Theme(
       data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
       child: Directionality(
-        textDirection: TextDirection.rtl,
+        textDirection:
+            showingArabic ? TextDirection.rtl : TextDirection.ltr,
         child: ExpansionTile(
           tilePadding: EdgeInsets.zero,
           childrenPadding: const EdgeInsets.only(bottom: 8),
@@ -144,18 +154,24 @@ class DhikrCard extends StatelessWidget {
           ),
           children: [
             Text(
-              dhikr.benefit!,
-              style: TextStyle(
-                fontFamily: 'Amiri',
-                fontSize: 17,
-                height: 1.7,
-                color: colors.onSurfaceVariant,
-              ),
+              text,
+              style: showingArabic
+                  ? TextStyle(
+                      fontFamily: 'Amiri',
+                      fontSize: 17,
+                      height: 1.7,
+                      color: colors.onSurfaceVariant,
+                    )
+                  : TextStyle(
+                      fontSize: 14.5,
+                      height: 1.5,
+                      color: colors.onSurfaceVariant,
+                    ),
             ),
-            if (dhikr.benefitSource != null) ...[
+            if (source != null) ...[
               const SizedBox(height: 4),
               Text(
-                dhikr.benefitSource!,
+                source,
                 style: TextStyle(fontSize: 12, color: colors.outline),
               ),
             ],

@@ -152,7 +152,9 @@
     "benefit_tier": "reward",
     "benefit_text_override": "كلمات تَعدل ساعات من الذكر: سبحان الله وبحمده عدد خلقه ورضا نفسه وزنة عرشه ومداد كلماته (حديث جويرية رضي الله عنها)",
     "benefit_source_override": "مسلم 2726",
-    "note": "قاعدة البيانات لا تذكر الفضل؛ أضفته من حديث جويرية — راجِع"
+    "note": "قاعدة البيانات لا تذكر الفضل؛ أضفته من حديث جويرية — راجِع",
+    "benefit_text_override_en": "Words that outweigh hours of remembrance: 'How perfect is Allah and praise be to Him: as numerous as His creation, as He is pleased, as weighty as His Throne, and as extensive as His words' (the hadith of Juwayriyyah, may Allah be pleased with her).",
+    "benefit_source_override_en": "Muslim 2726"
   },
   "me-32": {
     "form": "short",
@@ -193,7 +195,8 @@
     "benefit_tier": "reward",
     "benefit_text": "من سبّح الله دبر كل صلاة ثلاثًا وثلاثين، وحمد الله ثلاثًا وثلاثين، وكبّر الله ثلاثًا وثلاثين، وقال تمام المائة: لا إله إلا الله وحده لا شريك له... غُفرت خطاياه وإن كانت مثل زبد البحر",
     "benefit_source": "مسلم 597",
-    "note": "33 تسبيحة + 33 تحميدة + 33 تكبيرة + 1 تهليلة = 100 نقرة"
+    "note": "33 تسبيحة + 33 تحميدة + 33 تكبيرة + 1 تهليلة = 100 نقرة",
+    "benefit_text_en": "Whoever glorifies Allah thirty-three times after every prayer, praises Him thirty-three times, magnifies Him thirty-three times, and completes the hundred with 'La ilaha illallah, wahdahu la sharika lah...' — his sins are forgiven even if they are like the foam of the sea."
   },
   "pp-70": {
     "form": "quran",
@@ -207,7 +210,9 @@
     "repetitions": 1,
     "benefit_tier": "reward",
     "benefit_text": "من قرأ آية الكرسي دبر كل صلاة مكتوبة لم يمنعه من دخول الجنة إلا أن يموت",
-    "benefit_source": "النسائي في الكبرى 9848، صححه الألباني"
+    "benefit_source": "النسائي في الكبرى 9848، صححه الألباني",
+    "benefit_text_en": "Whoever recites Ayat al-Kursi after every obligatory prayer, nothing stands between him and entering Paradise except death.",
+    "benefit_source_en": "An-Nasa'i (Al-Kubra) 9848; graded authentic by Al-Albani"
   },
   "pp-72": {
     "form": "short",
@@ -215,7 +220,8 @@
     "benefit_tier": "protection",
     "benefit_text": "عشر مرات بعد المغرب والصبح: كُتب له بكل واحدة عشر حسنات ومُحي عنه عشر سيئات ورُفع له عشر درجات وكانت حرسًا له من الشيطان",
     "benefit_source": "الترمذي 3474",
-    "note": "فيها ثواب + حرز من الشيطان — صنّفتها حماية؛ راجِع"
+    "note": "فيها ثواب + حرز من الشيطان — صنّفتها حماية؛ راجِع",
+    "benefit_text_en": "Said ten times after Maghrib and after Fajr: ten good deeds are recorded for each, ten sins erased, ten degrees raised — and it is a guard against Shaytan."
   },
   "pp-73": {
     "form": "short",
@@ -230,21 +236,24 @@
     "benefit_tier": "protection",
     "benefit_text": "كان النبي ﷺ إذا أوى إلى فراشه كل ليلة جمع كفيه ثم نفث فيهما فقرأ فيهما الإخلاص والمعوذتين ثم يمسح بهما ما استطاع من جسده — رقية النوم",
     "benefit_source": "البخاري 5017",
-    "note": "الحديث وصفٌ لفعل النبي ﷺ لا وعد صريح — صنّفتها حماية لكونها رقية؛ راجِع"
+    "note": "الحديث وصفٌ لفعل النبي ﷺ لا وعد صريح — صنّفتها حماية لكونها رقية؛ راجِع",
+    "benefit_text_en": "Every night at bedtime the Prophet ﷺ would cup his hands, blow into them, recite al-Ikhlas, al-Falaq and an-Nas, then wipe with them over his body — the bedtime ruqyah."
   },
   "sl-100": {
     "form": "quran",
     "repetitions": 1,
     "benefit_tier": "protection",
     "benefit_text": "من قرأها إذا أوى إلى فراشه لن يزال عليه من الله حافظ ولا يقربه شيطان حتى يصبح",
-    "benefit_source": "البخاري 2311"
+    "benefit_source": "البخاري 2311",
+    "benefit_text_en": "Whoever recites it when going to bed, a guardian from Allah remains over him and no shaytan comes near him until morning."
   },
   "sl-101": {
     "form": "quran",
     "repetitions": 1,
     "benefit_tier": "protection",
     "benefit_text": "من قرأ بالآيتين من آخر سورة البقرة في ليلة كفتاه",
-    "benefit_source": "البخاري 5009، مسلم 807"
+    "benefit_source": "البخاري 5009، مسلم 807",
+    "benefit_text_en": "Whoever recites the last two verses of Surat al-Baqarah in a night, they suffice him."
   },
   "sl-102": {
     "form": "short",
@@ -276,7 +285,8 @@
     "benefit_tier": "reward",
     "benefit_text": "أوصى بها النبي ﷺ فاطمة وعليًا رضي الله عنهما عند النوم وقال: فهو خير لكما من خادم",
     "benefit_source": "البخاري 3705، مسلم 2727",
-    "note": "33 تسبيحة + 33 تحميدة + 34 تكبيرة = 100 نقرة؛ خير لكما من خادم — ثواب"
+    "note": "33 تسبيحة + 33 تحميدة + 34 تكبيرة = 100 نقرة؛ خير لكما من خادم — ثواب",
+    "benefit_text_en": "The Prophet ﷺ recommended it to Fatimah and Ali (may Allah be pleased with them) at bedtime, saying: it is better for you than a servant."
   },
   "sl-107": {
     "form": "long",
@@ -303,7 +313,8 @@
     "repetitions": 1,
     "benefit_tier": "reward",
     "benefit_text": "اجعلهن آخر ما تقول، فإن متَّ من ليلتك متَّ على الفطرة",
-    "benefit_source": "البخاري 247، مسلم 2710"
+    "benefit_source": "البخاري 247، مسلم 2710",
+    "benefit_text_en": "The Prophet ﷺ said: make these words the last thing you say — for if you die that night, you die upon the fitrah (natural state of faith)."
   },
   "sl-110a": {
     "arabic": "سورة السجدة",
@@ -313,7 +324,8 @@
     "sort_hint": 1,
     "benefit_text": "كان النبي ﷺ لا ينام حتى يقرأ الم تنزيل السجدة وتبارك الذي بيده الملك",
     "benefit_source": "الترمذي 2892",
-    "note": "قُسمت بطاقة sl-110 إلى سورتين كاملتين تُعرضان بالاسم في آخر القائمة"
+    "note": "قُسمت بطاقة sl-110 إلى سورتين كاملتين تُعرضان بالاسم في آخر القائمة",
+    "benefit_text_en": "The Prophet ﷺ would not sleep until he recited Alif Lam Mim Tanzil (as-Sajdah) and Tabarak alladhi biyadihil-mulk (al-Mulk)."
   },
   "sl-110b": {
     "arabic": "سورة الملك",
@@ -323,6 +335,7 @@
     "sort_hint": 2,
     "benefit_text": "كان النبي ﷺ لا ينام حتى يقرأ الم تنزيل السجدة وتبارك الذي بيده الملك؛ وسورة الملك هي المانعة تشفع لصاحبها حتى يُغفر له وتنجيه من عذاب القبر",
     "benefit_source": "الترمذي 2892، 2890",
-    "note": "قُسمت بطاقة sl-110 إلى سورتين كاملتين تُعرضان بالاسم في آخر القائمة"
+    "note": "قُسمت بطاقة sl-110 إلى سورتين كاملتين تُعرضان بالاسم في آخر القائمة",
+    "benefit_text_en": "The Prophet ﷺ would not sleep until he recited as-Sajdah and al-Mulk; Surat al-Mulk is the Preventer — it intercedes for its companion until he is forgiven, and saves from the punishment of the grave."
   }
 }

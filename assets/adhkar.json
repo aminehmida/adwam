@@ -12,7 +12,9 @@
       "form": "short",
       "benefit_tier": "none",
       "benefit_text": "استحباب ابتداء الدعاء بالحمد لله -تعالى- والثناء، ثم الصلاة على رسول الله ﷺ",
-      "benefit_source": "عن أنس يرفعه: ((لأن أقعد مع قوم يذكرون اللَّه تعالى من صلاة الغداة حتى تطلع الشمس أحبُّ إليَّ من أن أُعتق أربعة من ولد إسماعيل، ولأن أقعد مع قوم يذكرون اللَّه من صلاة العصر إلى أن تغرب الشمس أحبّ إليَّ من أن أعتق أربعة)). أبو داود، برقم 3667، وحسنه الألباني، في صحيح أبي داود، 2/698 ."
+      "benefit_source": "عن أنس يرفعه: ((لأن أقعد مع قوم يذكرون اللَّه تعالى من صلاة الغداة حتى تطلع الشمس أحبُّ إليَّ من أن أُعتق أربعة من ولد إسماعيل، ولأن أقعد مع قوم يذكرون اللَّه من صلاة العصر إلى أن تغرب الشمس أحبّ إليَّ من أن أعتق أربعة)). أبو داود، برقم 3667، وحسنه الألباني، في صحيح أبي داود، 2/698 .",
+      "benefit_text_en": "The recommendation to begin supplication with praise to Allah the Exalted and extolling Him, followed by prayers upon the Messenger of Allah ﷺ.",
+      "benefit_source_en": "Anas (RA) said that he heard the Prophet (ﷺ) say: \"That I sit with people remembering Almighty Allah from the morning (Fajr) prayer until sunrise is more beloved to me than freeing four slaves from among the Children of Isma'il. That I sit with people remembering Allah from the afternoon ('Asr) prayer, until the sun sets, is more beloved to me than freeing four slaves from among the Children of Isma'il.\"This was reported by Abu Dawud (No. 3667). Al-Albani graded it good in Sahih Abu Dawud 2/698."
     },
     {
       "id": "me-02",
@@ -25,7 +27,9 @@
       "form": "quran",
       "benefit_tier": "protection",
       "benefit_text": "[سورة البقرة، الآية: 255] من قالها حين يصبح أُجير من الجن حتى يمسي، ومن قالها حين يمسي أُجير منهم حتى يصبح",
-      "benefit_source": "أخرجه الحاكم، 1/562، وصححه الألباني في صحيح الترغيب والترهيب، 1/273، وعزاه إلى النسائي، والطبراني، وقال: ((إسناد الطبراني جيد))."
+      "benefit_source": "أخرجه الحاكم، 1/562، وصححه الألباني في صحيح الترغيب والترهيب، 1/273، وعزاه إلى النسائي، والطبراني، وقال: ((إسناد الطبراني جيد)).",
+      "benefit_text_en": "(Ayat al-Kursi; Al-Qur'an 2:255) Whoever says this when he rises in the morning will be protected from jinns until he retires in the evening, and whoever says it when retiring in the evening will be protected from them until he rises in the morning.",
+      "benefit_source_en": "It was reported by Al-Hakim 1 / 562, Al-Albani graded it as authentic in Sahihut-Targhib wat-Tarhib 1/273, and traces it to An-Nasa'i and At-Tabarani. He says that At-Tabarani's chain of transmission is reliable (Jayyid)."
     },
     {
       "id": "me-03",
@@ -37,7 +41,9 @@
       "form": "quran",
       "benefit_tier": "protection",
       "benefit_text": "من قرأ آيتين من آخر سورة البقرة في ليلة كفتاه.",
-      "benefit_source": "أخرجه البخاري (4008)، ومسلم (807)."
+      "benefit_source": "أخرجه البخاري (4008)، ومسلم (807).",
+      "benefit_text_en": "Al-Baqarah 2:285-6. These two Verses will be sufficient for anyone who recites them at night before sleeping.",
+      "benefit_source_en": "It was narrated by Al-Bukhari, No. 4008, and Muslim, No. 807."
     },
     {
       "id": "me-04",
@@ -51,6 +57,8 @@
       "benefit_tier": "protection",
       "benefit_text": "من قالها ثلاث مرات حين يصبح وحين يمسي كفته من كل شيء",
       "benefit_source": "أخرجه أبو داود، 4/ 322، برقم 5082، والترمذي، 5/ 567، برقم 3575، وانظر: صحيح الترمذي، 3/182.",
+      "benefit_text_en": "Al-Ikhlas 112:1-4, Al-Falaq 113:1-5, An-Nas 114:1-6. Whoever recites these three times in the morning and in the evening, they will suffice him (as a protection) against everything.",
+      "benefit_source_en": "The Hadith was reported by Abu Dawud 4/322, and At-Tirmidhi 5/567. See Al-Albani's Sahih At-Tirmidhi 3/182.",
       "sort_hint": 1
     },
     {
@@ -65,6 +73,8 @@
       "benefit_tier": "protection",
       "benefit_text": "من قالها ثلاث مرات حين يصبح وحين يمسي كفته من كل شيء",
       "benefit_source": "أخرجه أبو داود، 4/ 322، برقم 5082، والترمذي، 5/ 567، برقم 3575، وانظر: صحيح الترمذي، 3/182.",
+      "benefit_text_en": "Al-Ikhlas 112:1-4, Al-Falaq 113:1-5, An-Nas 114:1-6. Whoever recites these three times in the morning and in the evening, they will suffice him (as a protection) against everything.",
+      "benefit_source_en": "The Hadith was reported by Abu Dawud 4/322, and At-Tirmidhi 5/567. See Al-Albani's Sahih At-Tirmidhi 3/182.",
       "sort_hint": 2
     },
     {
@@ -79,6 +89,8 @@
       "benefit_tier": "protection",
       "benefit_text": "من قالها ثلاث مرات حين يصبح وحين يمسي كفته من كل شيء",
       "benefit_source": "أخرجه أبو داود، 4/ 322، برقم 5082، والترمذي، 5/ 567، برقم 3575، وانظر: صحيح الترمذي، 3/182.",
+      "benefit_text_en": "Al-Ikhlas 112:1-4, Al-Falaq 113:1-5, An-Nas 114:1-6. Whoever recites these three times in the morning and in the evening, they will suffice him (as a protection) against everything.",
+      "benefit_source_en": "The Hadith was reported by Abu Dawud 4/322, and At-Tirmidhi 5/567. See Al-Albani's Sahih At-Tirmidhi 3/182.",
       "sort_hint": 3
     },
     {
@@ -92,6 +104,8 @@
       "benefit_tier": "none",
       "benefit_text": null,
       "benefit_source": "مسلم، 4/ 2088، برقم 2723.",
+      "benefit_text_en": null,
+      "benefit_source_en": "Muslim, 4/2088, No. 2723.",
       "sort_hint": 1
     },
     {
@@ -105,6 +119,8 @@
       "benefit_tier": "none",
       "benefit_text": null,
       "benefit_source": "مسلم، 4/ 2088، برقم 2723.",
+      "benefit_text_en": null,
+      "benefit_source_en": "Muslim, 4/2088, No. 2723.",
       "sort_hint": 1
     },
     {
@@ -118,6 +134,8 @@
       "benefit_tier": "none",
       "benefit_text": null,
       "benefit_source": "الترمذي، 5/ 466، برقم 3391، وانظر: صحيح الترمذي 3/142.",
+      "benefit_text_en": null,
+      "benefit_source_en": "Al-Tirmidhi, 5/466, No. 3391, and see: Sahih Al-Tirmidhi 3/142.",
       "sort_hint": 1
     },
     {
@@ -131,6 +149,8 @@
       "benefit_tier": "none",
       "benefit_text": null,
       "benefit_source": "الترمذي، 5/ 466، برقم 3391، وانظر: صحيح الترمذي 3/142.",
+      "benefit_text_en": null,
+      "benefit_source_en": "Al-Tirmidhi, 5/466, No. 3391, and see: Sahih Al-Tirmidhi 3/142.",
       "sort_hint": 1
     },
     {
@@ -144,7 +164,9 @@
       "form": "long",
       "benefit_tier": "reward",
       "benefit_text": "وَمَنْ قَالَهَا مِنَ النَّهَارِ مُوقِنًا بِهَا، فَمَاتَ مِنْ يَوْمِهِ قَبْلَ أَنْ يُمْسِيَ، فَهُوَ مِنْ أَهْلِ الْجَنَّةِ، وَمَنْ قَالَهَا مِنَ اللَّيْلِ وَهُوَ مُوقِنٌ بِهَا، فَمَاتَ قَبْلَ أَنْ يُصْبِحَ، فَهُوَ مِنْ أَهْلِ الْجَنَّةِ",
-      "benefit_source": "أخرجه البخاري، 7/ 150، برقم 6306."
+      "benefit_source": "أخرجه البخاري، 7/ 150، برقم 6306.",
+      "benefit_text_en": "Whoever recites this with conviction in the evening and dies during that night shall enter Paradise, and whoever recites it with conviction in the morning and dies during that day shall enter Paradise",
+      "benefit_source_en": "Narrated by Al-Bukhari, 7/150, No. 6306."
     },
     {
       "id": "me-12",
@@ -156,7 +178,9 @@
       "form": "short",
       "benefit_tier": "reward",
       "benefit_text": "من قالها حين يصبح، أو يمسي أربع مرات، أعتقه اللَّه من النار",
-      "benefit_source": "أخرجه أبو داود، 4/ 317، برقم 5069، والبخاري في الأدب المفرد، برقم 1201، والنسائي في عمل اليوم والليلة، برقم 9، وابن السني، برقم 70، وحسّن سماحة الشيخ ابن باز ‘ إسناد النسائي، وأبي داود، في تحفة الأخيار، ص23."
+      "benefit_source": "أخرجه أبو داود، 4/ 317، برقم 5069، والبخاري في الأدب المفرد، برقم 1201، والنسائي في عمل اليوم والليلة، برقم 9، وابن السني، برقم 70، وحسّن سماحة الشيخ ابن باز ‘ إسناد النسائي، وأبي داود، في تحفة الأخيار، ص23.",
+      "benefit_text_en": "Allah will spare whoever says this four times in the morning or evening from the fire of Hell.",
+      "benefit_source_en": "It was narrated by Abu Dawood, 4/317, No. 5069, and by Al-Bukhari in Al-Adab Al-Mufrad, No. 1201, and by Al-Nasa'i in 'Amal Al-Yawm wal-Laylah, No. 9, and by Ibn Al-Sunni, No. 70. Sheikh Ibn Baz classified the isnad of Al-Nasa'i and Abu Dawood as hasan in Tuhfat Al-Akhyar, p. 23."
     },
     {
       "id": "me-13",
@@ -168,7 +192,9 @@
       "form": "short",
       "benefit_tier": "reward",
       "benefit_text": "من قالها حين يصبح، أو يمسي أربع مرات، أعتقه اللَّه من النار",
-      "benefit_source": "أخرجه أبو داود، 4/ 317، برقم 5069، والبخاري في الأدب المفرد، برقم 1201، والنسائي في عمل اليوم والليلة، برقم 9، وابن السني، برقم 70، وحسّن سماحة الشيخ ابن باز ‘ إسناد النسائي، وأبي داود، في تحفة الأخيار، ص23."
+      "benefit_source": "أخرجه أبو داود، 4/ 317، برقم 5069، والبخاري في الأدب المفرد، برقم 1201، والنسائي في عمل اليوم والليلة، برقم 9، وابن السني، برقم 70، وحسّن سماحة الشيخ ابن باز ‘ إسناد النسائي، وأبي داود، في تحفة الأخيار، ص23.",
+      "benefit_text_en": "Allah will spare whoever says this four times in the morning or evening from the fire of Hell.",
+      "benefit_source_en": "It was narrated by Abu Dawood, 4/317, No. 5069, and by Al-Bukhari in Al-Adab Al-Mufrad, No. 1201, and by Al-Nasa'i in 'Amal Al-Yawm wal-Laylah, No. 9, and by Ibn Al-Sunni, No. 70. Sheikh Ibn Baz classified the isnad of Al-Nasa'i and Abu Dawood as hasan in Tuhfat Al-Akhyar, p. 23."
     },
     {
       "id": "me-14",
@@ -180,7 +206,9 @@
       "form": "short",
       "benefit_tier": "reward",
       "benefit_text": "من قالها حين يصبح فقد أدَّى شكر يومه، ومن قالها حين يمسي فقد أدَّى شكر ليلته",
-      "benefit_source": "أخرجه أبو داود، 4/ 318، برقم 5073، والنسائي في عمل اليوم والليلة، برقم 7، وابن السني، برقم 41، وابن حبان، ((موارد)) برقم 2361، وحسّن ابن باز ‘ إسناده في تحفة الأخيار، ص24."
+      "benefit_source": "أخرجه أبو داود، 4/ 318، برقم 5073، والنسائي في عمل اليوم والليلة، برقم 7، وابن السني، برقم 41، وابن حبان، ((موارد)) برقم 2361، وحسّن ابن باز ‘ إسناده في تحفة الأخيار، ص24.",
+      "benefit_text_en": "Whoever recites this in the morning, has completed his obligation to thank Allah for that day; and whoever says it in the evening, has completed his obligation for that night.",
+      "benefit_source_en": "It was narrated by Abu Dawood, 4/318, No. 5073, and by Al-Nasa'i in 'Amal Al-Yawm wal-Laylah, No. 7, and by Ibn Al-Sunni, No. 41, and by Ibn Hibban in Mawarid, No. 2361. Sheikh Ibn Baz classified the isnad as hasan in Tuhfat Al-Akhyar, p. 24."
     },
     {
       "id": "me-15",
@@ -192,7 +220,9 @@
       "form": "short",
       "benefit_tier": "reward",
       "benefit_text": "من قالها حين يصبح فقد أدَّى شكر يومه، ومن قالها حين يمسي فقد أدَّى شكر ليلته",
-      "benefit_source": "أخرجه أبو داود، 4/ 318، برقم 5073، والنسائي في عمل اليوم والليلة، برقم 7، وابن السني، برقم 41، وابن حبان، ((موارد)) برقم 2361، وحسّن ابن باز ‘ إسناده في تحفة الأخيار، ص24."
+      "benefit_source": "أخرجه أبو داود، 4/ 318، برقم 5073، والنسائي في عمل اليوم والليلة، برقم 7، وابن السني، برقم 41، وابن حبان، ((موارد)) برقم 2361، وحسّن ابن باز ‘ إسناده في تحفة الأخيار، ص24.",
+      "benefit_text_en": "Whoever recites this in the morning, has completed his obligation to thank Allah for that day; and whoever says it in the evening, has completed his obligation for that night.",
+      "benefit_source_en": "It was narrated by Abu Dawood, 4/318, No. 5073, and by Al-Nasa'i in 'Amal Al-Yawm wal-Laylah, No. 7, and by Ibn Al-Sunni, No. 41, and by Ibn Hibban in Mawarid, No. 2361. Sheikh Ibn Baz classified the isnad as hasan in Tuhfat Al-Akhyar, p. 24."
     },
     {
       "id": "me-16",
@@ -205,7 +235,9 @@
       "form": "short",
       "benefit_tier": "none",
       "benefit_text": null,
-      "benefit_source": "أبو داود، 4/ 324، برقم 5090، وأحمد، 5/ 42، برقم 20430، والنسائي في عمل اليوم والليلة، برقم 22، وابن السني، برقم 69، والبخاري في الأدب المفرد، برقم 701، وحسّن العلامة ابن باز ‘ إسناده في تحفة الأخيار، ص26."
+      "benefit_source": "أبو داود، 4/ 324، برقم 5090، وأحمد، 5/ 42، برقم 20430، والنسائي في عمل اليوم والليلة، برقم 22، وابن السني، برقم 69، والبخاري في الأدب المفرد، برقم 701، وحسّن العلامة ابن باز ‘ إسناده في تحفة الأخيار، ص26.",
+      "benefit_text_en": null,
+      "benefit_source_en": "Abu Dawud 4/324, Ahmad 5/42, An-Nasa'i, 'Amalul-Yawm wal-Laylah (No. 22), Ibn As-Sunni (No. 69), Al-Bukhari Al-'Adab Al-Mufrad. Its chain of transmission is good (Hasan), Ibn Baz, p. 26."
     },
     {
       "id": "me-17",
@@ -218,7 +250,9 @@
       "form": "short",
       "benefit_tier": "protection",
       "benefit_text": "من قالها حين يصبح وحين يمسي سبع مرات كفاه اللَّه ما أهمّه من أمر الدنيا والآخرة",
-      "benefit_source": "أخرجه ابن السني، برقم 71 مرفوعاً، وأبو داود موقوفاً، 4/ 321، برقم 5081، وصحّح إسناده شعيب وعبدالقادر الأرناؤوط. انظر: زاد المعاد 2/376."
+      "benefit_source": "أخرجه ابن السني، برقم 71 مرفوعاً، وأبو داود موقوفاً، 4/ 321، برقم 5081، وصحّح إسناده شعيب وعبدالقادر الأرناؤوط. انظر: زاد المعاد 2/376.",
+      "benefit_text_en": "Allah will grant whoever recites this seven times in the morning or evening whatever he desires from this world or the next",
+      "benefit_source_en": "It was narrated by Ibn As-Sunni, No. 71, attributed directly to the Prophet (Marfu'), and by Abu Dawud as a statement of a Companion (Mawquf), 4/321, No. 5081. The chain of transmission was authenticated by Shu'ayb and 'Abd al-Qadir al-Arna'ut. See: Zad Al-Ma'ad 2/376."
     },
     {
       "id": "me-18",
@@ -231,7 +265,9 @@
       "form": "long",
       "benefit_tier": "none",
       "benefit_text": null,
-      "benefit_source": "أبو داود، برقم 5074، وابن ماجه، برقم 3871، وانظر: صحيح ابن ماجه، 2/332."
+      "benefit_source": "أبو داود، برقم 5074، وابن ماجه، برقم 3871، وانظر: صحيح ابن ماجه، 2/332.",
+      "benefit_text_en": null,
+      "benefit_source_en": "Abu Dawood, No. 5074, and Ibn Majah, No. 3871. See: Sahih Ibn Majah, 2/332."
     },
     {
       "id": "me-19",
@@ -244,7 +280,9 @@
       "form": "long",
       "benefit_tier": "none",
       "benefit_text": null,
-      "benefit_source": "الترمذي، برقم 3392، وأبو داود، برقم 5067،. وانظر: صحيح الترمذي، 3/142."
+      "benefit_source": "الترمذي، برقم 3392، وأبو داود، برقم 5067،. وانظر: صحيح الترمذي، 3/142.",
+      "benefit_text_en": null,
+      "benefit_source_en": "Al-Tirmidhi, No. 3392, and Abu Dawood, No. 5067. See: Sahih Al-Tirmidhi, 3/142."
     },
     {
       "id": "me-20",
@@ -257,7 +295,9 @@
       "form": "short",
       "benefit_tier": "protection",
       "benefit_text": "من قالها ثلاثاً إذا أصبح، وثلاثاً إذا أمسى لم يضره شيء",
-      "benefit_source": "أخرجه أبو داود، 4/ 323، برقم، 5088، والترمذي، 5/ 465، برقم 3388، وابن ماجه، برقم 3869، وأحمد، برقم 446. وانظر: صحيح ابن ماجه، 2/332، وحسّن إسناده العلامة ابن باز ‘ في تحفة الأخيار، ص39."
+      "benefit_source": "أخرجه أبو داود، 4/ 323، برقم، 5088، والترمذي، 5/ 465، برقم 3388، وابن ماجه، برقم 3869، وأحمد، برقم 446. وانظر: صحيح ابن ماجه، 2/332، وحسّن إسناده العلامة ابن باز ‘ في تحفة الأخيار، ص39.",
+      "benefit_text_en": "Whoever recites it three times in the morning will not be afflicted by any calamity before evening, and whoever recites it three times in the evening will not be overtaken by any calamity before morning.",
+      "benefit_source_en": "It was narrated by Abu Dawood, 4/323, No. 5088, Al-Tirmidhi, 5/465, No. 3388, Ibn Majah, No. 3869, and Ahmad, No. 446. See: Sahih Ibn Majah, 2/332. Sheikh Ibn Baz classified the isnad as hasan in Tuhfat Al-Akhyar, p. 39."
     },
     {
       "id": "me-21",
@@ -270,7 +310,9 @@
       "form": "short",
       "benefit_tier": "reward",
       "benefit_text": "من قالها ثلاثاً حين يصبح وثلاثاً حين يمسي كان حقاً على اللَّه أن يرضيه يوم القيامة",
-      "benefit_source": "أحمد، 4/ 337، برقم 18967، والنسائي في عمل اليوم والليلة، برقم 4، وابن السني، برقم 68، وأبو داود، 4/ 318، برقم 1531، والترمذي، 5/ 465، برقم، 3389، وحسّنه ابن باز ‘ في تحفة الأخيار ص39."
+      "benefit_source": "أحمد، 4/ 337، برقم 18967، والنسائي في عمل اليوم والليلة، برقم 4، وابن السني، برقم 68، وأبو داود، 4/ 318، برقم 1531، والترمذي، 5/ 465، برقم، 3389، وحسّنه ابن باز ‘ في تحفة الأخيار ص39.",
+      "benefit_text_en": "Allah has promised that anyone who says this three times every morning or evening will be pleased on the Day of Resurrection.",
+      "benefit_source_en": "Ahmad, 4/337, No. 18967, Al-Nasa'i in 'Amal Al-Yawm wal-Laylah, No. 4, Ibn Al-Sunni, No. 68, Abu Dawood, 4/318, No. 1531, and Al-Tirmidhi, 5/465, No. 3389. Sheikh Ibn Baz classified it as hasan in Tuhfat Al-Akhyar, p. 39."
     },
     {
       "id": "me-22",
@@ -283,7 +325,9 @@
       "form": "short",
       "benefit_tier": "none",
       "benefit_text": null,
-      "benefit_source": "الحاكم وصححه، ووافقه الذهبي، 1/545، وانظر: صحيح الترغيب والترهيب، 1/273."
+      "benefit_source": "الحاكم وصححه، ووافقه الذهبي، 1/545، وانظر: صحيح الترغيب والترهيب، 1/273.",
+      "benefit_text_en": null,
+      "benefit_source_en": "Its chain of transmission is sound (Sahih), Al-Hakim 1/545, see Albani, Sahihut-Targhib wat-Tarhib, 1/273."
     },
     {
       "id": "me-23",
@@ -296,6 +340,8 @@
       "benefit_tier": "none",
       "benefit_text": null,
       "benefit_source": "أبو داود، 4/ 322، برقم 5084، وحسن إسناده شعيب وعبد القادر الأرناؤوط في تحقيق زاد المعاد، 2/373.",
+      "benefit_text_en": null,
+      "benefit_source_en": "Abu Dawud 4/322. Its transmission chain is good (Hasan). See also Ibn Al-Qayyim, Zadul- Ma'ad 2/273.",
       "sort_hint": 1
     },
     {
@@ -309,6 +355,8 @@
       "benefit_tier": "none",
       "benefit_text": null,
       "benefit_source": "أبو داود، 4/ 322، برقم 5084، وحسن إسناده شعيب وعبد القادر الأرناؤوط في تحقيق زاد المعاد، 2/373.",
+      "benefit_text_en": null,
+      "benefit_source_en": "Abu Dawud 4/322. Its transmission chain is good (Hasan). See also Ibn Al-Qayyim, Zadul- Ma'ad 2/273.",
       "sort_hint": 1
     },
     {
@@ -322,6 +370,8 @@
       "benefit_tier": "none",
       "benefit_text": null,
       "benefit_source": "أحمد، 3/ 406، و407، برقم 15360، ورقم 15563، وابن السني في عمل اليوم والليلة، برقم 34، وانظر: صحيح الجامع، 4/209.",
+      "benefit_text_en": null,
+      "benefit_source_en": "Ahmad, 3/406 and 407, nos. 15360 and 15563, and Ibn Al-Sunni in 'Amal Al-Yawm wal-Laylah, No. 34. See: Sahih Al-Jami', 4/209.",
       "sort_hint": 1
     },
     {
@@ -335,6 +385,8 @@
       "benefit_tier": "none",
       "benefit_text": null,
       "benefit_source": "أحمد، 3/ 406، و407، برقم 15360، ورقم 15563، وابن السني في عمل اليوم والليلة، برقم 34، وانظر: صحيح الجامع، 4/209.",
+      "benefit_text_en": null,
+      "benefit_source_en": "Ahmad, 3/406 and 407, nos. 15360 and 15563, and Ibn Al-Sunni in 'Amal Al-Yawm wal-Laylah, No. 34. See: Sahih Al-Jami', 4/209.",
       "sort_hint": 1
     },
     {
@@ -347,7 +399,9 @@
       "form": "short",
       "benefit_tier": "none",
       "benefit_text": null,
-      "benefit_source": "أخرجه ابن السني في ((عمل اليوم والليلة)) برقم (54)، وابن ماجة برقم (925)، وحسن إسناده عبدالقادر وشعيب الأرناؤوط، في تحقيق ((زاد المعاد)) (2/375)."
+      "benefit_source": "أخرجه ابن السني في ((عمل اليوم والليلة)) برقم (54)، وابن ماجة برقم (925)، وحسن إسناده عبدالقادر وشعيب الأرناؤوط، في تحقيق ((زاد المعاد)) (2/375).",
+      "benefit_text_en": null,
+      "benefit_source_en": "It was narrated by Ibn Al-Sunni in 'Amal Al-Yawm wal-Laylah, No. 54, and by Ibn Majah, No. 925. The chain of transmission was classified as hasan by 'Abd al-Qadir and Shu'ayb al-Arna'ut in their verification of Zad Al-Ma'ad, 2/375."
     },
     {
       "id": "me-28",
@@ -360,7 +414,9 @@
       "form": "short",
       "benefit_tier": "reward",
       "benefit_text": "عشرَ مرَّات أَوْ مرَّةً واحدةً عندَ الكَسَلِ، ومن قالها عَشْرَ مِرَارٍ كَانَ كَمَنْ أَعْتَقَ أَرْبَعَةَ أَنْفُسٍ مِنْ وَلَدِ إِسْمَاعِيلَ.",
-      "benefit_source": "صحيح البخاري: 6404، صحيح مسلم: 2693، النسائي في عمل اليوم والليلة، برقم 24، وانظر: صحيح الترغيب والترهيب، 1/272، وتحفة الأخيار لابن باز ‘، ص44، وانظر فضلها في: ص146، حديث، رقم 255 مرَّةً واحدةً عندَ الكَسَلِ: أبو داود، برقم 5077، وابن ماجه، برقم 3798، وأحمد، برقم 8719، وانظر: صحيح الترغيب والترهيب، 1/270، وصحيح أبي داود، 3/957، وصحيح ابن ماجه، 2/331، وزاد المعاد، 2/377."
+      "benefit_source": "صحيح البخاري: 6404، صحيح مسلم: 2693، النسائي في عمل اليوم والليلة، برقم 24، وانظر: صحيح الترغيب والترهيب، 1/272، وتحفة الأخيار لابن باز ‘، ص44، وانظر فضلها في: ص146، حديث، رقم 255 مرَّةً واحدةً عندَ الكَسَلِ: أبو داود، برقم 5077، وابن ماجه، برقم 3798، وأحمد، برقم 8719، وانظر: صحيح الترغيب والترهيب، 1/270، وصحيح أبي داود، 3/957، وصحيح ابن ماجه، 2/331، وزاد المعاد، 2/377.",
+      "benefit_text_en": "Ten times or once when feeling lazy, and whoever says it ten times, it is as if he has freed four souls from the descendants of Isma'il.",
+      "benefit_source_en": "Sahih Al-Bukhari: 6404, Sahih Muslim: 2693, Al-Nasa'i in 'Amal Al-Yawm wal-Laylah, No. 24. See: Sahih Al-Targhib wal-Tarhib, 1/272, Tuhfat Al-Akhyar by Ibn Baz, p. 44, and its virtue in: p. 146, hadith No. 255. Once when feeling lazy: Abu Dawood, No. 5077, Ibn Majah, No. 3798, Ahmad, No. 8719. See: Sahih Al-Targhib wal-Tarhib, 1/270, Sahih Abi Dawood, 3/957, Sahih Ibn Majah, 2/331, and Zad Al-Ma'ad, 2/377."
     },
     {
       "id": "me-29",
@@ -373,7 +429,9 @@
       "form": "short",
       "benefit_tier": "reward",
       "benefit_text": "من صلّى عليَّ حين يصبح عشراً، وحين يمسي عشراً، أدركته شفاعتي يوم القيامة",
-      "benefit_source": "أخرجه الطبراني بإسنادين أحدهما جيد، انظر: مجمع الزوائد (10/120)، وصحيح الترغيب والترهيب (1/273) [برقم (656)]، وضعيف الترغيب والترهيب برقم: 396. وفي السلسلة الضعيفة برقم: 5788."
+      "benefit_source": "أخرجه الطبراني بإسنادين أحدهما جيد، انظر: مجمع الزوائد (10/120)، وصحيح الترغيب والترهيب (1/273) [برقم (656)]، وضعيف الترغيب والترهيب برقم: 396. وفي السلسلة الضعيفة برقم: 5788.",
+      "benefit_text_en": "The Prophet (ﷺ) said: \"Who recites blessings upon me ten times in the morning and ten times in the evening will obtain my intercession on the Day of Resurrection.",
+      "benefit_source_en": "It was narrated by Al-Tabarani with two isnads, one of which is good. See: Majma' Al-Zawa'id, 10/120, and Sahih Al-Targhib wal-Tarhib, 1/273 [No. 656], and Da'if Al-Targhib wal-Tarhib, No. 396, and in Al-Silsilah Al-Da'ifah, No. 5788."
     },
     {
       "id": "me-30",
@@ -385,7 +443,9 @@
       "form": "short",
       "benefit_tier": "protection",
       "benefit_text": "من قالها حين يمسي ثلاث مرات لم تضرّه حُمَة تلك الليلة",
-      "benefit_source": "، أخرجه أحمد، 2/ 290، برقم 7898، والنسائي في عمل اليوم والليلة، برقم 590، وابن السني، برقم 68، وانظر: صحيح الترمذي، 3/187، وصحيح ابن ماجه، 2/266، وتحفة الأخيار لابن باز، ص45."
+      "benefit_source": "، أخرجه أحمد، 2/ 290، برقم 7898، والنسائي في عمل اليوم والليلة، برقم 590، وابن السني، برقم 68، وانظر: صحيح الترمذي، 3/187، وصحيح ابن ماجه، 2/266، وتحفة الأخيار لابن باز، ص45.",
+      "benefit_text_en": "Whoever recites this three times in the evening will be protected from insect stings",
+      "benefit_source_en": "Ahmad 2/ 290, An-Nasa'i, 'Amalul-Yawm wal-Laylah No. 590, At-Tirmidhi 3/187, Ibn As-Sunni No. 68. According to Al-Albani, Ibn Majah's (2/266) chain of transmission is sound (Sahih), and following Ibn Baz 45, At-Tirmidhi's report is good (Hasan)."
     },
     {
       "id": "me-31",
@@ -397,7 +457,9 @@
       "form": "short",
       "benefit_tier": "reward",
       "benefit_text": "كلمات تَعدل ساعات من الذكر: سبحان الله وبحمده عدد خلقه ورضا نفسه وزنة عرشه ومداد كلماته (حديث جويرية رضي الله عنها)",
-      "benefit_source": "مسلم 2726"
+      "benefit_source": "مسلم 2726",
+      "benefit_text_en": "Words that outweigh hours of remembrance: 'How perfect is Allah and praise be to Him: as numerous as His creation, as He is pleased, as weighty as His Throne, and as extensive as His words' (the hadith of Juwayriyyah, may Allah be pleased with her).",
+      "benefit_source_en": "Muslim 2726"
     },
     {
       "id": "me-32",
@@ -409,7 +471,9 @@
       "form": "short",
       "benefit_tier": "protection",
       "benefit_text": "من قالها مائة مرة في يوم كانت له عدل عشر رقاب، وكُتِبَ له مائة حسنة، ومُحيت عنه مائة سيئة، وكانت له حرزاً من الشيطان يومه ذلك حتى يمسي، ولم يأت أحد بأفضل مما جاء به إلا أحد عمل أكثر من ذلك",
-      "benefit_source": "البخاري، 4/ 95، برقم 3293، ومسلم، 4/ 2071، برقم 2691\nعشرَ مرَّات: النسائي في عمل اليوم والليلة، برقم 24، وانظر: صحيح الترغيب والترهيب، 1/272، وتحفة الأخيار لابن باز ‘، ص44، وانظر فضلها في: ص146، حديث، رقم 255 مرَّةً واحدةً عندَ الكَسَلِ: أبو داود، برقم 5077، وابن ماجه، برقم 3798، وأحمد، برقم 8719، وانظر: صحيح الترغيب والترهيب، 1/270، وصحيح أبي داود، 3/957، وصحيح ابن ماجه، 2/331، وزاد المعاد، 2/377."
+      "benefit_source": "البخاري، 4/ 95، برقم 3293، ومسلم، 4/ 2071، برقم 2691\nعشرَ مرَّات: النسائي في عمل اليوم والليلة، برقم 24، وانظر: صحيح الترغيب والترهيب، 1/272، وتحفة الأخيار لابن باز ‘، ص44، وانظر فضلها في: ص146، حديث، رقم 255 مرَّةً واحدةً عندَ الكَسَلِ: أبو داود، برقم 5077، وابن ماجه، برقم 3798، وأحمد، برقم 8719، وانظر: صحيح الترغيب والترهيب، 1/270، وصحيح أبي داود، 3/957، وصحيح ابن ماجه، 2/331، وزاد المعاد، 2/377.",
+      "benefit_text_en": "Whoever recites this one hundred times a day will have the reward of freeing ten slaves. One hundred Hasanaat (rewards) will be written for him and one hundred misdeeds will be washed away. He will be shielded from Satan until the evening. No one will be able to present anything better than this except for someone who has recited more than this.",
+      "benefit_source_en": "Al-Bukhari, 4/95, No. 3293, and Muslim, 4/2071, No. 2691. Ten times: Al-Nasa'i in 'Amal Al-Yawm wal-Laylah, No. 24. See: Sahih Al-Targhib wal-Tarhib, 1/272, and Tuhfat Al-Akhyar by Ibn Baz, p. 44, and its virtue in: p. 146, hadith No. 255. Once when feeling lazy: Abu Dawood, No. 5077, Ibn Majah, No. 3798, Ahmad, No. 8719. See: Sahih Al-Targhib wal-Tarhib, 1/270, Sahih Abi Dawood, 3/957, Sahih Ibn Majah, 2/331, and Zad Al-Ma'ad, 2/377."
     },
     {
       "id": "me-33",
@@ -421,7 +485,9 @@
       "form": "short",
       "benefit_tier": "none",
       "benefit_text": null,
-      "benefit_source": "البخاري مع ((الفتح)) (11/101) [برقم (6307)]، ومسلم (4/2075) [برقم (2702)]."
+      "benefit_source": "البخاري مع ((الفتح)) (11/101) [برقم (6307)]، ومسلم (4/2075) [برقم (2702)].",
+      "benefit_text_en": null,
+      "benefit_source_en": "Al-Bukhari with Al-Fath, 11/101 [No. 6307], and Muslim, 4/2075 [No. 2702]."
     },
     {
       "id": "me-34",
@@ -434,7 +500,9 @@
       "form": "short",
       "benefit_tier": "reward",
       "benefit_text": "من قالها مائة مرة حين يصبح وحين يمسي لم يأت أحد يوم القيامة بأفضل مما جاء به إلا أحد قال مثل ما قال أو زاد عليه",
-      "benefit_source": "مسلم، 4/ 2071 برقم 2692."
+      "benefit_source": "مسلم، 4/ 2071 برقم 2692.",
+      "benefit_text_en": "Whoever recites this one hundred times in the morning and in the evening will not be surpassed on the Day of Resurrection by anyone having done better than this except for someone who had recited it more.",
+      "benefit_source_en": "Muslim 2692."
     },
     {
       "id": "pp-66",
@@ -446,7 +514,9 @@
       "form": "short",
       "benefit_tier": "none",
       "benefit_text": null,
-      "benefit_source": "مسلم 591"
+      "benefit_source": "مسلم 591",
+      "benefit_text_en": null,
+      "benefit_source_en": "Muslim 591"
     },
     {
       "id": "pp-67",
@@ -458,7 +528,9 @@
       "form": "short",
       "benefit_tier": "none",
       "benefit_text": null,
-      "benefit_source": "البخاري 844، مسلم 593"
+      "benefit_source": "البخاري 844، مسلم 593",
+      "benefit_text_en": null,
+      "benefit_source_en": "Al-Bukhari 844, Muslim 593"
     },
     {
       "id": "pp-68",
@@ -470,7 +542,9 @@
       "form": "short",
       "benefit_tier": "none",
       "benefit_text": null,
-      "benefit_source": "مسلم 594"
+      "benefit_source": "مسلم 594",
+      "benefit_text_en": null,
+      "benefit_source_en": "Muslim 594"
     },
     {
       "id": "pp-69",
@@ -482,7 +556,9 @@
       "form": "short",
       "benefit_tier": "reward",
       "benefit_text": "من سبّح الله دبر كل صلاة ثلاثًا وثلاثين، وحمد الله ثلاثًا وثلاثين، وكبّر الله ثلاثًا وثلاثين، وقال تمام المائة: لا إله إلا الله وحده لا شريك له... غُفرت خطاياه وإن كانت مثل زبد البحر",
-      "benefit_source": "مسلم 597"
+      "benefit_source": "مسلم 597",
+      "benefit_text_en": "Whoever glorifies Allah thirty-three times after every prayer, praises Him thirty-three times, magnifies Him thirty-three times, and completes the hundred with 'La ilaha illallah, wahdahu la sharika lah...' — his sins are forgiven even if they are like the foam of the sea.",
+      "benefit_source_en": "Muslim 597"
     },
     {
       "id": "pp-70",
@@ -494,7 +570,9 @@
       "form": "quran",
       "benefit_tier": "none",
       "benefit_text": null,
-      "benefit_source": "أبو داود 1523"
+      "benefit_source": "أبو داود 1523",
+      "benefit_text_en": null,
+      "benefit_source_en": "Abu Dawud 1523"
     },
     {
       "id": "pp-71",
@@ -506,7 +584,9 @@
       "form": "quran",
       "benefit_tier": "reward",
       "benefit_text": "من قرأ آية الكرسي دبر كل صلاة مكتوبة لم يمنعه من دخول الجنة إلا أن يموت",
-      "benefit_source": "النسائي في الكبرى 9848، صححه الألباني"
+      "benefit_source": "النسائي في الكبرى 9848، صححه الألباني",
+      "benefit_text_en": "Whoever recites Ayat al-Kursi after every obligatory prayer, nothing stands between him and entering Paradise except death.",
+      "benefit_source_en": "An-Nasa'i (Al-Kubra) 9848; graded authentic by Al-Albani"
     },
     {
       "id": "pp-72",
@@ -518,7 +598,9 @@
       "form": "short",
       "benefit_tier": "protection",
       "benefit_text": "عشر مرات بعد المغرب والصبح: كُتب له بكل واحدة عشر حسنات ومُحي عنه عشر سيئات ورُفع له عشر درجات وكانت حرسًا له من الشيطان",
-      "benefit_source": "الترمذي 3474"
+      "benefit_source": "الترمذي 3474",
+      "benefit_text_en": "Said ten times after Maghrib and after Fajr: ten good deeds are recorded for each, ten sins erased, ten degrees raised — and it is a guard against Shaytan.",
+      "benefit_source_en": "At-Tirmidhi 3474"
     },
     {
       "id": "pp-73",
@@ -530,7 +612,9 @@
       "form": "short",
       "benefit_tier": "none",
       "benefit_text": null,
-      "benefit_source": "ابن ماجه 925"
+      "benefit_source": "ابن ماجه 925",
+      "benefit_text_en": null,
+      "benefit_source_en": "Ibn Majah 925"
     },
     {
       "id": "sl-99",
@@ -542,7 +626,9 @@
       "form": "quran",
       "benefit_tier": "protection",
       "benefit_text": "كان النبي ﷺ إذا أوى إلى فراشه كل ليلة جمع كفيه ثم نفث فيهما فقرأ فيهما الإخلاص والمعوذتين ثم يمسح بهما ما استطاع من جسده — رقية النوم",
-      "benefit_source": "البخاري 5017"
+      "benefit_source": "البخاري 5017",
+      "benefit_text_en": "Every night at bedtime the Prophet ﷺ would cup his hands, blow into them, recite al-Ikhlas, al-Falaq and an-Nas, then wipe with them over his body — the bedtime ruqyah.",
+      "benefit_source_en": "Al-Bukhari 5017"
     },
     {
       "id": "sl-100",
@@ -554,7 +640,9 @@
       "form": "quran",
       "benefit_tier": "protection",
       "benefit_text": "من قرأها إذا أوى إلى فراشه لن يزال عليه من الله حافظ ولا يقربه شيطان حتى يصبح",
-      "benefit_source": "البخاري 2311"
+      "benefit_source": "البخاري 2311",
+      "benefit_text_en": "Whoever recites it when going to bed, a guardian from Allah remains over him and no shaytan comes near him until morning.",
+      "benefit_source_en": "Al-Bukhari 2311"
     },
     {
       "id": "sl-101",
@@ -566,7 +654,9 @@
       "form": "quran",
       "benefit_tier": "protection",
       "benefit_text": "من قرأ بالآيتين من آخر سورة البقرة في ليلة كفتاه",
-      "benefit_source": "البخاري 5009، مسلم 807"
+      "benefit_source": "البخاري 5009، مسلم 807",
+      "benefit_text_en": "Whoever recites the last two verses of Surat al-Baqarah in a night, they suffice him.",
+      "benefit_source_en": "Al-Bukhari 5009, Muslim 807"
     },
     {
       "id": "sl-102",
@@ -578,7 +668,9 @@
       "form": "short",
       "benefit_tier": "none",
       "benefit_text": null,
-      "benefit_source": "البخاري 6320، مسلم 2714"
+      "benefit_source": "البخاري 6320، مسلم 2714",
+      "benefit_text_en": null,
+      "benefit_source_en": "Al-Bukhari 6320, Muslim 2714"
     },
     {
       "id": "sl-103",
@@ -590,7 +682,9 @@
       "form": "short",
       "benefit_tier": "none",
       "benefit_text": null,
-      "benefit_source": "مسلم 2712"
+      "benefit_source": "مسلم 2712",
+      "benefit_text_en": null,
+      "benefit_source_en": "Muslim 2712"
     },
     {
       "id": "sl-104",
@@ -602,7 +696,9 @@
       "form": "short",
       "benefit_tier": "none",
       "benefit_text": null,
-      "benefit_source": "أبو داود 5045"
+      "benefit_source": "أبو داود 5045",
+      "benefit_text_en": null,
+      "benefit_source_en": "Abu Dawud 5045"
     },
     {
       "id": "sl-105",
@@ -614,7 +710,9 @@
       "form": "short",
       "benefit_tier": "none",
       "benefit_text": null,
-      "benefit_source": "البخاري 6324"
+      "benefit_source": "البخاري 6324",
+      "benefit_text_en": null,
+      "benefit_source_en": "Al-Bukhari 6324"
     },
     {
       "id": "sl-106",
@@ -626,7 +724,9 @@
       "form": "short",
       "benefit_tier": "reward",
       "benefit_text": "أوصى بها النبي ﷺ فاطمة وعليًا رضي الله عنهما عند النوم وقال: فهو خير لكما من خادم",
-      "benefit_source": "البخاري 3705، مسلم 2727"
+      "benefit_source": "البخاري 3705، مسلم 2727",
+      "benefit_text_en": "The Prophet ﷺ recommended it to Fatimah and Ali (may Allah be pleased with them) at bedtime, saying: it is better for you than a servant.",
+      "benefit_source_en": "Al-Bukhari 3705, Muslim 2727"
     },
     {
       "id": "sl-107",
@@ -638,7 +738,9 @@
       "form": "long",
       "benefit_tier": "none",
       "benefit_text": null,
-      "benefit_source": "مسلم 2713"
+      "benefit_source": "مسلم 2713",
+      "benefit_text_en": null,
+      "benefit_source_en": "Muslim 2713"
     },
     {
       "id": "sl-108",
@@ -650,7 +752,9 @@
       "form": "short",
       "benefit_tier": "none",
       "benefit_text": null,
-      "benefit_source": "مسلم 2715"
+      "benefit_source": "مسلم 2715",
+      "benefit_text_en": null,
+      "benefit_source_en": "Muslim 2715"
     },
     {
       "id": "sl-109",
@@ -662,7 +766,9 @@
       "form": "long",
       "benefit_tier": "none",
       "benefit_text": null,
-      "benefit_source": "أبو داود 5067، الترمذي 3392"
+      "benefit_source": "أبو داود 5067، الترمذي 3392",
+      "benefit_text_en": null,
+      "benefit_source_en": "Abu Dawud 5067, At-Tirmidhi 3392"
     },
     {
       "id": "sl-110a",
@@ -675,6 +781,8 @@
       "benefit_tier": "protection",
       "benefit_text": "كان النبي ﷺ لا ينام حتى يقرأ الم تنزيل السجدة وتبارك الذي بيده الملك",
       "benefit_source": "الترمذي 2892",
+      "benefit_text_en": "The Prophet ﷺ would not sleep until he recited Alif Lam Mim Tanzil (as-Sajdah) and Tabarak alladhi biyadihil-mulk (al-Mulk).",
+      "benefit_source_en": "At-Tirmidhi 2892",
       "sort_hint": 1
     },
     {
@@ -688,6 +796,8 @@
       "benefit_tier": "protection",
       "benefit_text": "كان النبي ﷺ لا ينام حتى يقرأ الم تنزيل السجدة وتبارك الذي بيده الملك؛ وسورة الملك هي المانعة تشفع لصاحبها حتى يُغفر له وتنجيه من عذاب القبر",
       "benefit_source": "الترمذي 2892، 2890",
+      "benefit_text_en": "The Prophet ﷺ would not sleep until he recited as-Sajdah and al-Mulk; Surat al-Mulk is the Preventer — it intercedes for its companion until he is forgiven, and saves from the punishment of the grave.",
+      "benefit_source_en": "At-Tirmidhi 2892, 2890",
       "sort_hint": 2
     },
     {
@@ -700,7 +810,9 @@
       "form": "long",
       "benefit_tier": "reward",
       "benefit_text": "اجعلهن آخر ما تقول، فإن متَّ من ليلتك متَّ على الفطرة",
-      "benefit_source": "البخاري 247، مسلم 2710"
+      "benefit_source": "البخاري 247، مسلم 2710",
+      "benefit_text_en": "The Prophet ﷺ said: make these words the last thing you say — for if you die that night, you die upon the fitrah (natural state of faith).",
+      "benefit_source_en": "Al-Bukhari 247, Muslim 2710"
     }
   ]
 }
