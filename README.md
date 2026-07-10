@@ -11,8 +11,8 @@ Within each session:
 1. **Quran passages** always first
 2. **Benefit tier** from the virtue hadith: protection → reward → none
    (a long reward dua outranks every no-benefit dhikr)
-3. **Form**: short dhikrs before long duas
-4. **Repetition count** ascending (1, 3, 4, 7, 10, … 100)
+3. **Repetition count** ascending (1, 3, 4, 7, 10, … 100)
+4. **Form**: short before long, breaking ties at the same count
 5. Curated `sort_hint` for manual fine ordering (e.g. the أصبحنا cluster)
 
 Drag-to-reorder and hide (collapse-in-place) override the defaults per session;

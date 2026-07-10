@@ -88,12 +88,12 @@ def build():
 
 
 def default_sort_key(d):
-    # Quran always first; then benefit tier dominates the short/long split,
-    # so e.g. a long reward dua outranks every no-benefit dhikr.
+    # Quran always first; then benefit tier; then repetitions ascending;
+    # short-before-long only breaks ties at the same count.
     return (0 if d["form"] == "quran" else 1,
             TIER_ORDER[d["benefit_tier"]],
-            FORM_ORDER[d["form"]],
             d["repetitions"],
+            FORM_ORDER[d["form"]],
             d.get("sort_hint", NO_HINT))
 
 

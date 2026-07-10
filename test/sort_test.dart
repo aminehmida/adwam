@@ -47,7 +47,8 @@ void main() {
     );
   });
 
-  test('within a tier: short before long, then repetitions ascending', () {
+  test('within a tier: repetitions ascending, short breaks same-count ties',
+      () {
     expect(
       sortedIds([
         d('long-1x', form: DhikrForm.long, reps: 1, tier: BenefitTier.reward),
@@ -55,7 +56,7 @@ void main() {
         d('short-x1', reps: 1, tier: BenefitTier.reward),
         d('short-x7', reps: 7, tier: BenefitTier.reward),
       ]),
-      ['short-x1', 'short-x7', 'short-x100', 'long-1x'],
+      ['short-x1', 'long-1x', 'short-x7', 'short-x100'],
     );
   });
 
