@@ -33,7 +33,19 @@ void main() {
     );
   });
 
-  test('within a band, repetition count ascending', () {
+  test('within a band, benefit tier first: protection leads even at 100x', () {
+    expect(
+      sortedIds([
+        d('none-1x', reps: 1, tier: BenefitTier.none),
+        d('reward-3x', reps: 3, tier: BenefitTier.reward),
+        d('protection-100x', reps: 100, tier: BenefitTier.protection),
+        d('other-1x', reps: 1, tier: BenefitTier.otherBenefit),
+      ]),
+      ['protection-100x', 'reward-3x', 'other-1x', 'none-1x'],
+    );
+  });
+
+  test('same band and tier: repetition count ascending', () {
     expect(
       sortedIds([
         d('x100', reps: 100),
@@ -42,18 +54,6 @@ void main() {
         d('x3', reps: 3),
       ]),
       ['x1', 'x3', 'x7', 'x100'],
-    );
-  });
-
-  test('same band and count: benefit tier breaks the tie', () {
-    expect(
-      sortedIds([
-        d('none', tier: BenefitTier.none),
-        d('reward', tier: BenefitTier.reward),
-        d('protection', tier: BenefitTier.protection),
-        d('other', tier: BenefitTier.otherBenefit),
-      ]),
-      ['protection', 'reward', 'other', 'none'],
     );
   });
 

@@ -4,15 +4,16 @@ import 'package:flutter/services.dart' show rootBundle;
 
 import '../models/dhikr.dart';
 
-/// Default sort: form band (quran, short, long), then repetition count
-/// ascending, then benefit tier (protection, reward, other benefit, none).
-/// Enum declaration order encodes both rankings, so `.index` is the key.
+/// Default sort: form band (quran, short, long), then benefit tier
+/// (protection, reward, other benefit, none), then repetition count
+/// ascending. Enum declaration order encodes both rankings, so `.index`
+/// is the key.
 int compareDhikrs(Dhikr a, Dhikr b) {
   final byForm = a.form.index.compareTo(b.form.index);
   if (byForm != 0) return byForm;
-  final byCount = a.repetitions.compareTo(b.repetitions);
-  if (byCount != 0) return byCount;
-  return a.tier.index.compareTo(b.tier.index);
+  final byTier = a.tier.index.compareTo(b.tier.index);
+  if (byTier != 0) return byTier;
+  return a.repetitions.compareTo(b.repetitions);
 }
 
 class ContentRepository {

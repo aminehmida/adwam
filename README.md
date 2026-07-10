@@ -9,8 +9,8 @@ per-session customization.
 Within each session, three-level sort:
 
 1. **Form**: Quran passages → short dhikrs → long duas
-2. **Repetition count** ascending (1, 3, 4, 7, 10, … 100)
-3. **Benefit tier** from the virtue hadith: protection → reward → other benefit → none
+2. **Benefit tier** from the virtue hadith: protection → reward → other benefit → none
+3. **Repetition count** ascending (1, 3, 4, 7, 10, … 100)
 
 Drag-to-reorder and hide (collapse-in-place) override the defaults per session;
 "reset to default order" brings them back.

@@ -85,7 +85,7 @@ def build():
 
 
 def default_sort_key(d):
-    return (FORM_ORDER[d["form"]], d["repetitions"], TIER_ORDER[d["benefit_tier"]])
+    return (FORM_ORDER[d["form"]], TIER_ORDER[d["benefit_tier"]], d["repetitions"])
 
 
 def write_review(dhikrs, curation):
@@ -93,7 +93,7 @@ def write_review(dhikrs, curation):
         "# مراجعة تصنيف الأذكار — Content Review",
         "",
         "Draft classification by Claude — **please review**, especially rows with a ملاحظة.",
-        "Sort shown is the app's default order per context: (قرآن → قصير → طويل) → التكرار تصاعديًا → (حماية → ثواب → فضل آخر → بدون).",
+        "Sort shown is the app's default order per context: (قرآن → قصير → طويل) → (حماية → ثواب → فضل آخر → بدون) → التكرار تصاعديًا.",
         "",
         "To correct: edit `content/curation.json`, then rerun `python3 tool/build_content.py`.",
         "",
