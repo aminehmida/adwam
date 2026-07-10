@@ -70,7 +70,10 @@ class HomeScreen extends StatelessWidget {
   Widget _languageSelector(BuildContext context) {
     final settings = context.watch<SettingsController>();
     final colors = Theme.of(context).colorScheme;
+    // heightFactor keeps the pinned bottom bar wrapped to its content —
+    // a plain Center would expand and squeeze the card list to zero height.
     return Center(
+      heightFactor: 1,
       child: SegmentedButton<String>(
         segments: const [
           ButtonSegment(
