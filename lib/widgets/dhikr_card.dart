@@ -80,8 +80,6 @@ class DhikrCard extends StatelessWidget {
               ],
               const SizedBox(height: 10),
               _counterRow(context, colors, accent),
-              const SizedBox(height: 6),
-              _reviewInfoRow(colors),
             ],
           ),
         ),
@@ -223,26 +221,4 @@ class DhikrCard extends StatelessWidget {
     );
   }
 
-  // Temporary review aid: surfaces the curation id + source on each card so
-  // it can be checked against content/REVIEW.md. Remove after review.
-  Widget _reviewInfoRow(ColorScheme colors) {
-    final style = TextStyle(fontSize: 11, color: colors.outline);
-    return Row(
-      children: [
-        Text(dhikr.id, style: style.copyWith(fontFamily: 'monospace')),
-        if (dhikr.benefitSource != null) ...[
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              dhikr.benefitSource!,
-              style: style,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              textDirection: TextDirection.rtl,
-            ),
-          ),
-        ],
-      ],
-    );
-  }
 }
