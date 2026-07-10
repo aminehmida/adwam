@@ -20,6 +20,10 @@ class DhikrCard extends StatelessWidget {
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
 
+  /// Edit-mode control strip (drag handle + visibility toggle). When set,
+  /// the card shows it above the text and ignores tap/long-press.
+  final Widget? editControls;
+
   const DhikrCard({
     super.key,
     required this.dhikr,
@@ -28,6 +32,7 @@ class DhikrCard extends StatelessWidget {
     this.collapsed = false,
     this.onTap,
     this.onLongPress,
+    this.editControls,
   });
 
   @override
@@ -47,13 +52,17 @@ class DhikrCard extends StatelessWidget {
       ),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: onTap,
-        onLongPress: onLongPress,
+        onTap: editControls == null ? onTap : null,
+        onLongPress: editControls == null ? onLongPress : null,
         child: Padding(
           padding: const EdgeInsets.fromLTRB(18, 18, 18, 12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              if (editControls != null) ...[
+                editControls!,
+                const SizedBox(height: 8),
+              ],
               Directionality(
                 textDirection: TextDirection.rtl,
                 child: Text(
