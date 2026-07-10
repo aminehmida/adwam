@@ -29,9 +29,9 @@ class HomeScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.settings_outlined),
             tooltip: AppLocalizations.of(context)!.settings,
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const SettingsScreen()),
-            ),
+            onPressed: () => Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (_) => const SettingsScreen())),
           ),
         ],
       ),
@@ -39,52 +39,56 @@ class HomeScreen extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
           for (final session in SessionType.values)
-            Builder(builder: (context) {
-              final visible = config.visibleIds(session);
-              return ContextCard(
-                session: session,
-                done: progress.doneCount(session, visible),
-                total: visible.length,
-                onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => SessionScreen(session: session),
+            Builder(
+              builder: (context) {
+                final visible = config.visibleIds(session);
+                return ContextCard(
+                  session: session,
+                  done: progress.doneCount(session, visible),
+                  total: visible.length,
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => SessionScreen(session: session),
+                    ),
                   ),
-                ),
-              );
-            }),
-          _languageSelector(context),
+                );
+              },
+            ),
         ],
+      ),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 8, bottom: 12),
+          child: _languageSelector(context),
+        ),
       ),
     );
   }
 
-  /// Quick UI-language toggle; same override as the language setting in
-  /// SettingsScreen.
+  /// Quick UI-language toggle pinned to the bottom of the screen; same
+  /// override as the language setting in SettingsScreen.
   Widget _languageSelector(BuildContext context) {
     final settings = context.watch<SettingsController>();
     final colors = Theme.of(context).colorScheme;
-    return Padding(
-      padding: const EdgeInsets.only(top: 28),
-      child: Center(
-        child: SegmentedButton<String>(
-          segments: const [
-            ButtonSegment(
-              value: 'ar',
-              label: Text('العربية', style: TextStyle(fontFamily: 'Amiri')),
-            ),
-            ButtonSegment(value: 'en', label: Text('English')),
-          ],
-          selected: {Localizations.localeOf(context).languageCode},
-          showSelectedIcon: false,
-          onSelectionChanged: (selection) =>
-              settings.setLocale(Locale(selection.first)),
-          style: SegmentedButton.styleFrom(
-            visualDensity: VisualDensity.compact,
-            side: BorderSide(color: colors.outlineVariant),
-            foregroundColor: colors.onSurfaceVariant,
-            selectedForegroundColor: colors.onPrimaryContainer,
-            selectedBackgroundColor: colors.primaryContainer,
+    return Center(
+      child: SegmentedButton<String>(
+        segments: const [
+          ButtonSegment(
+            value: 'ar',
+            label: Text('العربية', style: TextStyle(fontFamily: 'Amiri')),
           ),
+          ButtonSegment(value: 'en', label: Text('English')),
+        ],
+        selected: {Localizations.localeOf(context).languageCode},
+        showSelectedIcon: false,
+        onSelectionChanged: (selection) =>
+            settings.setLocale(Locale(selection.first)),
+        style: SegmentedButton.styleFrom(
+          visualDensity: VisualDensity.compact,
+          side: BorderSide(color: colors.outlineVariant),
+          foregroundColor: colors.onSurfaceVariant,
+          selectedForegroundColor: colors.onPrimaryContainer,
+          selectedBackgroundColor: colors.primaryContainer,
         ),
       ),
     );
