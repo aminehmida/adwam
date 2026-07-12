@@ -21,6 +21,7 @@ class SessionScreen extends StatefulWidget {
 
 class _SessionScreenState extends State<SessionScreen> {
   final Map<String, GlobalKey> _itemKeys = {};
+  final ScrollController _scrollController = ScrollController();
   bool _editing = false;
 
   /// Hidden dhikrs the user tapped to read. Cleared on scroll — a peek is
@@ -40,23 +41,51 @@ class _SessionScreenState extends State<SessionScreen> {
     }
   }
 
-  void _scrollToNextIncomplete() {
+  Future<void> _scrollToNextIncomplete() async {
     final config = context.read<ListConfigController>();
     final progress = context.read<ProgressController>();
-    for (final d in config.listFor(widget.session)) {
-      if (config.isHidden(widget.session, d.id)) continue;
-      if (progress.isDone(widget.session, d.id)) continue;
-      final itemContext = _keyFor(d.id).currentContext;
-      if (itemContext != null) {
-        Scrollable.ensureVisible(
+    final dhikrs = config.listFor(widget.session);
+    final targetIndex = dhikrs.indexWhere((d) =>
+        !config.isHidden(widget.session, d.id) &&
+        !progress.isDone(widget.session, d.id));
+    if (targetIndex == -1) return;
+    final targetId = dhikrs[targetIndex].id;
+
+    // ListView.builder only builds items near the viewport, so the target's
+    // key may have no context yet. Step towards it until it gets built.
+    for (var attempt = 0; attempt < 20; attempt++) {
+      if (!mounted) return;
+      final itemContext = _keyFor(targetId).currentContext;
+      if (itemContext != null && itemContext.mounted) {
+        await Scrollable.ensureVisible(
           itemContext,
           duration: const Duration(milliseconds: 400),
           curve: Curves.easeInOut,
           alignment: 0.1,
         );
+        return;
       }
-      return;
+      if (!_scrollController.hasClients) return;
+      final position = _scrollController.position;
+      final estimate =
+          position.maxScrollExtent * (targetIndex / dhikrs.length);
+      final next = (estimate > position.pixels
+              ? position.pixels + position.viewportDimension
+              : position.pixels - position.viewportDimension)
+          .clamp(0.0, position.maxScrollExtent);
+      if ((next - position.pixels).abs() < 1) return;
+      await _scrollController.animateTo(
+        next,
+        duration: const Duration(milliseconds: 120),
+        curve: Curves.linear,
+      );
     }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -116,6 +145,7 @@ class _SessionScreenState extends State<SessionScreen> {
         return false;
       },
       child: ListView.builder(
+        controller: _scrollController,
         padding: const EdgeInsets.fromLTRB(14, 4, 14, 32),
         itemCount: dhikrs.length,
         itemBuilder: (context, index) {
