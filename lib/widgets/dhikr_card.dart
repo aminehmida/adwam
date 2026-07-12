@@ -17,6 +17,10 @@ class DhikrCard extends StatelessWidget {
   final int count;
   final bool done;
   final bool collapsed;
+
+  /// Icon shown in the collapsed row: eye-off for hidden dhikrs, check for
+  /// finished ones.
+  final IconData collapsedIcon;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
 
@@ -30,6 +34,7 @@ class DhikrCard extends StatelessWidget {
     required this.count,
     required this.done,
     this.collapsed = false,
+    this.collapsedIcon = Icons.visibility_off_outlined,
     this.onTap,
     this.onLongPress,
     this.editControls,
@@ -97,8 +102,7 @@ class DhikrCard extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
         child: Row(
           children: [
-            Icon(Icons.visibility_off_outlined,
-                size: 15, color: colors.outline),
+            Icon(collapsedIcon, size: 15, color: colors.outline),
             const SizedBox(width: 12),
             Expanded(
               child: Directionality(

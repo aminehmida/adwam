@@ -24,15 +24,21 @@ class _SessionScreenState extends State<SessionScreen> {
   final ScrollController _scrollController = ScrollController();
   bool _editing = false;
 
-  /// Hidden dhikrs the user tapped to read. Cleared on scroll — a peek is
-  /// temporary; unhiding permanently happens in edit mode.
+  /// Hidden or finished dhikrs the user tapped to read. Cleared on scroll —
+  /// a peek is temporary; unhiding permanently happens in edit mode.
   final Set<String> _peeked = {};
+
+  /// Last dhikr the user tapped or long-pressed. A finished dhikr stays
+  /// expanded while it is the active one — some people tap the count before
+  /// reciting — and only collapses once another dhikr is tapped.
+  String? _activeId;
 
   GlobalKey _keyFor(String id) => _itemKeys.putIfAbsent(id, GlobalKey.new);
 
   void _onTap(Dhikr dhikr) {
     final progress = context.read<ProgressController>();
     final completed = progress.increment(widget.session, dhikr);
+    if (_activeId != dhikr.id) setState(() => _activeId = dhikr.id);
     if (completed) {
       HapticFeedback.mediumImpact();
       _scrollToNextIncomplete();
@@ -151,18 +157,22 @@ class _SessionScreenState extends State<SessionScreen> {
         itemBuilder: (context, index) {
           final dhikr = dhikrs[index];
           final hidden = config.isHidden(widget.session, dhikr.id);
-          final peeking = hidden && _peeked.contains(dhikr.id);
+          final done = progress.isDone(widget.session, dhikr.id);
+          final finished = !hidden && done && dhikr.id != _activeId;
+          final collapsed = hidden || finished;
+          final peeking = collapsed && _peeked.contains(dhikr.id);
           final newSection = startsSection(dhikrs, index);
           final Widget card;
           if (peeking) {
-            // Temporary read-only look at a hidden dhikr; collapses again
-            // on scroll or tap. Unhide permanently via edit mode.
+            // Temporary read-only look at a hidden or finished dhikr;
+            // collapses again on scroll or tap. Unhide permanently via
+            // edit mode.
             card = Opacity(
               opacity: 0.6,
               child: DhikrCard(
                 dhikr: dhikr,
                 count: progress.countFor(widget.session, dhikr.id),
-                done: progress.isDone(widget.session, dhikr.id),
+                done: done,
                 onTap: () => setState(() => _peeked.remove(dhikr.id)),
               ),
             );
@@ -170,15 +180,19 @@ class _SessionScreenState extends State<SessionScreen> {
             card = DhikrCard(
               dhikr: dhikr,
               count: progress.countFor(widget.session, dhikr.id),
-              done: progress.isDone(widget.session, dhikr.id),
-              collapsed: hidden,
-              onTap: hidden
+              done: done,
+              collapsed: collapsed,
+              collapsedIcon: hidden
+                  ? Icons.visibility_off_outlined
+                  : Icons.check_rounded,
+              onTap: collapsed
                   ? () => setState(() => _peeked.add(dhikr.id))
                   : () => _onTap(dhikr),
-              onLongPress: hidden
+              onLongPress: collapsed
                   ? null
                   : () {
                       HapticFeedback.mediumImpact();
+                      setState(() => _activeId = dhikr.id);
                       context
                           .read<ProgressController>()
                           .markDone(widget.session, dhikr);

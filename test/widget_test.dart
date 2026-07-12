@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -49,5 +50,36 @@ void main() {
     await tester.pageBack();
     await tester.pumpAndSettle();
     expect(find.text('1 / 2'), findsOneWidget);
+  });
+
+  testWidgets('finished dhikr collapses once another dhikr is tapped',
+      (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    final repo = ContentRepository([_dhikr('one'), _dhikr('two')]);
+    final store = await PrefsStore.open();
+
+    await tester.pumpWidget(DhikrApp(repo: repo, store: store));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Morning adhkar'));
+    await tester.pumpAndSettle();
+
+    // Complete the first dhikr; it stays expanded until another is tapped.
+    await tester.tap(find.text('ذكر one'));
+    await tester.pump();
+    await tester.tap(find.text('ذكر one'));
+    await tester.pumpAndSettle();
+    expect(find.text('2 / 2'), findsOneWidget);
+    expect(find.byIcon(Icons.check_rounded), findsNothing);
+
+    // Tapping the next dhikr collapses the finished one to a check-mark row.
+    await tester.tap(find.text('ذكر two'));
+    await tester.pumpAndSettle();
+    expect(find.text('2 / 2'), findsNothing);
+    expect(find.byIcon(Icons.check_rounded), findsOneWidget);
+
+    // Tapping the collapsed row peeks the full card again.
+    await tester.tap(find.text('ذكر one'));
+    await tester.pumpAndSettle();
+    expect(find.text('2 / 2'), findsOneWidget);
   });
 }
