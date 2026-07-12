@@ -22,6 +22,10 @@ const _tierNames = {
 /// Dhikrs without an explicit sort_hint sort after hinted ones.
 const noSortHint = 1 << 20;
 
+/// Dhikrs without a fixed_order sort after fixed ones (which never
+/// happens in practice: a session either fixes every entry or none).
+const noFixedOrder = 1 << 20;
+
 const _sessionNames = {
   'morning': SessionType.morning,
   'evening': SessionType.evening,
@@ -42,6 +46,10 @@ class Dhikr {
   final Set<SessionType> contexts;
   final int sortHint;
 
+  /// Explicit position in the session list (e.g. the sunnah sequence of
+  /// the post-prayer adhkar). Outranks every heuristic sort rule.
+  final int fixedOrder;
+
   const Dhikr({
     required this.id,
     required this.arabic,
@@ -54,6 +62,7 @@ class Dhikr {
     this.benefitSourceEn,
     required this.contexts,
     this.sortHint = noSortHint,
+    this.fixedOrder = noFixedOrder,
   });
 
   /// Final sort tiebreak: shorter text first among otherwise equal dhikrs.
@@ -73,5 +82,6 @@ class Dhikr {
             .map((c) => _sessionNames[c]!)
             .toSet(),
         sortHint: json['sort_hint'] as int? ?? noSortHint,
+        fixedOrder: json['fixed_order'] as int? ?? noFixedOrder,
       );
 }

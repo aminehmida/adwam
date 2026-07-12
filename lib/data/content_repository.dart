@@ -11,13 +11,16 @@ int _band(DhikrForm form) => switch (form) {
       _ => 1,
     };
 
-/// Default sort: Quran passages always first and full surahs always last;
-/// then benefit tier (protection, reward, none); then repetition count
-/// ascending; short before long at the same count; then the curated
-/// sort_hint (cluster members share one value, e.g. the أصبحنا/أمسينا
-/// dhikrs, so they stay together ahead of their group); and as the least
-/// rule, fewer words first.
+/// Default sort: an explicit fixed_order (the sunnah sequence of the
+/// post-prayer adhkar) beats everything. Otherwise: Quran passages always
+/// first and full surahs always last; then benefit tier (protection,
+/// reward, none); then repetition count ascending; short before long at
+/// the same count; then the curated sort_hint (cluster members share one
+/// value, e.g. the أصبحنا/أمسينا dhikrs, so they stay together ahead of
+/// their group); and as the least rule, fewer words first.
 int compareDhikrs(Dhikr a, Dhikr b) {
+  final byFixed = a.fixedOrder.compareTo(b.fixedOrder);
+  if (byFixed != 0) return byFixed;
   final byBand = _band(a.form).compareTo(_band(b.form));
   if (byBand != 0) return byBand;
   final byTier = a.tier.index.compareTo(b.tier.index);

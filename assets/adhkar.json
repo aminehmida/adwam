@@ -506,6 +506,7 @@
     },
     {
       "id": "pp-66",
+      "fixed_order": 1,
       "contexts": [
         "post_prayer"
       ],
@@ -520,6 +521,7 @@
     },
     {
       "id": "pp-67",
+      "fixed_order": 2,
       "contexts": [
         "post_prayer"
       ],
@@ -534,6 +536,7 @@
     },
     {
       "id": "pp-68",
+      "fixed_order": 3,
       "contexts": [
         "post_prayer"
       ],
@@ -548,6 +551,7 @@
     },
     {
       "id": "pp-69",
+      "fixed_order": 5,
       "contexts": [
         "post_prayer"
       ],
@@ -562,6 +566,7 @@
     },
     {
       "id": "pp-70",
+      "fixed_order": 7,
       "contexts": [
         "post_prayer"
       ],
@@ -576,6 +581,7 @@
     },
     {
       "id": "pp-71",
+      "fixed_order": 6,
       "contexts": [
         "post_prayer"
       ],
@@ -590,6 +596,7 @@
     },
     {
       "id": "pp-72",
+      "fixed_order": 4,
       "contexts": [
         "post_prayer"
       ],
@@ -604,6 +611,7 @@
     },
     {
       "id": "pp-73",
+      "fixed_order": 8,
       "contexts": [
         "post_prayer"
       ],

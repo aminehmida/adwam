@@ -9,6 +9,7 @@ Dhikr d(
   int reps = 1,
   BenefitTier tier = BenefitTier.none,
   int hint = noSortHint,
+  int fixed = noFixedOrder,
   String? arabic,
 }) =>
     Dhikr(
@@ -19,12 +20,26 @@ Dhikr d(
       tier: tier,
       contexts: const {SessionType.morning},
       sortHint: hint,
+      fixedOrder: fixed,
     );
 
 List<String> sortedIds(List<Dhikr> input) =>
     (input..sort(compareDhikrs)).map((x) => x.id).toList();
 
 void main() {
+  test('fixed_order beats every heuristic rule: istighfar before '
+      'Ayat al-Kursi in the post-prayer sunnah sequence', () {
+    expect(
+      sortedIds([
+        d('ayat-al-kursi',
+            form: DhikrForm.quran, tier: BenefitTier.reward, fixed: 6),
+        d('tasbih-x100', reps: 100, tier: BenefitTier.reward, fixed: 5),
+        d('istighfar', fixed: 1),
+      ]),
+      ['istighfar', 'tasbih-x100', 'ayat-al-kursi'],
+    );
+  });
+
   test('quran always first, even without a benefit hadith', () {
     expect(
       sortedIds([
