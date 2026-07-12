@@ -259,6 +259,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Daily adhkar. Sources: Hisn al-Muslim (hisnmuslim.com) and the Seen-Arabic Morning & Evening Adhkar database.'**
   String get aboutBody;
+
+  /// No description provided for @tapAnywhereToCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap anywhere to count · swipe to close'**
+  String get tapAnywhereToCount;
 }
 
 class _AppLocalizationsDelegate

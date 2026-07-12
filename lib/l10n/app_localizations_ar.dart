@@ -90,4 +90,7 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get aboutBody =>
       'أذكار اليوم والليلة. المصادر: حصن المسلم (hisnmuslim.com) وقاعدة بيانات أذكار الصباح والمساء (Seen-Arabic).';
+
+  @override
+  String get tapAnywhereToCount => 'انقر في أي مكان للعدّ · اسحب للإغلاق';
 }

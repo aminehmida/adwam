@@ -91,4 +91,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get aboutBody =>
       'Daily adhkar. Sources: Hisn al-Muslim (hisnmuslim.com) and the Seen-Arabic Morning & Evening Adhkar database.';
+
+  @override
+  String get tapAnywhereToCount => 'Tap anywhere to count · swipe to close';
 }

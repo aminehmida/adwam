@@ -17,6 +17,15 @@ Dhikr _dhikr(String id) => Dhikr(
       contexts: SessionType.values.toSet(),
     );
 
+Dhikr _hundredDhikr(String id) => Dhikr(
+      id: id,
+      arabic: 'ذكر $id',
+      repetitions: 100,
+      form: DhikrForm.short,
+      tier: BenefitTier.none,
+      contexts: SessionType.values.toSet(),
+    );
+
 /// Boots the app with three dhikrs ('two' hidden for morning) and opens the
 /// morning session. Visible cards show a '0 / 2' counter; collapsed ones
 /// show only their title.
@@ -32,6 +41,19 @@ Future<void> openMorning(WidgetTester tester) async {
   await tester.tap(find.text('Morning adhkar'));
   await tester.pumpAndSettle();
 }
+
+/// Boots the app with a 100-repetition dhikr plus a small one and opens the
+/// morning session.
+Future<void> openMorningWithHundred(WidgetTester tester) async {
+  SharedPreferences.setMockInitialValues({});
+  final repo = ContentRepository([_hundredDhikr('big'), _dhikr('small')]);
+  await tester.pumpWidget(DhikrApp(repo: repo, store: await PrefsStore.open()));
+  await tester.pumpAndSettle();
+  await tester.tap(find.text('Morning adhkar'));
+  await tester.pumpAndSettle();
+}
+
+const _focusHint = 'Tap anywhere to count · swipe to close';
 
 void main() {
   testWidgets('hidden dhikr renders as a collapsed title-only row',
@@ -123,5 +145,68 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('0 / 1'), findsOneWidget); // morning: 1 visible left
     expect(find.text('0 / 3'), findsNWidgets(3)); // other sessions untouched
+  });
+
+  testWidgets('tapping a 100-rep dhikr opens the focus counter and counts',
+      (tester) async {
+    await openMorningWithHundred(tester);
+
+    await tester.tap(find.text('ذكر big'));
+    await tester.pumpAndSettle();
+    // The first tap counted and the overlay shows the big counter.
+    expect(find.text(_focusHint), findsOneWidget);
+    expect(find.text('/ 100'), findsOneWidget);
+    expect(find.text('1'), findsOneWidget);
+
+    // Tapping anywhere on the overlay counts.
+    await tester.tap(find.text(_focusHint));
+    await tester.pumpAndSettle();
+    expect(find.text('2'), findsOneWidget);
+
+    // The small dhikr never opens the overlay.
+    expect(find.text('/ 2'), findsNothing);
+  });
+
+  testWidgets('swiping dismisses the focus counter without counting',
+      (tester) async {
+    await openMorningWithHundred(tester);
+
+    await tester.tap(find.text('ذكر big'));
+    await tester.pumpAndSettle();
+    expect(find.text(_focusHint), findsOneWidget);
+
+    await tester.drag(find.text(_focusHint), const Offset(0, -120));
+    await tester.pumpAndSettle();
+    expect(find.text(_focusHint), findsNothing);
+    expect(find.text('1 / 100'), findsOneWidget); // only the first tap counted
+  });
+
+  testWidgets('back dismisses the focus counter without leaving the screen',
+      (tester) async {
+    await openMorningWithHundred(tester);
+
+    await tester.tap(find.text('ذكر big'));
+    await tester.pumpAndSettle();
+    expect(find.text(_focusHint), findsOneWidget);
+
+    await tester.binding.handlePopRoute(); // system back
+    await tester.pumpAndSettle();
+    expect(find.text(_focusHint), findsNothing);
+    expect(find.text('1 / 100'), findsOneWidget); // still on the session
+  });
+
+  testWidgets('reaching the target closes the focus counter and marks done',
+      (tester) async {
+    await openMorningWithHundred(tester);
+
+    await tester.tap(find.text('ذكر big'));
+    await tester.pumpAndSettle();
+    for (var i = 2; i <= 100; i++) {
+      await tester.tap(find.text(_focusHint), warnIfMissed: false);
+      await tester.pump(const Duration(milliseconds: 20));
+    }
+    await tester.pumpAndSettle();
+    expect(find.text(_focusHint), findsNothing);
+    expect(find.byIcon(Icons.check_circle_rounded), findsOneWidget);
   });
 }

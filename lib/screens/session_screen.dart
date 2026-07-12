@@ -20,10 +20,39 @@ class SessionScreen extends StatefulWidget {
   State<SessionScreen> createState() => _SessionScreenState();
 }
 
-class _SessionScreenState extends State<SessionScreen> {
+class _SessionScreenState extends State<SessionScreen>
+    with SingleTickerProviderStateMixin {
   final Map<String, GlobalKey> _itemKeys = {};
   final ScrollController _scrollController = ScrollController();
   bool _editing = false;
+
+  /// Dhikrs with at least this many repetitions count in a full-screen
+  /// focus overlay instead of on the card itself.
+  static const _focusThreshold = 100;
+
+  /// Dhikr currently counted in the focus overlay; stays set while the
+  /// exit animation runs.
+  Dhikr? _focused;
+  bool _focusDismissing = false;
+  double _focusDrag = 0;
+
+  late final AnimationController _focusController;
+  late final CurvedAnimation _focusAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 350),
+      reverseDuration: const Duration(milliseconds: 250),
+    );
+    _focusAnim = CurvedAnimation(
+      parent: _focusController,
+      curve: Curves.easeOutCubic,
+      reverseCurve: Curves.easeInCubic,
+    );
+  }
 
   /// Hidden or finished dhikrs the user tapped to read. Cleared on scroll —
   /// a peek is temporary; unhiding permanently happens in edit mode.
@@ -53,7 +82,37 @@ class _SessionScreenState extends State<SessionScreen> {
       HapticFeedback.lightImpact();
     }
     _anchorTo(dhikr.id);
+    if (!completed && dhikr.repetitions >= _focusThreshold) {
+      setState(() => _focused = dhikr);
+      _focusController.forward(from: 0);
+      return;
+    }
     if (completed && mounted) await _scrollToNextIncomplete();
+  }
+
+  void _onFocusTap() {
+    final dhikr = _focused;
+    if (dhikr == null || _focusDismissing) return;
+    final completed = context.read<ProgressController>().increment(
+      widget.session,
+      dhikr,
+    );
+    if (completed) {
+      HapticFeedback.mediumImpact();
+      _dismissFocus(completed: true);
+    } else {
+      HapticFeedback.lightImpact();
+    }
+  }
+
+  Future<void> _dismissFocus({bool completed = false}) async {
+    if (_focused == null || _focusDismissing) return;
+    _focusDismissing = true;
+    await _focusController.reverse();
+    _focusDismissing = false;
+    if (!mounted) return;
+    setState(() => _focused = null);
+    if (completed) await _scrollToNextIncomplete();
   }
 
   /// Make [id]'s card the viewport origin (and the active card) without any
@@ -143,6 +202,8 @@ class _SessionScreenState extends State<SessionScreen> {
 
   @override
   void dispose() {
+    _focusAnim.dispose();
+    _focusController.dispose();
     _scrollController.dispose();
     super.dispose();
   }
@@ -154,44 +215,172 @@ class _SessionScreenState extends State<SessionScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return PopScope(
-      canPop: !_editing,
+      canPop: !_editing && _focused == null,
       onPopInvokedWithResult: (didPop, _) {
-        if (!didPop) setState(() => _editing = false);
+        if (didPop) return;
+        if (_focused != null) {
+          _dismissFocus();
+        } else {
+          setState(() => _editing = false);
+        }
       },
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            sessionTitle(context, widget.session),
-            style: const TextStyle(fontFamily: 'Amiri'),
-          ),
-          actions: _editing
-              ? [
-                  PopupMenuButton<String>(
-                    onSelected: (_) => _confirmReset(context),
-                    itemBuilder: (menuContext) => [
-                      PopupMenuItem(
-                        value: 'reset',
-                        child: Text(
-                          AppLocalizations.of(menuContext)!.resetOrderTitle,
-                        ),
+      // The focus overlay sits above the whole Scaffold (app bar included)
+      // so opening it darkens the entire screen.
+      child: Stack(
+        children: [
+          Scaffold(
+            appBar: AppBar(
+              title: Text(
+                sessionTitle(context, widget.session),
+                style: const TextStyle(fontFamily: 'Amiri'),
+              ),
+              actions: _editing
+                  ? [
+                      PopupMenuButton<String>(
+                        onSelected: (_) => _confirmReset(context),
+                        itemBuilder: (menuContext) => [
+                          PopupMenuItem(
+                            value: 'reset',
+                            child: Text(
+                              AppLocalizations.of(menuContext)!.resetOrderTitle,
+                            ),
+                          ),
+                        ],
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.check),
+                        tooltip: l10n.doneEditing,
+                        onPressed: () => setState(() => _editing = false),
+                      ),
+                    ]
+                  : [
+                      IconButton(
+                        icon: const Icon(Icons.tune),
+                        tooltip: l10n.editList,
+                        onPressed: () => setState(() => _editing = true),
                       ),
                     ],
+            ),
+            body: _editing
+                ? _editList(config, dhikrs)
+                : _countList(config, dhikrs),
+          ),
+          if (_focused != null) _focusOverlay(context),
+        ],
+      ),
+    );
+  }
+
+  /// Full-screen counting overlay for high-repetition dhikrs: the dhikr text
+  /// rises to the top, a large counter grows in the middle and the background
+  /// fades to dark. Any tap counts; a vertical swipe or back dismisses.
+  Widget _focusOverlay(BuildContext context) {
+    final dhikr = _focused!;
+    final progress = context.watch<ProgressController>();
+    final count = progress.countFor(widget.session, dhikr.id);
+    final l10n = AppLocalizations.of(context)!;
+    return FadeTransition(
+      opacity: _focusAnim,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: _onFocusTap,
+        onVerticalDragStart: (_) => _focusDrag = 0,
+        onVerticalDragUpdate: (details) {
+          _focusDrag += details.delta.dy;
+          if (_focusDrag.abs() > 48) _dismissFocus();
+        },
+        onVerticalDragEnd: (details) {
+          if ((details.primaryVelocity ?? 0).abs() > 250) _dismissFocus();
+        },
+        child: ColoredBox(
+          color: Colors.black.withValues(alpha: .82),
+          child: SafeArea(
+            child: Column(
+              children: [
+                SlideTransition(
+                  position: Tween(
+                    begin: const Offset(0, .35),
+                    end: Offset.zero,
+                  ).animate(_focusAnim),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 28, 24, 0),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxHeight: MediaQuery.sizeOf(context).height * .35,
+                      ),
+                      child: Directionality(
+                        textDirection: TextDirection.rtl,
+                        child: Text(
+                          dhikr.arabic,
+                          textAlign: TextAlign.center,
+                          overflow: TextOverflow.fade,
+                          style: arabicTextStyle.copyWith(
+                            color: Colors.white.withValues(alpha: .95),
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.check),
-                    tooltip: l10n.doneEditing,
-                    onPressed: () => setState(() => _editing = false),
+                ),
+                Expanded(
+                  child: Center(
+                    child: ScaleTransition(
+                      scale: Tween(begin: .7, end: 1.0).animate(_focusAnim),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 120),
+                            transitionBuilder: (child, anim) => FadeTransition(
+                              opacity: anim,
+                              child: ScaleTransition(
+                                scale: Tween(
+                                  begin: .85,
+                                  end: 1.0,
+                                ).animate(anim),
+                                child: child,
+                              ),
+                            ),
+                            child: Text(
+                              '$count',
+                              key: ValueKey(count),
+                              style: const TextStyle(
+                                fontSize: 112,
+                                fontWeight: FontWeight.w600,
+                                fontFeatures: [FontFeature.tabularFigures()],
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                          Text(
+                            '/ ${dhikr.repetitions}',
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontFeatures: const [
+                                FontFeature.tabularFigures(),
+                              ],
+                              color: Colors.white.withValues(alpha: .55),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                ]
-              : [
-                  IconButton(
-                    icon: const Icon(Icons.tune),
-                    tooltip: l10n.editList,
-                    onPressed: () => setState(() => _editing = true),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 24),
+                  child: Text(
+                    l10n.tapAnywhereToCount,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.white.withValues(alpha: .45),
+                    ),
                   ),
-                ],
+                ),
+              ],
+            ),
+          ),
         ),
-        body: _editing ? _editList(config, dhikrs) : _countList(config, dhikrs),
       ),
     );
   }

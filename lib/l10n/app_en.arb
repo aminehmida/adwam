@@ -26,5 +26,6 @@
   "resetCustomizations": "Reset all customizations",
   "resetCustomizationsBody": "Order and hidden adhkar in every list will return to the defaults.",
   "about": "About",
-  "aboutBody": "Daily adhkar. Sources: Hisn al-Muslim (hisnmuslim.com) and the Seen-Arabic Morning & Evening Adhkar database."
+  "aboutBody": "Daily adhkar. Sources: Hisn al-Muslim (hisnmuslim.com) and the Seen-Arabic Morning & Evening Adhkar database.",
+  "tapAnywhereToCount": "Tap anywhere to count · swipe to close"
 }
