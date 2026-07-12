@@ -58,6 +58,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reset => 'Reset';
 
   @override
+  String get resetSessionTitle => 'Reset progress?';
+
+  @override
+  String resetSessionBody(String session) {
+    return 'Long pressing $session resets today\'s progress for everything inside. Are you sure?';
+  }
+
+  @override
+  String get dontShowAgain => 'Don\'t show this again';
+
+  @override
   String get settings => 'Settings';
 
   @override
@@ -71,6 +82,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get languageEnglish => 'English';
+
+  @override
+  String get theme => 'Theme';
+
+  @override
+  String get themeSystem => 'System';
+
+  @override
+  String get themeLight => 'Light';
+
+  @override
+  String get themeDark => 'Dark';
 
   @override
   String get resetTodayProgress => 'Reset today\'s progress';

@@ -194,6 +194,24 @@ abstract class AppLocalizations {
   /// **'Reset'**
   String get reset;
 
+  /// No description provided for @resetSessionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset progress?'**
+  String get resetSessionTitle;
+
+  /// No description provided for @resetSessionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Long pressing {session} resets today\'s progress for everything inside. Are you sure?'**
+  String resetSessionBody(String session);
+
+  /// No description provided for @dontShowAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t show this again'**
+  String get dontShowAgain;
+
   /// No description provided for @settings.
   ///
   /// In en, this message translates to:
@@ -223,6 +241,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'English'**
   String get languageEnglish;
+
+  /// No description provided for @theme.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get theme;
+
+  /// No description provided for @themeSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get themeSystem;
+
+  /// No description provided for @themeLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get themeLight;
+
+  /// No description provided for @themeDark.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get themeDark;
 
   /// No description provided for @resetTodayProgress.
   ///

@@ -36,6 +36,24 @@ class SettingsScreen extends StatelessWidget {
               ],
             ),
           ),
+          ListTile(
+            leading: const Icon(Icons.brightness_6),
+            title: Text(l10n.theme),
+            trailing: DropdownButton<ThemeMode>(
+              value: settings.themeMode,
+              onChanged: (value) {
+                if (value != null) settings.setThemeMode(value);
+              },
+              items: [
+                DropdownMenuItem(
+                    value: ThemeMode.system, child: Text(l10n.themeSystem)),
+                DropdownMenuItem(
+                    value: ThemeMode.light, child: Text(l10n.themeLight)),
+                DropdownMenuItem(
+                    value: ThemeMode.dark, child: Text(l10n.themeDark)),
+              ],
+            ),
+          ),
           const Divider(),
           ListTile(
             leading: const Icon(Icons.restart_alt),

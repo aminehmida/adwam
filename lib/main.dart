@@ -74,6 +74,7 @@ class _DhikrAppState extends State<DhikrApp> with WidgetsBindingObserver {
           supportedLocales: const [Locale('ar'), Locale('en')],
           theme: buildTheme(Brightness.light),
           darkTheme: buildTheme(Brightness.dark),
+          themeMode: settings.themeMode,
           home: const HomeScreen(),
         ),
       ),

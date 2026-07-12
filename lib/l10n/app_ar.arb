@@ -16,11 +16,25 @@
   "resetOrderBody": "سيُعاد ترتيب هذه القائمة وإظهار جميع الأذكار.",
   "cancel": "إلغاء",
   "reset": "استعادة",
+  "resetSessionTitle": "تصفير التقدّم؟",
+  "resetSessionBody": "الضغط المطوّل على «{session}» يصفّر تقدّم اليوم لجميع الأذكار داخلها. هل أنت متأكد؟",
+  "@resetSessionBody": {
+    "placeholders": {
+      "session": {
+        "type": "String"
+      }
+    }
+  },
+  "dontShowAgain": "عدم إظهار هذه الرسالة مجددًا",
   "settings": "الإعدادات",
   "language": "اللغة",
   "languageSystem": "لغة الجهاز",
   "languageArabic": "العربية",
   "languageEnglish": "English",
+  "theme": "المظهر",
+  "themeSystem": "حسب الجهاز",
+  "themeLight": "فاتح",
+  "themeDark": "داكن",
   "resetTodayProgress": "تصفير عدّادات اليوم",
   "resetTodayBody": "ستبدأ جميع عدّادات اليوم من جديد.",
   "resetCustomizations": "استعادة جميع التخصيصات",
