@@ -47,12 +47,15 @@ void main() {
     await openMorning(tester);
 
     await tester.tap(find.text('ذكر two'));
-    await tester.pump();
+    // Let the AnimatedSize expansion finish: mid-animation the expanding
+    // card still overlaps its neighbour, so a tap there would hit the
+    // wrong card.
+    await tester.pumpAndSettle();
     expect(find.text('0 / 2'), findsNWidgets(3)); // full card while peeking
 
     // Peeking never counts.
     await tester.tap(find.text('ذكر two'));
-    await tester.pump();
+    await tester.pumpAndSettle();
     expect(find.text('0 / 2'), findsNWidgets(2));
     expect(find.text('1 / 2'), findsNothing);
   });
@@ -66,10 +69,11 @@ void main() {
     await openMorning(tester);
 
     await tester.tap(find.text('ذكر two'));
-    await tester.pump();
+    await tester.pumpAndSettle();
     expect(find.text('0 / 2'), findsNWidgets(3));
 
-    await tester.drag(find.byType(ListView), const Offset(0, -80));
+    // The count list is a CustomScrollView (split around the anchor card).
+    await tester.drag(find.byType(CustomScrollView), const Offset(0, -80));
     await tester.pumpAndSettle();
     expect(find.text('0 / 2'), findsNWidgets(2));
   });
