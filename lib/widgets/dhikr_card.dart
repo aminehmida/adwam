@@ -28,6 +28,15 @@ class DhikrCard extends StatelessWidget {
   /// the card shows it above the text and ignores tap/long-press.
   final Widget? editControls;
 
+  /// Measurement keys for the focus overlay's shared-element flight: the
+  /// Arabic text block and the progress-circle + count segment.
+  final Key? arabicKey;
+  final Key? counterKey;
+
+  /// While the focus overlay is up its flying copies replace these two
+  /// elements, so the card renders them invisibly (layout preserved).
+  final bool hiddenForFocus;
+
   const DhikrCard({
     super.key,
     required this.dhikr,
@@ -38,6 +47,9 @@ class DhikrCard extends StatelessWidget {
     this.onTap,
     this.onLongPress,
     this.editControls,
+    this.arabicKey,
+    this.counterKey,
+    this.hiddenForFocus = false,
   });
 
   @override
@@ -79,12 +91,16 @@ class DhikrCard extends StatelessWidget {
               ],
               Directionality(
                 textDirection: TextDirection.rtl,
-                child: Text(
-                  dhikr.arabic,
-                  style: arabicTextStyle.copyWith(
-                    color: done
-                        ? colors.onSurfaceVariant.withValues(alpha: .75)
-                        : colors.onSurface,
+                child: Opacity(
+                  opacity: hiddenForFocus ? 0 : 1,
+                  child: Text(
+                    dhikr.arabic,
+                    key: arabicKey,
+                    style: arabicTextStyle.copyWith(
+                      color: done
+                          ? colors.onSurfaceVariant.withValues(alpha: .75)
+                          : colors.onSurface,
+                    ),
                   ),
                 ),
               ),
@@ -195,28 +211,38 @@ class DhikrCard extends StatelessWidget {
   Widget _counterRow(BuildContext context, ColorScheme colors, Color accent) {
     return Row(
       children: [
-        if (done)
-          Icon(Icons.check_circle_rounded, size: 26, color: colors.primary)
-        else
-          SizedBox(
-            width: 26,
-            height: 26,
-            child: CircularProgressIndicator(
-              value: dhikr.repetitions == 0 ? 1 : count / dhikr.repetitions,
-              strokeWidth: 3,
-              strokeCap: StrokeCap.round,
-              color: accent,
-              backgroundColor: colors.surfaceContainerHighest,
-            ),
-          ),
-        const SizedBox(width: 12),
-        Text(
-          '$count / ${dhikr.repetitions}',
-          style: TextStyle(
-            fontSize: 16,
-            fontFeatures: const [FontFeature.tabularFigures()],
-            color: done ? colors.primary : colors.onSurfaceVariant,
-            fontWeight: FontWeight.w600,
+        Opacity(
+          opacity: hiddenForFocus ? 0 : 1,
+          child: Row(
+            key: counterKey,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (done)
+                Icon(Icons.check_circle_rounded, size: 26, color: colors.primary)
+              else
+                SizedBox(
+                  width: 26,
+                  height: 26,
+                  child: CircularProgressIndicator(
+                    value:
+                        dhikr.repetitions == 0 ? 1 : count / dhikr.repetitions,
+                    strokeWidth: 3,
+                    strokeCap: StrokeCap.round,
+                    color: accent,
+                    backgroundColor: colors.surfaceContainerHighest,
+                  ),
+                ),
+              const SizedBox(width: 12),
+              Text(
+                '$count / ${dhikr.repetitions}',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                  color: done ? colors.primary : colors.onSurfaceVariant,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
           ),
         ),
         const Spacer(),

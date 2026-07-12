@@ -44,6 +44,11 @@ class PrefsStore {
       ? _prefs.remove('locale')
       : _prefs.setString('locale', locale.languageCode);
 
+  int loadFocusBgVariant() => _prefs.getInt('focusBgVariant') ?? 0;
+
+  Future<void> saveFocusBgVariant(int variant) =>
+      _prefs.setInt('focusBgVariant', variant);
+
   Future<void> clearAllConfigs() async {
     for (final s in SessionType.values) {
       await _prefs.remove(_configKey(s));

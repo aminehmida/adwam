@@ -1,3 +1,6 @@
+import 'dart:math' as math;
+import 'dart:ui' show ImageFilter, lerpDouble;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart' show RenderAbstractViewport;
 import 'package:flutter/services.dart';
@@ -7,6 +10,8 @@ import '../l10n/app_localizations.dart';
 import '../models/dhikr.dart';
 import '../state/list_config_controller.dart';
 import '../state/progress_controller.dart';
+import '../state/settings_controller.dart';
+import '../theme.dart';
 import '../widgets/context_card.dart' show sessionTitle;
 import '../widgets/dhikr_card.dart';
 import '../widgets/tier_header.dart';
@@ -36,21 +41,43 @@ class _SessionScreenState extends State<SessionScreen>
   bool _focusDismissing = false;
   double _focusDrag = 0;
 
+  /// Where the card's Arabic text and counter segment sat (in global
+  /// coordinates) when the overlay opened — the start/end of the
+  /// shared-element flight.
+  Rect? _focusArabicFrom;
+  Rect? _focusCounterFrom;
+  final Map<String, GlobalKey> _arabicKeys = {};
+  final Map<String, GlobalKey> _counterKeys = {};
+
+  // TEMP: focus-background candidates under evaluation, switchable live via
+  // chips in the overlay. The choice persists on the device (see
+  // SettingsController.focusBgVariant); remove the chips once one is chosen.
+  static const _focusBgLabels = ['Blur', '+ Vignette', '+ Pattern'];
+
   late final AnimationController _focusController;
   late final CurvedAnimation _focusAnim;
+  late final CurvedAnimation _focusScrim;
 
   @override
   void initState() {
     super.initState();
     _focusController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 350),
-      reverseDuration: const Duration(milliseconds: 250),
+      duration: const Duration(milliseconds: 550),
+      reverseDuration: const Duration(milliseconds: 450),
     );
+    // Both directions are staged so the eye can follow the shared elements.
+    // Opening: the scrim darkens first around the still-in-place card
+    // elements, then the flight starts. Closing plays the same stages
+    // backwards: the elements fly home while the screen is still dark, then
+    // the scrim lifts around them as they settle back into the card.
     _focusAnim = CurvedAnimation(
       parent: _focusController,
-      curve: Curves.easeOutCubic,
-      reverseCurve: Curves.easeInCubic,
+      curve: const Interval(.25, 1, curve: Curves.easeInOutCubic),
+    );
+    _focusScrim = CurvedAnimation(
+      parent: _focusController,
+      curve: const Interval(0, .5, curve: Curves.easeOutCubic),
     );
   }
 
@@ -74,6 +101,9 @@ class _SessionScreenState extends State<SessionScreen>
   GlobalKey _keyFor(String id) => _itemKeys.putIfAbsent(id, GlobalKey.new);
 
   Future<void> _onTap(Dhikr dhikr) async {
+    // Measure the flight origins before anything moves.
+    final arabicFrom = _globalRect(_arabicKeys[dhikr.id]);
+    final counterFrom = _globalRect(_counterKeys[dhikr.id]);
     final progress = context.read<ProgressController>();
     final completed = progress.increment(widget.session, dhikr);
     if (completed) {
@@ -82,12 +112,25 @@ class _SessionScreenState extends State<SessionScreen>
       HapticFeedback.lightImpact();
     }
     _anchorTo(dhikr.id);
-    if (!completed && dhikr.repetitions >= _focusThreshold) {
-      setState(() => _focused = dhikr);
+    if (!completed &&
+        dhikr.repetitions >= _focusThreshold &&
+        arabicFrom != null &&
+        counterFrom != null) {
+      setState(() {
+        _focused = dhikr;
+        _focusArabicFrom = arabicFrom;
+        _focusCounterFrom = counterFrom;
+      });
       _focusController.forward(from: 0);
       return;
     }
     if (completed && mounted) await _scrollToNextIncomplete();
+  }
+
+  Rect? _globalRect(GlobalKey? key) {
+    final box = key?.currentContext?.findRenderObject();
+    if (box is! RenderBox || !box.attached || !box.hasSize) return null;
+    return box.localToGlobal(Offset.zero) & box.size;
   }
 
   void _onFocusTap() {
@@ -202,6 +245,7 @@ class _SessionScreenState extends State<SessionScreen>
 
   @override
   void dispose() {
+    _focusScrim.dispose();
     _focusAnim.dispose();
     _focusController.dispose();
     _scrollController.dispose();
@@ -271,118 +315,226 @@ class _SessionScreenState extends State<SessionScreen>
     );
   }
 
-  /// Full-screen counting overlay for high-repetition dhikrs: the dhikr text
-  /// rises to the top, a large counter grows in the middle and the background
-  /// fades to dark. Any tap counts; a vertical swipe or back dismisses.
+  /// Full-screen counting overlay for high-repetition dhikrs. The card's own
+  /// Arabic text flies to the top of the screen and its progress-circle +
+  /// count segment flies to the center and grows, while the background fades
+  /// to dark. Any tap counts; a vertical swipe or back dismisses (reversing
+  /// the flight back into the card).
   Widget _focusOverlay(BuildContext context) {
     final dhikr = _focused!;
     final progress = context.watch<ProgressController>();
+    final bgVariant = context.watch<SettingsController>().focusBgVariant;
     final count = progress.countFor(widget.session, dhikr.id);
+    final done = progress.isDone(widget.session, dhikr.id);
     final l10n = AppLocalizations.of(context)!;
-    return FadeTransition(
-      opacity: _focusAnim,
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: _onFocusTap,
-        onVerticalDragStart: (_) => _focusDrag = 0,
-        onVerticalDragUpdate: (details) {
-          _focusDrag += details.delta.dy;
-          if (_focusDrag.abs() > 48) _dismissFocus();
-        },
-        onVerticalDragEnd: (details) {
-          if ((details.primaryVelocity ?? 0).abs() > 250) _dismissFocus();
-        },
-        child: ColoredBox(
-          color: Colors.black.withValues(alpha: .82),
-          child: SafeArea(
-            child: Column(
+    final colors = Theme.of(context).colorScheme;
+    final accent = tierColor(context, dhikr.tier);
+    final media = MediaQuery.of(context);
+    final arabicFrom = _focusArabicFrom!;
+    final counterFrom = _focusCounterFrom!;
+    return AnimatedBuilder(
+      animation: _focusController,
+      builder: (context, _) {
+        final t = _focusAnim.value;
+        final scrimT = _focusScrim.value;
+        final size = media.size;
+        // The text keeps its exact width and wrapping; only its top moves.
+        final arabicTop = lerpDouble(
+          arabicFrom.top,
+          media.padding.top + 24,
+          t,
+        )!;
+        // The counter segment keeps its layout and scales up around its
+        // center while that center moves to the middle of the screen.
+        final counterCenter = Offset.lerp(
+          counterFrom.center,
+          Offset(size.width / 2, size.height * .54),
+          t,
+        )!;
+        final counterScale = lerpDouble(1, 3.6, t)!;
+        return Material(
+          type: MaterialType.transparency,
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: _onFocusTap,
+            onVerticalDragStart: (_) => _focusDrag = 0,
+            onVerticalDragUpdate: (details) {
+              _focusDrag += details.delta.dy;
+              if (_focusDrag.abs() > 48) _dismissFocus();
+            },
+            onVerticalDragEnd: (details) {
+              if ((details.primaryVelocity ?? 0).abs() > 250) _dismissFocus();
+            },
+            child: Stack(
               children: [
-                SlideTransition(
-                  position: Tween(
-                    begin: const Offset(0, .35),
-                    end: Offset.zero,
-                  ).animate(_focusAnim),
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 28, 24, 0),
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxHeight: MediaQuery.sizeOf(context).height * .35,
+                Positioned.fill(
+                  child: ClipRect(
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(
+                        sigmaX: 8 * scrimT,
+                        sigmaY: 8 * scrimT,
                       ),
-                      child: Directionality(
-                        textDirection: TextDirection.rtl,
-                        child: Text(
-                          dhikr.arabic,
-                          textAlign: TextAlign.center,
-                          overflow: TextOverflow.fade,
-                          style: arabicTextStyle.copyWith(
-                            color: Colors.white.withValues(alpha: .95),
-                          ),
+                      child: _focusBackground(scrimT, bgVariant),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  left: arabicFrom.left,
+                  top: arabicTop,
+                  width: arabicFrom.width,
+                  child: Directionality(
+                    textDirection: TextDirection.rtl,
+                    child: Text(
+                      dhikr.arabic,
+                      style: arabicTextStyle.copyWith(
+                        // Tint follows the scrim, not the flight: the text
+                        // turns white at its card position while the
+                        // background darkens, anchoring the eye to the
+                        // departure point.
+                        color: Color.lerp(
+                          colors.onSurface,
+                          Colors.white.withValues(alpha: .95),
+                          scrimT,
                         ),
                       ),
                     ),
                   ),
                 ),
-                Expanded(
-                  child: Center(
-                    child: ScaleTransition(
-                      scale: Tween(begin: .7, end: 1.0).animate(_focusAnim),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 120),
-                            transitionBuilder: (child, anim) => FadeTransition(
-                              opacity: anim,
-                              child: ScaleTransition(
-                                scale: Tween(
-                                  begin: .85,
-                                  end: 1.0,
-                                ).animate(anim),
-                                child: child,
-                              ),
-                            ),
-                            child: Text(
-                              '$count',
-                              key: ValueKey(count),
-                              style: const TextStyle(
-                                fontSize: 112,
-                                fontWeight: FontWeight.w600,
-                                fontFeatures: [FontFeature.tabularFigures()],
-                                color: Colors.white,
-                              ),
-                            ),
+                Positioned(
+                  left: counterCenter.dx - counterFrom.width / 2,
+                  top: counterCenter.dy - counterFrom.height / 2,
+                  child: Transform.scale(
+                    scale: counterScale,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          width: 26,
+                          height: 26,
+                          child: CircularProgressIndicator(
+                            value: done ? 1 : count / dhikr.repetitions,
+                            strokeWidth: 3,
+                            strokeCap: StrokeCap.round,
+                            color: accent,
+                            backgroundColor: colors.surfaceContainerHighest,
                           ),
-                          Text(
-                            '/ ${dhikr.repetitions}',
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontFeatures: const [
-                                FontFeature.tabularFigures(),
-                              ],
-                              color: Colors.white.withValues(alpha: .55),
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          '$count / ${dhikr.repetitions}',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontFeatures: const [FontFeature.tabularFigures()],
+                            color: Color.lerp(
+                              colors.onSurfaceVariant,
+                              Colors.white,
+                              scrimT,
                             ),
+                            fontWeight: FontWeight.w600,
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 24),
-                  child: Text(
-                    l10n.tapAnywhereToCount,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.white.withValues(alpha: .45),
+                // TEMP: live switcher between background candidates, sitting
+                // just below the counter's final (scaled) position.
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  top: size.height * .54 + (counterFrom.height * 3.6) / 2 + 28,
+                  child: Opacity(
+                    opacity: t,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        for (var i = 0; i < _focusBgLabels.length; i++)
+                          GestureDetector(
+                            onTap: () => context
+                                .read<SettingsController>()
+                                .setFocusBgVariant(i),
+                            child: Container(
+                              margin: const EdgeInsets.symmetric(horizontal: 4),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(999),
+                                color: Colors.white.withValues(
+                                  alpha: bgVariant == i ? .25 : .08,
+                                ),
+                              ),
+                              child: Text(
+                                _focusBgLabels[i],
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: media.padding.bottom + 28,
+                  child: Opacity(
+                    opacity: t,
+                    child: Center(
+                      child: Text(
+                        l10n.tapAnywhereToCount,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.white.withValues(alpha: .45),
+                        ),
+                      ),
                     ),
                   ),
                 ),
               ],
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
+  }
+
+  /// Background behind the blur, per candidate variant. The blur does the
+  /// de-cluttering, so the dark layer can stay lighter than a flat scrim.
+  Widget _focusBackground(double t, int variant) {
+    switch (variant) {
+      case 1: // Radial vignette spotlighting the counter.
+        return DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: RadialGradient(
+              center: const Alignment(0, .1),
+              radius: 1.2,
+              colors: [
+                Colors.black.withValues(alpha: .45 * t),
+                Colors.black.withValues(alpha: .85 * t),
+              ],
+            ),
+          ),
+          child: const SizedBox.expand(),
+        );
+      case 2: // Faint eight-pointed-star lattice over the dark layer.
+        return CustomPaint(
+          foregroundPainter: _GeometricPatternPainter(.05 * t),
+          child: ColoredBox(
+            color: Colors.black.withValues(alpha: .6 * t),
+            child: const SizedBox.expand(),
+          ),
+        );
+      default: // Blur only.
+        return ColoredBox(
+          color: Colors.black.withValues(alpha: .6 * t),
+          child: const SizedBox.expand(),
+        );
+    }
   }
 
   Widget _countList(ListConfigController config, List<Dhikr> dhikrs) {
@@ -446,6 +598,7 @@ class _SessionScreenState extends State<SessionScreen>
     // dhikr; it collapses again on scroll or tap. Unhide permanently
     // via edit mode. The Opacity wrapper is always present so the
     // card's element (and its size animation) survives peek toggles.
+    final focusable = dhikr.repetitions >= _focusThreshold;
     final card = Opacity(
       opacity: peeking ? 0.6 : 1,
       child: DhikrCard(
@@ -453,6 +606,13 @@ class _SessionScreenState extends State<SessionScreen>
         count: progress.countFor(widget.session, dhikr.id),
         done: done,
         collapsed: collapsed && !peeking,
+        arabicKey: focusable
+            ? _arabicKeys.putIfAbsent(dhikr.id, GlobalKey.new)
+            : null,
+        counterKey: focusable
+            ? _counterKeys.putIfAbsent(dhikr.id, GlobalKey.new)
+            : null,
+        hiddenForFocus: _focused?.id == dhikr.id,
         collapsedIcon: hidden
             ? Icons.visibility_off_outlined
             : Icons.check_rounded,
@@ -567,4 +727,54 @@ class _SessionScreenState extends State<SessionScreen>
       context.read<ListConfigController>().resetToDefault(widget.session);
     }
   }
+}
+
+/// Repeating eight-pointed-star lattice (two overlapping squares per cell),
+/// drawn as thin strokes for the focus overlay's pattern background.
+class _GeometricPatternPainter extends CustomPainter {
+  final double opacity;
+
+  const _GeometricPatternPainter(this.opacity);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (opacity <= 0) return;
+    final paint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.8
+      ..color = Colors.white.withValues(alpha: opacity);
+    const cell = 104.0;
+    var row = 0;
+    for (var y = 0.0; y < size.height + cell; y += cell * .75, row++) {
+      final shift = row.isEven ? 0.0 : cell / 2;
+      for (var x = -cell + shift; x < size.width + cell; x += cell) {
+        _star(canvas, Offset(x, y), cell * .46, paint);
+      }
+    }
+  }
+
+  void _star(Canvas canvas, Offset c, double r, Paint p) {
+    final upright = Path();
+    final rotated = Path();
+    for (var i = 0; i < 4; i++) {
+      final a = i * math.pi / 2;
+      final v1 = c + Offset(math.cos(a), math.sin(a)) * r;
+      final v2 =
+          c + Offset(math.cos(a + math.pi / 4), math.sin(a + math.pi / 4)) * r;
+      if (i == 0) {
+        upright.moveTo(v1.dx, v1.dy);
+        rotated.moveTo(v2.dx, v2.dy);
+      } else {
+        upright.lineTo(v1.dx, v1.dy);
+        rotated.lineTo(v2.dx, v2.dy);
+      }
+    }
+    canvas
+      ..drawPath(upright..close(), p)
+      ..drawPath(rotated..close(), p);
+  }
+
+  @override
+  bool shouldRepaint(covariant _GeometricPatternPainter old) =>
+      old.opacity != opacity;
 }

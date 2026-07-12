@@ -153,18 +153,18 @@ void main() {
 
     await tester.tap(find.text('ذكر big'));
     await tester.pumpAndSettle();
-    // The first tap counted and the overlay shows the big counter.
+    // The first tap counted and the overlay is up: the counter exists twice,
+    // as the card's (hidden) segment and as the overlay's flying copy.
     expect(find.text(_focusHint), findsOneWidget);
-    expect(find.text('/ 100'), findsOneWidget);
-    expect(find.text('1'), findsOneWidget);
+    expect(find.text('1 / 100'), findsNWidgets(2));
 
     // Tapping anywhere on the overlay counts.
     await tester.tap(find.text(_focusHint));
     await tester.pumpAndSettle();
-    expect(find.text('2'), findsOneWidget);
+    expect(find.text('2 / 100'), findsNWidgets(2));
 
-    // The small dhikr never opens the overlay.
-    expect(find.text('/ 2'), findsNothing);
+    // The small dhikr is untouched and never opens an overlay.
+    expect(find.text('0 / 2'), findsOneWidget);
   });
 
   testWidgets('swiping dismisses the focus counter without counting',
