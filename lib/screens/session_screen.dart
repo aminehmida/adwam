@@ -35,15 +35,50 @@ class _SessionScreenState extends State<SessionScreen> {
 
   GlobalKey _keyFor(String id) => _itemKeys.putIfAbsent(id, GlobalKey.new);
 
-  void _onTap(Dhikr dhikr) {
+  Future<void> _onTap(Dhikr dhikr) async {
     final progress = context.read<ProgressController>();
     final completed = progress.increment(widget.session, dhikr);
-    if (_activeId != dhikr.id) setState(() => _activeId = dhikr.id);
     if (completed) {
       HapticFeedback.mediumImpact();
-      _scrollToNextIncomplete();
     } else {
       HapticFeedback.lightImpact();
+    }
+    // Let the previous finished card animate closed (with the tapped card
+    // pinned in place) before measuring where to scroll next.
+    if (_activeId != dhikr.id) await _collapseKeepingInPlace(dhikr.id);
+    if (completed && mounted) await _scrollToNextIncomplete();
+  }
+
+  /// Collapsing the previously finished dhikr shrinks content above the
+  /// tapped card, which would drag the list up under the user's finger.
+  /// While the collapse animates, re-measure the tapped card every frame and
+  /// shift the scroll offset by the same delta so it stays visually pinned.
+  /// Completes once the layout has settled.
+  Future<void> _collapseKeepingInPlace(String tappedId) async {
+    final box =
+        _keyFor(tappedId).currentContext?.findRenderObject() as RenderBox?;
+    final anchor = box?.localToGlobal(Offset.zero).dy;
+    setState(() => _activeId = tappedId);
+    if (anchor == null) return;
+    var idle = 0;
+    // Frame cap well past the collapse animation, in case layout never
+    // settles for an unforeseen reason.
+    for (var frames = 0; frames < 90 && idle < 5; frames++) {
+      WidgetsBinding.instance.scheduleFrame();
+      await WidgetsBinding.instance.endOfFrame;
+      if (!mounted || !_scrollController.hasClients) return;
+      final box =
+          _keyFor(tappedId).currentContext?.findRenderObject() as RenderBox?;
+      if (box == null || !box.attached) return;
+      final delta = box.localToGlobal(Offset.zero).dy - anchor;
+      if (delta.abs() < 0.5) {
+        idle++;
+        continue;
+      }
+      idle = 0;
+      final position = _scrollController.position;
+      _scrollController.jumpTo((position.pixels + delta)
+          .clamp(position.minScrollExtent, position.maxScrollExtent));
     }
   }
 
@@ -162,43 +197,36 @@ class _SessionScreenState extends State<SessionScreen> {
           final collapsed = hidden || finished;
           final peeking = collapsed && _peeked.contains(dhikr.id);
           final newSection = startsSection(dhikrs, index);
-          final Widget card;
-          if (peeking) {
-            // Temporary read-only look at a hidden or finished dhikr;
-            // collapses again on scroll or tap. Unhide permanently via
-            // edit mode.
-            card = Opacity(
-              opacity: 0.6,
-              child: DhikrCard(
-                dhikr: dhikr,
-                count: progress.countFor(widget.session, dhikr.id),
-                done: done,
-                onTap: () => setState(() => _peeked.remove(dhikr.id)),
-              ),
-            );
-          } else {
-            card = DhikrCard(
+          // A peek is a temporary read-only look at a hidden or finished
+          // dhikr; it collapses again on scroll or tap. Unhide permanently
+          // via edit mode. The Opacity wrapper is always present so the
+          // card's element (and its size animation) survives peek toggles.
+          final card = Opacity(
+            opacity: peeking ? 0.6 : 1,
+            child: DhikrCard(
               dhikr: dhikr,
               count: progress.countFor(widget.session, dhikr.id),
               done: done,
-              collapsed: collapsed,
+              collapsed: collapsed && !peeking,
               collapsedIcon: hidden
                   ? Icons.visibility_off_outlined
                   : Icons.check_rounded,
-              onTap: collapsed
-                  ? () => setState(() => _peeked.add(dhikr.id))
-                  : () => _onTap(dhikr),
-              onLongPress: collapsed
+              onTap: peeking
+                  ? () => setState(() => _peeked.remove(dhikr.id))
+                  : collapsed
+                      ? () => setState(() => _peeked.add(dhikr.id))
+                      : () => _onTap(dhikr),
+              onLongPress: collapsed || peeking
                   ? null
                   : () {
                       HapticFeedback.mediumImpact();
-                      setState(() => _activeId = dhikr.id);
+                      _collapseKeepingInPlace(dhikr.id);
                       context
                           .read<ProgressController>()
                           .markDone(widget.session, dhikr);
                     },
-            );
-          }
+            ),
+          );
           return KeyedSubtree(
             key: _keyFor(dhikr.id),
             child: newSection

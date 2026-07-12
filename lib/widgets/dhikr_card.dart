@@ -42,8 +42,17 @@ class DhikrCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (collapsed) return _collapsedRow(context);
+    // Animate between the full card and the collapsed row so collapsing a
+    // finished dhikr (or peeking a hidden one) doesn't snap.
+    return AnimatedSize(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+      alignment: Alignment.topCenter,
+      child: collapsed ? _collapsedRow(context) : _fullCard(context),
+    );
+  }
 
+  Widget _fullCard(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final accent = tierColor(context, dhikr.tier);
 
