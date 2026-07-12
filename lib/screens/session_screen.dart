@@ -729,8 +729,10 @@ class _SessionScreenState extends State<SessionScreen>
   }
 }
 
-/// Repeating eight-pointed-star lattice (two overlapping squares per cell),
-/// drawn as thin strokes for the focus overlay's pattern background.
+/// Classic star-and-cross zellige lattice for the focus overlay's pattern
+/// background: touching eight-pointed stars on a square grid, an inner echo
+/// star rotated an eighth turn inside each, and diamonds filling the cell
+/// centres. Detail lines are thinner and fainter than the main lattice.
 class _GeometricPatternPainter extends CustomPainter {
   final double opacity;
 
@@ -739,39 +741,52 @@ class _GeometricPatternPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     if (opacity <= 0) return;
-    final paint = Paint()
+    final main = Paint()
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.8
+      ..strokeWidth = 4
       ..color = Colors.white.withValues(alpha: opacity);
-    const cell = 104.0;
-    var row = 0;
-    for (var y = 0.0; y < size.height + cell; y += cell * .75, row++) {
-      final shift = row.isEven ? 0.0 : cell / 2;
-      for (var x = -cell + shift; x < size.width + cell; x += cell) {
-        _star(canvas, Offset(x, y), cell * .46, paint);
+    final detail = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.2
+      ..color = Colors.white.withValues(alpha: opacity * .8);
+    const cell = 120.0;
+    for (var y = 0.0; y < size.height + cell; y += cell) {
+      for (var x = 0.0; x < size.width + cell; x += cell) {
+        final c = Offset(x, y);
+        // Main star, sized so neighbouring points almost touch, plus an
+        // inner echo star offset by an eighth turn.
+        _star(canvas, c, cell * .48, 0, main);
+        _star(canvas, c, cell * .26, math.pi / 8, detail);
+        // Diamond in the middle of each group of four stars.
+        _diamond(
+          canvas,
+          c + const Offset(cell / 2, cell / 2),
+          cell * .17,
+          detail,
+        );
       }
     }
   }
 
-  void _star(Canvas canvas, Offset c, double r, Paint p) {
-    final upright = Path();
-    final rotated = Path();
-    for (var i = 0; i < 4; i++) {
-      final a = i * math.pi / 2;
-      final v1 = c + Offset(math.cos(a), math.sin(a)) * r;
-      final v2 =
-          c + Offset(math.cos(a + math.pi / 4), math.sin(a + math.pi / 4)) * r;
-      if (i == 0) {
-        upright.moveTo(v1.dx, v1.dy);
-        rotated.moveTo(v2.dx, v2.dy);
-      } else {
-        upright.lineTo(v1.dx, v1.dy);
-        rotated.lineTo(v2.dx, v2.dy);
-      }
-    }
+  /// Eight-pointed star: two overlapping squares, the second an eighth of a
+  /// turn further round.
+  void _star(Canvas canvas, Offset c, double r, double rotation, Paint p) {
     canvas
-      ..drawPath(upright..close(), p)
-      ..drawPath(rotated..close(), p);
+      ..drawPath(_square(c, r, rotation), p)
+      ..drawPath(_square(c, r, rotation + math.pi / 4), p);
+  }
+
+  void _diamond(Canvas canvas, Offset c, double r, Paint p) =>
+      canvas.drawPath(_square(c, r, 0), p);
+
+  Path _square(Offset c, double r, double rotation) {
+    final path = Path();
+    for (var i = 0; i < 4; i++) {
+      final a = rotation + i * math.pi / 2;
+      final v = c + Offset(math.cos(a), math.sin(a)) * r;
+      i == 0 ? path.moveTo(v.dx, v.dy) : path.lineTo(v.dx, v.dy);
+    }
+    return path..close();
   }
 
   @override
