@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:flutter/material.dart' show ThemeMode;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/daily_progress.dart';
@@ -43,6 +44,16 @@ class PrefsStore {
   Future<void> saveLocaleOverride(Locale? locale) => locale == null
       ? _prefs.remove('locale')
       : _prefs.setString('locale', locale.languageCode);
+
+  ThemeMode loadThemeMode() {
+    final name = _prefs.getString('themeMode');
+    return ThemeMode.values
+        .firstWhere((m) => m.name == name, orElse: () => ThemeMode.system);
+  }
+
+  Future<void> saveThemeMode(ThemeMode mode) => mode == ThemeMode.system
+      ? _prefs.remove('themeMode')
+      : _prefs.setString('themeMode', mode.name);
 
   bool loadSkipSessionResetConfirm() =>
       _prefs.getBool('skipSessionResetConfirm') ?? false;
