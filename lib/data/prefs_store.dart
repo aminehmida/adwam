@@ -44,6 +44,12 @@ class PrefsStore {
       ? _prefs.remove('locale')
       : _prefs.setString('locale', locale.languageCode);
 
+  bool loadSkipSessionResetConfirm() =>
+      _prefs.getBool('skipSessionResetConfirm') ?? false;
+
+  Future<void> saveSkipSessionResetConfirm(bool value) =>
+      _prefs.setBool('skipSessionResetConfirm', value);
+
   Future<void> clearAllConfigs() async {
     for (final s in SessionType.values) {
       await _prefs.remove(_configKey(s));

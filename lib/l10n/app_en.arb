@@ -16,6 +16,16 @@
   "resetOrderBody": "This list will be reordered and all adhkar shown again.",
   "cancel": "Cancel",
   "reset": "Reset",
+  "resetSessionTitle": "Reset progress?",
+  "resetSessionBody": "Long pressing {session} resets today's progress for everything inside. Are you sure?",
+  "@resetSessionBody": {
+    "placeholders": {
+      "session": {
+        "type": "String"
+      }
+    }
+  },
+  "dontShowAgain": "Don't show this again",
   "settings": "Settings",
   "language": "Language",
   "languageSystem": "System",

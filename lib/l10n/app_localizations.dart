@@ -194,6 +194,24 @@ abstract class AppLocalizations {
   /// **'Reset'**
   String get reset;
 
+  /// No description provided for @resetSessionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset progress?'**
+  String get resetSessionTitle;
+
+  /// No description provided for @resetSessionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Long pressing {session} resets today\'s progress for everything inside. Are you sure?'**
+  String resetSessionBody(String session);
+
+  /// No description provided for @dontShowAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t show this again'**
+  String get dontShowAgain;
+
   /// No description provided for @settings.
   ///
   /// In en, this message translates to:

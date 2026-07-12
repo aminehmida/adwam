@@ -26,6 +26,7 @@ class ContextCard extends StatelessWidget {
   final int done;
   final int total;
   final VoidCallback onTap;
+  final VoidCallback? onLongPress;
 
   const ContextCard({
     super.key,
@@ -33,6 +34,7 @@ class ContextCard extends StatelessWidget {
     required this.done,
     required this.total,
     required this.onTap,
+    this.onLongPress,
   });
 
   @override
@@ -55,6 +57,7 @@ class ContextCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
+        onLongPress: onLongPress,
         child: Padding(
           padding: const EdgeInsets.all(18),
           child: Row(

@@ -57,6 +57,17 @@ class AppLocalizationsAr extends AppLocalizations {
   String get reset => 'استعادة';
 
   @override
+  String get resetSessionTitle => 'تصفير التقدّم؟';
+
+  @override
+  String resetSessionBody(String session) {
+    return 'الضغط المطوّل على «$session» يصفّر تقدّم اليوم لجميع الأذكار داخلها. هل أنت متأكد؟';
+  }
+
+  @override
+  String get dontShowAgain => 'عدم إظهار هذه الرسالة مجددًا';
+
+  @override
   String get settings => 'الإعدادات';
 
   @override

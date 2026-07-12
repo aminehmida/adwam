@@ -75,6 +75,16 @@ void main() {
     expect(revived.isDone(SessionType.morning, 'a'), isTrue);
   });
 
+  test('resetSession clears only that session', () {
+    controller.markDone(SessionType.morning, _dhikr('a'));
+    controller.increment(SessionType.evening, _dhikr('b'));
+
+    controller.resetSession(SessionType.morning);
+    expect(controller.isDone(SessionType.morning, 'a'), isFalse);
+    expect(controller.countFor(SessionType.morning, 'a'), 0);
+    expect(controller.countFor(SessionType.evening, 'b'), 1);
+  });
+
   test('resetToday clears everything', () {
     controller.markDone(SessionType.morning, _dhikr('a'));
     controller.resetToday();

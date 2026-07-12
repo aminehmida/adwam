@@ -50,6 +50,20 @@ class ProgressController extends ChangeNotifier {
     _persistAndNotify();
   }
 
+  /// Clears today's counters and done-marks for one session only.
+  void resetSession(SessionType session) {
+    checkDateRollover();
+    final prefix = '${session.name}.';
+    _progress = _progress.copyWith(
+      counts: {
+        for (final entry in _progress.counts.entries)
+          if (!entry.key.startsWith(prefix)) entry.key: entry.value,
+      },
+      done: _progress.done.where((key) => !key.startsWith(prefix)).toSet(),
+    );
+    _persistAndNotify();
+  }
+
   void resetToday() {
     _progress = DailyProgress(dateStamp: dateStampOf(DateTime.now()));
     _persistAndNotify();

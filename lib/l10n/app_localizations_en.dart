@@ -58,6 +58,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reset => 'Reset';
 
   @override
+  String get resetSessionTitle => 'Reset progress?';
+
+  @override
+  String resetSessionBody(String session) {
+    return 'Long pressing $session resets today\'s progress for everything inside. Are you sure?';
+  }
+
+  @override
+  String get dontShowAgain => 'Don\'t show this again';
+
+  @override
   String get settings => 'Settings';
 
   @override
