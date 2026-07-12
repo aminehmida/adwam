@@ -1,10 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:dhikr/data/content_repository.dart';
-import 'package:dhikr/data/prefs_store.dart';
-import 'package:dhikr/models/dhikr.dart';
-import 'package:dhikr/state/list_config_controller.dart';
+import 'package:adwam/data/content_repository.dart';
+import 'package:adwam/data/prefs_store.dart';
+import 'package:adwam/models/dhikr.dart';
+import 'package:adwam/state/list_config_controller.dart';
 
 Dhikr d(String id, BenefitTier tier) => Dhikr(
       id: id,

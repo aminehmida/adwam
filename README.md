@@ -1,4 +1,6 @@
-# Dhikr — أذكار اليوم والليلة
+# Adwam (أدوَم) — أذكار اليوم والليلة
+
+> «أحبُّ الأعمالِ إلى الله أدومُها وإن قلّ» — the name: the most *lasting* deeds.
 
 Offline daily adhkar app (Flutter, Android). Four sessions — morning, evening,
 post-prayer, before-sleep — with a principled default ordering and full

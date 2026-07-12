@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:dhikr/data/content_repository.dart';
-import 'package:dhikr/models/dhikr.dart';
+import 'package:adwam/data/content_repository.dart';
+import 'package:adwam/models/dhikr.dart';
 
 Dhikr d(
   String id, {

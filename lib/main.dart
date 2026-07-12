@@ -63,7 +63,7 @@ class _DhikrAppState extends State<DhikrApp> with WidgetsBindingObserver {
       ],
       child: Consumer<SettingsController>(
         builder: (context, settings, _) => MaterialApp(
-          title: 'Dhikr',
+          title: 'Adwam',
           locale: settings.locale,
           localizationsDelegates: const [
             AppLocalizations.delegate,

@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:dhikr/models/daily_progress.dart';
-import 'package:dhikr/models/dhikr.dart';
+import 'package:adwam/models/daily_progress.dart';
+import 'package:adwam/models/dhikr.dart';
 
 void main() {
   final noon = DateTime(2026, 7, 10, 12);

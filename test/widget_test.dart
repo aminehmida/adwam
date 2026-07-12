@@ -1,10 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:dhikr/data/content_repository.dart';
-import 'package:dhikr/data/prefs_store.dart';
-import 'package:dhikr/main.dart';
-import 'package:dhikr/models/dhikr.dart';
+import 'package:adwam/data/content_repository.dart';
+import 'package:adwam/data/prefs_store.dart';
+import 'package:adwam/main.dart';
+import 'package:adwam/models/dhikr.dart';
 
 Dhikr _dhikr(String id, {int reps = 2}) => Dhikr(
       id: id,
