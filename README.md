@@ -8,6 +8,15 @@
 
 The most beloved deeds to Allah are the most lasting, even if small. The app is named after this hadith and built around it: a simple, fully offline app for the daily adhkar of the Prophet ﷺ, covering morning, evening, after prayer, and before sleep.
 
+## Download
+
+Grab the APK from the **[latest release](https://github.com/aminehmida/adwam/releases/latest)**:
+
+- `adwam-<version>-arm64-v8a.apk` — for any modern Android phone
+- `adwam-<version>-universal.apk` — larger; for older or unusual devices
+
+Past versions are on the [releases page](https://github.com/aminehmida/adwam/releases).
+
 ## Ordering
 
 All of the Prophet's adhkar are beneficial, but on a busy day you may not get through the whole session. Adwam orders each session so that the time you do have counts:
