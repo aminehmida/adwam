@@ -36,6 +36,8 @@
   "themeSystem": "حسب الجهاز",
   "themeLight": "فاتح",
   "themeDark": "داكن",
+  "volumeKeyCounting": "العدّ بزر الصوت",
+  "volumeKeyCountingBody": "الضغط على زر خفض الصوت يعدّ الذكر الحالي، ولن يتغيّر مستوى الصوت أثناء العدّ.",
   "resetTodayProgress": "تصفير عدّادات اليوم",
   "resetTodayBody": "ستبدأ جميع عدّادات اليوم من جديد.",
   "resetCustomizations": "استعادة جميع التخصيصات",

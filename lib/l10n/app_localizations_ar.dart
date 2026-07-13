@@ -98,6 +98,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get themeDark => 'داكن';
 
   @override
+  String get volumeKeyCounting => 'العدّ بزر الصوت';
+
+  @override
+  String get volumeKeyCountingBody =>
+      'الضغط على زر خفض الصوت يعدّ الذكر الحالي، ولن يتغيّر مستوى الصوت أثناء العدّ.';
+
+  @override
   String get resetTodayProgress => 'تصفير عدّادات اليوم';
 
   @override

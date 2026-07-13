@@ -36,6 +36,8 @@
   "themeSystem": "System",
   "themeLight": "Light",
   "themeDark": "Dark",
+  "volumeKeyCounting": "Count with volume button",
+  "volumeKeyCountingBody": "Pressing volume down counts the current dhikr; the volume itself won't change while counting.",
   "resetTodayProgress": "Reset today's progress",
   "resetTodayBody": "All of today's counters will start over.",
   "resetCustomizations": "Reset all customizations",

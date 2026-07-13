@@ -272,6 +272,18 @@ abstract class AppLocalizations {
   /// **'Dark'**
   String get themeDark;
 
+  /// No description provided for @volumeKeyCounting.
+  ///
+  /// In en, this message translates to:
+  /// **'Count with volume button'**
+  String get volumeKeyCounting;
+
+  /// No description provided for @volumeKeyCountingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Pressing volume down counts the current dhikr; the volume itself won\'t change while counting.'**
+  String get volumeKeyCountingBody;
+
   /// No description provided for @resetTodayProgress.
   ///
   /// In en, this message translates to:

@@ -61,6 +61,11 @@ class PrefsStore {
   Future<void> saveSkipSessionResetConfirm(bool value) =>
       _prefs.setBool('skipSessionResetConfirm', value);
 
+  bool loadVolumeKeyCounting() => _prefs.getBool('volumeKeyCounting') ?? true;
+
+  Future<void> saveVolumeKeyCounting(bool value) =>
+      _prefs.setBool('volumeKeyCounting', value);
+
   int loadFocusBgVariant() => _prefs.getInt('focusBgVariant') ?? 0;
 
   Future<void> saveFocusBgVariant(int variant) =>

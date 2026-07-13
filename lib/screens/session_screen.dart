@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'dart:ui' show ImageFilter, lerpDouble;
 
+import 'package:flutter/foundation.dart' show defaultTargetPlatform, kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart' show RenderAbstractViewport;
 import 'package:flutter/services.dart';
@@ -84,6 +85,31 @@ class _SessionScreenState extends State<SessionScreen>
       parent: _focusController,
       curve: const Interval(0, .5, curve: Curves.easeOutCubic),
     );
+    if (_volumeKeysSupported) {
+      _volumeChannel.setMethodCallHandler(_onVolumeCall);
+      _settingsForVolume = context.read<SettingsController>()
+        ..addListener(_syncVolumeIntercept);
+      _syncVolumeIntercept();
+    }
+  }
+
+  Future<dynamic> _onVolumeCall(MethodCall call) async {
+    if (call.method == 'volumeDown') _onVolumeDown();
+  }
+
+  /// Intercept only while counting makes sense: setting on and not editing.
+  /// Everywhere else the button keeps its normal volume behavior.
+  void _syncVolumeIntercept() {
+    if (!_volumeKeysSupported) return;
+    final enabled = _settingsForVolume?.volumeKeyCounting ?? false;
+    _setIntercept(enabled && !_editing);
+  }
+
+  void _setIntercept(bool value) {
+    // Widget tests run with an Android defaultTargetPlatform but no host.
+    _volumeChannel
+        .invokeMethod('setIntercept', value)
+        .catchError((_) => null, test: (e) => e is MissingPluginException);
   }
 
   /// Hidden or finished dhikrs the user tapped to read. Cleared on scroll —
@@ -102,6 +128,14 @@ class _SessionScreenState extends State<SessionScreen>
   /// the anchor or anything below — the tapped card is pinned by construction.
   String? _anchorId;
   static const _centerKey = ValueKey('anchor-sliver');
+
+  /// Android-only: the hardware volume-down key counts the current dhikr.
+  /// MainActivity consumes the key (so the volume never changes) and calls
+  /// `volumeDown` here; `setIntercept` tells it when to do so.
+  static const _volumeChannel = MethodChannel('dev.amine.adwam/volume');
+  static bool get _volumeKeysSupported =>
+      !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
+  SettingsController? _settingsForVolume;
 
   GlobalKey _keyFor(String id) => _itemKeys.putIfAbsent(id, GlobalKey.new);
 
@@ -278,6 +312,66 @@ class _SessionScreenState extends State<SessionScreen>
     return null;
   }
 
+  /// A volume-down press counts whichever card a tap would naturally hit:
+  /// the focus overlay if open, else the active card while it is incomplete
+  /// and on screen, else the topmost visible incomplete card (so scrolling
+  /// past a dhikr skips it, like tapping the next one would), wrapping to
+  /// the first incomplete anywhere when nothing ahead is visible.
+  void _onVolumeDown() {
+    if (!mounted || _editing) return;
+    if (ModalRoute.of(context)?.isCurrent == false) return;
+    if (_focused != null) {
+      _onFocusTap();
+      return;
+    }
+    final config = context.read<ListConfigController>();
+    final progress = context.read<ProgressController>();
+    final dhikrs = config.listFor(widget.session);
+    bool isIncomplete(Dhikr d) =>
+        !config.isHidden(widget.session, d.id) &&
+        !progress.isDone(widget.session, d.id);
+    Dhikr? target;
+    final activeIndex = dhikrs.indexWhere((d) => d.id == _activeId);
+    if (activeIndex != -1 &&
+        isIncomplete(dhikrs[activeIndex]) &&
+        _isInViewport(dhikrs[activeIndex].id)) {
+      target = dhikrs[activeIndex];
+    }
+    target ??= _topVisibleWhere(dhikrs, isIncomplete);
+    if (target == null) {
+      final firstIndex = dhikrs.indexWhere(isIncomplete);
+      if (firstIndex != -1) target = dhikrs[firstIndex];
+    }
+    if (target != null) _onTap(target);
+  }
+
+  /// Whether [id]'s card has any part inside the count viewport. Same math
+  /// as [_topVisibleItem], plus the upper bound: items built in the cache
+  /// extent below the viewport don't count as visible.
+  bool _isInViewport(String id) {
+    if (!_scrollController.hasClients) return false;
+    final object = _itemKeys[id]?.currentContext?.findRenderObject();
+    if (object == null || !object.attached) return false;
+    final viewport = RenderAbstractViewport.maybeOf(object);
+    if (viewport == null) return false;
+    final position = _scrollController.position;
+    final top = viewport.getOffsetToReveal(object, 0).offset;
+    final height = object is RenderBox && object.hasSize
+        ? object.size.height
+        : 0.0;
+    final delta = top - position.pixels;
+    return delta + height > 0 && delta < position.viewportDimension;
+  }
+
+  /// Topmost dhikr passing [test] with any part inside the count viewport.
+  Dhikr? _topVisibleWhere(List<Dhikr> dhikrs, bool Function(Dhikr) test) {
+    for (final dhikr in dhikrs) {
+      if (!test(dhikr)) continue;
+      if (_isInViewport(dhikr.id)) return dhikr;
+    }
+    return null;
+  }
+
   /// Swap to the edit list, keeping the card at the top of the count list
   /// in place instead of opening at the top.
   void _startEditing() {
@@ -294,6 +388,7 @@ class _SessionScreenState extends State<SessionScreen>
       estimate = math.max(0, index * total / dhikrs.length);
     }
     setState(() => _editing = true);
+    _syncVolumeIntercept();
     if (anchor != null) _alignEditListTo(anchor, estimate);
   }
 
@@ -357,6 +452,7 @@ class _SessionScreenState extends State<SessionScreen>
       _editing = false;
       if (anchor != null) _anchorId = anchor.id;
     });
+    _syncVolumeIntercept();
     if (anchor == null) return;
     // The anchor card sits at offset 0 by construction; shift by the delta
     // it had in the edit list. Runs post-frame so the rebuilt count list has
@@ -375,6 +471,11 @@ class _SessionScreenState extends State<SessionScreen>
 
   @override
   void dispose() {
+    if (_volumeKeysSupported) {
+      _settingsForVolume?.removeListener(_syncVolumeIntercept);
+      _setIntercept(false);
+      _volumeChannel.setMethodCallHandler(null);
+    }
     _focusScrim.dispose();
     _focusAnim.dispose();
     _focusController.dispose();

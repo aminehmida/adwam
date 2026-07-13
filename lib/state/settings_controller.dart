@@ -7,18 +7,21 @@ import '../data/prefs_store.dart';
 
 /// App-level settings: the locale override (null = follow system), the
 /// theme mode, whether the long-press session-reset confirmation has been
-/// muted, and the focus-overlay background variant.
+/// muted, whether the volume-down key counts the current dhikr (Android),
+/// and the focus-overlay background variant.
 class SettingsController extends ChangeNotifier {
   final PrefsStore _store;
   Locale? _locale;
   ThemeMode _themeMode;
   bool _skipSessionResetConfirm;
+  bool _volumeKeyCounting;
   int _focusBgVariant;
 
   SettingsController(this._store)
       : _locale = _store.loadLocaleOverride(),
         _themeMode = _store.loadThemeMode(),
         _skipSessionResetConfirm = _store.loadSkipSessionResetConfirm(),
+        _volumeKeyCounting = _store.loadVolumeKeyCounting(),
         _focusBgVariant = _store.loadFocusBgVariant();
 
   Locale? get locale => _locale;
@@ -42,6 +45,14 @@ class SettingsController extends ChangeNotifier {
   void setSkipSessionResetConfirm(bool value) {
     _skipSessionResetConfirm = value;
     _store.saveSkipSessionResetConfirm(value);
+    notifyListeners();
+  }
+
+  bool get volumeKeyCounting => _volumeKeyCounting;
+
+  void setVolumeKeyCounting(bool value) {
+    _volumeKeyCounting = value;
+    _store.saveVolumeKeyCounting(value);
     notifyListeners();
   }
 

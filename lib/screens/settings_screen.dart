@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show defaultTargetPlatform, kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -54,6 +55,14 @@ class SettingsScreen extends StatelessWidget {
               ],
             ),
           ),
+          if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android)
+            SwitchListTile(
+              secondary: const Icon(Icons.volume_down),
+              title: Text(l10n.volumeKeyCounting),
+              subtitle: Text(l10n.volumeKeyCountingBody),
+              value: settings.volumeKeyCounting,
+              onChanged: settings.setVolumeKeyCounting,
+            ),
           const Divider(),
           ListTile(
             leading: const Icon(Icons.restart_alt),

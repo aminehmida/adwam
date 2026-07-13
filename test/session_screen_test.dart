@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -54,6 +55,20 @@ Future<void> openMorningWithHundred(WidgetTester tester) async {
 }
 
 const _focusHint = 'Tap anywhere to count · swipe to close';
+
+const _volumeChannel = MethodChannel('dev.amine.adwam/volume');
+
+/// Simulates MainActivity reporting a volume-down press over the channel.
+Future<void> pressVolumeDown(WidgetTester tester) async {
+  await tester.binding.defaultBinaryMessenger.handlePlatformMessage(
+    _volumeChannel.name,
+    const StandardMethodCodec().encodeMethodCall(
+      const MethodCall('volumeDown'),
+    ),
+    (_) {},
+  );
+  await tester.pumpAndSettle();
+}
 
 void main() {
   testWidgets('hidden dhikr renders as a collapsed title-only row',
@@ -190,6 +205,55 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('0 / 1'), findsOneWidget); // morning: 1 visible left
     expect(find.text('0 / 3'), findsNWidgets(3)); // other sessions untouched
+  });
+
+  testWidgets('volume-down counts like a tap and skips finished dhikrs',
+      (tester) async {
+    final intercepts = <bool>[];
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      _volumeChannel,
+      (call) async {
+        if (call.method == 'setIntercept') {
+          intercepts.add(call.arguments as bool);
+        }
+        return null;
+      },
+    );
+    await openMorning(tester);
+    expect(intercepts, [true]); // interception on when the session opens
+
+    await pressVolumeDown(tester);
+    expect(find.text('1 / 2'), findsOneWidget); // topmost visible card
+
+    await pressVolumeDown(tester); // completes 'one'
+    expect(find.byIcon(Icons.check_circle_rounded), findsOneWidget);
+
+    // 'two' is hidden, so the next press counts 'three'.
+    await pressVolumeDown(tester);
+    expect(find.text('1 / 2'), findsOneWidget);
+
+    // Edit mode hands the key back to the system; leaving restores it.
+    await tester.tap(find.byIcon(Icons.tune));
+    await tester.pumpAndSettle();
+    expect(intercepts.last, isFalse);
+    await tester.tap(find.byIcon(Icons.check));
+    await tester.pumpAndSettle();
+    expect(intercepts.last, isTrue);
+  });
+
+  testWidgets('volume-down counts inside the focus counter', (tester) async {
+    await openMorningWithHundred(tester);
+
+    await tester.tap(find.text('ذكر big'));
+    await tester.pumpAndSettle();
+    expect(find.text(_focusHint), findsOneWidget);
+    expect(find.text('1 / 100'), findsNWidgets(2));
+
+    // While the overlay is up, the volume key counts it — not the card the
+    // viewport scan would pick.
+    await pressVolumeDown(tester);
+    expect(find.text('2 / 100'), findsNWidgets(2));
+    expect(find.text('0 / 2'), findsOneWidget); // 'small' untouched
   });
 
   testWidgets('tapping a 100-rep dhikr opens the focus counter and counts',

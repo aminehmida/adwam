@@ -99,6 +99,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get themeDark => 'Dark';
 
   @override
+  String get volumeKeyCounting => 'Count with volume button';
+
+  @override
+  String get volumeKeyCountingBody =>
+      'Pressing volume down counts the current dhikr; the volume itself won\'t change while counting.';
+
+  @override
   String get resetTodayProgress => 'Reset today\'s progress';
 
   @override
