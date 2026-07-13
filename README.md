@@ -61,6 +61,10 @@ Features under consideration:
 
 Flutter app (currently on Android; iOS planned). Toolchain pinned via [mise](https://mise.jdx.dev).
 
+The code was written using [Claude Code](https://claude.com/claude-code), and reviewed and tested manually.
+
+PRs, bug reports, and ideas are welcome.
+
 ```sh
 flutter pub get
 flutter test
