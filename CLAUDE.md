@@ -26,6 +26,14 @@ Adwam (أدوَم) — Flutter adhkar app (currently released on Android; iOS pl
 - E2E: `mise exec -- flutter test integration_test -d emulator-5554` on AVD `adwam_test`; boot headless with `emulator -avd adwam_test -no-window -no-audio -no-boot-anim -no-snapshot` (emulator bin under `/opt/homebrew/share/android-commandlinetools/emulator/`), poll `adb shell getprop sys.boot_completed`
 - Icons: `mise exec -- dart run flutter_launcher_icons` (adaptive layers in `assets/icon/`)
 
+# Releasing on GitHub
+
+- Cut a release by pushing a `v*` tag (`git tag v1.0.1 && git push origin v1.0.1`) — `.github/workflows/release.yml` runs analyze + tests, builds, and publishes a GitHub Release with two APKs: `adwam-<tag>-arm64-v8a.apk` (17MB, any modern phone) and `adwam-<tag>-universal.apk` (46MB, all ABIs). `workflow_dispatch` runs build the artifact only, no Release.
+- Versioning: versionName comes from the tag (`v1.2.0` → `1.2.0`); versionCode is `3000 + run_number`, so CI APKs install over local 2xxx builds — a local `--build-number` deploy after installing a CI release must exceed the CI number.
+- CI signs with the real upload key via repo secrets `KEYSTORE_BASE64`/`KEYSTORE_PASSWORD`/`KEY_PASSWORD`/`KEY_ALIAS` (from local `android/key.properties` + keystore; re-set with `gh secret set` if the key rotates). Without them it silently falls back to debug signing — verify with `apksigner verify --print-certs` (cert CN=Amine Hmida, OU=Dhikr) if in doubt.
+- Workflow gotcha: the `secrets` context is not allowed in a step-level `if` — pass secrets via `env` and guard in bash.
+- Warm runs take ~6.5 min (Gradle + pub + Flutter SDK caches); the first run after a cache bust is ~3 min slower.
+
 # Content pipeline
 
 - `tool/build_content.py` merges raw sources in `content/sources/` (Seen-Arabic Morning-And-Evening-Adhkar-DB; hisnmuslim.com API ch. 25 + 28) with the hand-reviewed overlay `content/curation.json` → generates `assets/adhkar.json` (the app's only content asset) and `content/REVIEW.md`.
