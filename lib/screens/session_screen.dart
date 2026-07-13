@@ -133,7 +133,7 @@ class _SessionScreenState extends State<SessionScreen>
       _focusController.forward(from: 0);
       return;
     }
-    if (completed && mounted) await _scrollToNextIncomplete();
+    if (completed && mounted) await _scrollToNextIncomplete(after: dhikr.id);
   }
 
   Rect? _globalRect(GlobalKey? key) {
@@ -158,13 +158,14 @@ class _SessionScreenState extends State<SessionScreen>
   }
 
   Future<void> _dismissFocus({bool completed = false}) async {
-    if (_focused == null || _focusDismissing) return;
+    final dhikr = _focused;
+    if (dhikr == null || _focusDismissing) return;
     _focusDismissing = true;
     await _focusController.reverse();
     _focusDismissing = false;
     if (!mounted) return;
     setState(() => _focused = null);
-    if (completed) await _scrollToNextIncomplete();
+    if (completed) await _scrollToNextIncomplete(after: dhikr.id);
   }
 
   /// Make [id]'s card the viewport origin (and the active card) without any
@@ -200,7 +201,7 @@ class _SessionScreenState extends State<SessionScreen>
     });
   }
 
-  Future<void> _scrollToNextIncomplete() async {
+  Future<void> _scrollToNextIncomplete({required String after}) async {
     // Let a re-anchor from the tap take effect before measuring targets:
     // scroll offsets are relative to the (possibly new) origin.
     await WidgetsBinding.instance.endOfFrame;
@@ -208,11 +209,14 @@ class _SessionScreenState extends State<SessionScreen>
     final config = context.read<ListConfigController>();
     final progress = context.read<ProgressController>();
     final dhikrs = config.listFor(widget.session);
-    final targetIndex = dhikrs.indexWhere(
-      (d) =>
-          !config.isHidden(widget.session, d.id) &&
-          !progress.isDone(widget.session, d.id),
-    );
+    bool isIncomplete(Dhikr d) =>
+        !config.isHidden(widget.session, d.id) &&
+        !progress.isDone(widget.session, d.id);
+    // Search forward from the finished dhikr so a deliberately skipped
+    // earlier one isn't snapped back to; wrap only when nothing is ahead.
+    final afterIndex = dhikrs.indexWhere((d) => d.id == after);
+    var targetIndex = dhikrs.indexWhere(isIncomplete, afterIndex + 1);
+    if (targetIndex == -1) targetIndex = dhikrs.indexWhere(isIncomplete);
     if (targetIndex == -1) return;
     final targetId = dhikrs[targetIndex].id;
 
