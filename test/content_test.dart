@@ -51,6 +51,20 @@ void main() {
     }
   });
 
+  test('surah-form dhikrs carry a full mushaf body with 30 ayah markers; '
+      'no other dhikr has a body', () {
+    for (final d in repo.all) {
+      if (d.form == DhikrForm.surah) {
+        expect(d.body?.trim(), isNotEmpty, reason: d.id);
+        expect(d.body, isNot(d.arabic), reason: d.id);
+        // Both sleep surahs (as-Sajdah, al-Mulk) have exactly 30 ayat.
+        expect('۝'.allMatches(d.body!).length, 30, reason: d.id);
+      } else {
+        expect(d.body, isNull, reason: d.id);
+      }
+    }
+  });
+
   test('full surahs really are at the end of every session list', () {
     for (final session in SessionType.values) {
       final list = repo.defaultList(session);

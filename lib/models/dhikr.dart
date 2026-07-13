@@ -45,6 +45,10 @@ const customIdPrefix = 'custom-';
 class Dhikr {
   final String id;
   final String arabic;
+
+  /// Full mushaf text (with end-of-ayah markers) of `surah`-form dhikrs,
+  /// shown in the reader overlay; [arabic] stays the display name.
+  final String? body;
   final int repetitions;
   final DhikrForm form;
   final BenefitTier tier;
@@ -64,6 +68,7 @@ class Dhikr {
   const Dhikr({
     required this.id,
     required this.arabic,
+    this.body,
     required this.repetitions,
     required this.form,
     required this.tier,
@@ -91,6 +96,7 @@ class Dhikr {
   factory Dhikr.fromJson(Map<String, dynamic> json) => Dhikr(
         id: json['id'] as String,
         arabic: json['arabic'] as String,
+        body: json['body'] as String?,
         repetitions: json['repetitions'] as int,
         form: _formNames[json['form']]!,
         tier: _tierNames[json['benefit_tier']]!,

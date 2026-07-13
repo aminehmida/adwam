@@ -95,6 +95,11 @@ class PrefsStore {
   Future<void> saveFocusBgVariant(int variant) =>
       _prefs.setInt('focusBgVariant', variant);
 
+  double loadQuranFontSize() => _prefs.getDouble('quranFontSize') ?? 23;
+
+  Future<void> saveQuranFontSize(double size) =>
+      _prefs.setDouble('quranFontSize', size);
+
   Future<void> clearAllConfigs() async {
     for (final s in SessionType.values) {
       await _prefs.remove(_configKey(s));

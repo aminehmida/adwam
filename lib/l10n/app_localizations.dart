@@ -419,7 +419,7 @@ abstract class AppLocalizations {
   /// No description provided for @aboutBody.
   ///
   /// In en, this message translates to:
-  /// **'Daily adhkar. Sources: Hisn al-Muslim (hisnmuslim.com) and the Seen-Arabic Morning & Evening Adhkar database.'**
+  /// **'Daily adhkar. Sources: Hisn al-Muslim (hisnmuslim.com), the Seen-Arabic Morning & Evening Adhkar database, and the Quran text from Tanzil (tanzil.net).'**
   String get aboutBody;
 
   /// No description provided for @tapAnywhereToCount.
@@ -427,6 +427,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tap anywhere to count · swipe to close'**
   String get tapAnywhereToCount;
+
+  /// No description provided for @doneReading.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get doneReading;
+
+  /// No description provided for @quranFontSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Quran font size'**
+  String get quranFontSize;
+
+  /// No description provided for @quranFontSizeBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Text size when reading a full surah.'**
+  String get quranFontSizeBody;
 }
 
 class _AppLocalizationsDelegate

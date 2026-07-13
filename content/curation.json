@@ -334,6 +334,7 @@
   "sl-110a": {
     "arabic": "سورة السجدة",
     "form": "surah",
+    "quran_chapter": 32,
     "repetitions": 1,
     "benefit_tier": "protection",
     "sort_hint": 1,
@@ -347,6 +348,7 @@
   "sl-110b": {
     "arabic": "سورة الملك",
     "form": "surah",
+    "quran_chapter": 67,
     "repetitions": 1,
     "benefit_tier": "protection",
     "sort_hint": 2,

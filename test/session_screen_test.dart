@@ -27,6 +27,16 @@ Dhikr _hundredDhikr(String id) => Dhikr(
       contexts: SessionType.values.toSet(),
     );
 
+Dhikr _surahDhikr(String id) => Dhikr(
+      id: id,
+      arabic: 'سورة $id',
+      body: 'آية أولى ۝١ آية ثانية ۝٢',
+      repetitions: 1,
+      form: DhikrForm.surah,
+      tier: BenefitTier.none,
+      contexts: SessionType.values.toSet(),
+    );
+
 /// Boots the app with three dhikrs ('two' hidden for morning) and opens the
 /// morning session. Visible cards show a '0 / 2' counter; collapsed ones
 /// show only their title.
@@ -48,6 +58,17 @@ Future<void> openMorning(WidgetTester tester) async {
 Future<void> openMorningWithHundred(WidgetTester tester) async {
   SharedPreferences.setMockInitialValues({});
   final repo = ContentRepository([_hundredDhikr('big'), _dhikr('small')]);
+  await tester.pumpWidget(DhikrApp(repo: repo, store: await PrefsStore.open()));
+  await tester.pumpAndSettle();
+  await tester.tap(find.text('Morning adhkar'));
+  await tester.pumpAndSettle();
+}
+
+/// Boots the app with a surah-form dhikr plus a small one and opens the
+/// morning session.
+Future<void> openMorningWithSurah(WidgetTester tester) async {
+  SharedPreferences.setMockInitialValues({});
+  final repo = ContentRepository([_dhikr('small'), _surahDhikr('big')]);
   await tester.pumpWidget(DhikrApp(repo: repo, store: await PrefsStore.open()));
   await tester.pumpAndSettle();
   await tester.tap(find.text('Morning adhkar'));
@@ -317,5 +338,42 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text(_focusHint), findsNothing);
     expect(find.byIcon(Icons.check_circle_rounded), findsOneWidget);
+  });
+
+  testWidgets('tapping a surah card opens the reader without counting',
+      (tester) async {
+    await openMorningWithSurah(tester);
+
+    await tester.tap(find.text('سورة big'));
+    await tester.pumpAndSettle();
+    // The surah body is only rendered inside the reader.
+    expect(find.text('آية أولى ۝١ آية ثانية ۝٢'), findsOneWidget);
+    expect(find.text('0 / 1'), findsOneWidget); // opening never counts
+  });
+
+  testWidgets('the reader\'s Done button completes the surah and closes',
+      (tester) async {
+    await openMorningWithSurah(tester);
+
+    await tester.tap(find.text('سورة big'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Done'));
+    await tester.pumpAndSettle();
+    expect(find.text('آية أولى ۝١ آية ثانية ۝٢'), findsNothing);
+    expect(find.text('1 / 1'), findsOneWidget);
+    expect(find.byIcon(Icons.check_circle_rounded), findsOneWidget);
+  });
+
+  testWidgets('back closes the reader without completing the surah',
+      (tester) async {
+    await openMorningWithSurah(tester);
+
+    await tester.tap(find.text('سورة big'));
+    await tester.pumpAndSettle();
+
+    await tester.binding.handlePopRoute(); // system back
+    await tester.pumpAndSettle();
+    expect(find.text('آية أولى ۝١ آية ثانية ۝٢'), findsNothing);
+    expect(find.text('0 / 1'), findsOneWidget); // still on the session, unread
   });
 }

@@ -79,6 +79,24 @@ class SettingsScreen extends StatelessWidget {
               onChanged: settings.setShowTransliteration,
             ),
           ],
+          ListTile(
+            leading: const Icon(Icons.format_size),
+            title: Text(l10n.quranFontSize),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(l10n.quranFontSizeBody),
+                Slider(
+                  value: settings.quranFontSize.clamp(18, 32),
+                  min: 18,
+                  max: 32,
+                  divisions: 7,
+                  label: '${settings.quranFontSize.round()}',
+                  onChanged: settings.setQuranFontSize,
+                ),
+              ],
+            ),
+          ),
           const Divider(),
           ListTile(
             leading: const Icon(Icons.restart_alt),

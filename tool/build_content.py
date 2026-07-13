@@ -10,6 +10,9 @@ Sources (content/sources/):
   hisn_sleep.json       hisnmuslim.com API ch. 28 (text only)
   hisn_*_en.json        hisnmuslim.com API en/25 + en/28 (matched by ID):
                         TRANSLATED_TEXT, LANGUAGE_ARABIC_TRANSLATED_TEXT
+  tanzil_uthmani.json   Tanzil Uthmani text of the full surahs read before
+                        sleep (chapters 32, 67) — ayah text verbatim per the
+                        Tanzil license; becomes the surah cards' `body`
 
 Overlay (content/curation.json): per-id form, benefit_tier, fixed_order, and
 for hisn items repetitions/benefit_text/benefit_source; translation_override /
@@ -51,6 +54,19 @@ def source_en(ar):
 
 def load(path):
     return json.loads(path.read_text(encoding="utf-8-sig"))
+
+
+def arabic_digits(n):
+    return "".join(chr(0x0660 + int(d)) for d in str(n))
+
+
+def surah_body(ayat):
+    """Join a surah's ayat into one mushaf-flow string. Each ayah ends with
+    U+06DD ARABIC END OF AYAH followed immediately (no space) by the verse
+    number — Amiri's contextual shaping encloses the digits in the mark.
+    The ayah text itself is Tanzil's, verbatim (license: no changes)."""
+    return " ".join(f"{aya} ۝{arabic_digits(i)}"
+                    for i, aya in enumerate(ayat, 1))
 
 
 def clean_hisn(text):
@@ -110,6 +126,9 @@ def build():
             **({"sort_hint": cur["sort_hint"]} if "sort_hint" in cur else {}),
         })
 
+    # Full-surah bodies (Tanzil Uthmani text, chapters keyed by number).
+    tanzil = load(SRC / "tanzil_uthmani.json")
+
     # Post-prayer + sleep (hisnmuslim.com); *_en.json carries the English
     # rendering, matched by the same ID.
     for fname, en_fname, prefix, context in [
@@ -123,7 +142,9 @@ def build():
                 # Split cards take all their text, English included, from curation.
                 for split_id, ctx in SPLIT[did]:
                     cur = curation[split_id]
-                    dhikrs.append(_hisn_entry(split_id, [ctx], cur["arabic"], cur, {}))
+                    ayat = tanzil["chapters"][str(cur["quran_chapter"])]["ayat"]
+                    dhikrs.append(_hisn_entry(split_id, [ctx], cur["arabic"],
+                                              cur, {}, body=surah_body(ayat)))
                 continue
             cur = curation[did]
             dhikrs.append(_hisn_entry(
@@ -135,6 +156,11 @@ def build():
     if missing:
         raise SystemExit(f"missing translation/transliteration: {missing}")
 
+    bodyless = [d["id"] for d in dhikrs
+                if d["form"] == "surah" and not d.get("body")]
+    if bodyless:
+        raise SystemExit(f"surah-form entries missing body: {bodyless}")
+
     out = {"version": 1, "dhikrs": dhikrs}
     assets = ROOT / "assets"
     assets.mkdir(exist_ok=True)
@@ -145,11 +171,12 @@ def build():
     print(f"Wrote {len(dhikrs)} dhikrs -> assets/adhkar.json + content/REVIEW.md")
 
 
-def _hisn_entry(did, contexts, arabic, cur, en):
+def _hisn_entry(did, contexts, arabic, cur, en, body=None):
     return {
         "id": did,
         "contexts": contexts,
         "arabic": arabic,
+        **({"body": body} if body else {}),
         "repetitions": cur["repetitions"],
         "form": cur["form"],
         "benefit_tier": cur["benefit_tier"],

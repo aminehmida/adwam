@@ -16,6 +16,7 @@ import '../theme.dart';
 import '../widgets/context_card.dart' show sessionTitle;
 import '../widgets/custom_dhikr_dialog.dart';
 import '../widgets/dhikr_card.dart';
+import '../widgets/surah_reader.dart';
 import '../widgets/tier_header.dart';
 
 class SessionScreen extends StatefulWidget {
@@ -28,7 +29,7 @@ class SessionScreen extends StatefulWidget {
 }
 
 class _SessionScreenState extends State<SessionScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   final Map<String, GlobalKey> _itemKeys = {};
   final ScrollController _scrollController = ScrollController();
   bool _editing = false;
@@ -65,6 +66,14 @@ class _SessionScreenState extends State<SessionScreen>
   late final CurvedAnimation _focusAnim;
   late final CurvedAnimation _focusScrim;
 
+  /// Surah currently open in the reader overlay; stays set while the exit
+  /// animation runs. Mutually exclusive with [_focused] — a repetitions-1
+  /// surah is never high-rep.
+  Dhikr? _reading;
+  bool _readerDismissing = false;
+  late final AnimationController _readerController;
+  late final CurvedAnimation _readerAnim;
+
   @override
   void initState() {
     super.initState();
@@ -85,6 +94,17 @@ class _SessionScreenState extends State<SessionScreen>
     _focusScrim = CurvedAnimation(
       parent: _focusController,
       curve: const Interval(0, .5, curve: Curves.easeOutCubic),
+    );
+    // The reader has no shared-element flight, so it opens faster than the
+    // focus overlay: the scrim darkens while the text fades and slides in.
+    _readerController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 350),
+      reverseDuration: const Duration(milliseconds: 300),
+    );
+    _readerAnim = CurvedAnimation(
+      parent: _readerController,
+      curve: Curves.easeOutCubic,
     );
     if (_volumeKeysSupported) {
       _volumeChannel.setMethodCallHandler(_onVolumeCall);
@@ -141,6 +161,15 @@ class _SessionScreenState extends State<SessionScreen>
   GlobalKey _keyFor(String id) => _itemKeys.putIfAbsent(id, GlobalKey.new);
 
   Future<void> _onTap(Dhikr dhikr) async {
+    // A surah card opens the reader instead of counting; completion happens
+    // via the reader's Done button.
+    if (dhikr.form == DhikrForm.surah && dhikr.body != null) {
+      HapticFeedback.lightImpact();
+      _anchorTo(dhikr.id);
+      setState(() => _reading = dhikr);
+      _readerController.forward(from: 0);
+      return;
+    }
     // Measure the flight origins before anything moves.
     final arabicFrom = _globalRect(_arabicKeys[dhikr.id]);
     final counterFrom = _globalRect(_counterKeys[dhikr.id]);
@@ -196,6 +225,25 @@ class _SessionScreenState extends State<SessionScreen>
     _focusDismissing = false;
     if (!mounted) return;
     setState(() => _focused = null);
+    if (completed) await _scrollToNextIncomplete(after: dhikr.id);
+  }
+
+  void _completeReading() {
+    final dhikr = _reading;
+    if (dhikr == null || _readerDismissing) return;
+    context.read<ProgressController>().increment(widget.session, dhikr);
+    HapticFeedback.mediumImpact();
+    _dismissReader(completed: true);
+  }
+
+  Future<void> _dismissReader({bool completed = false}) async {
+    final dhikr = _reading;
+    if (dhikr == null || _readerDismissing) return;
+    _readerDismissing = true;
+    await _readerController.reverse();
+    _readerDismissing = false;
+    if (!mounted) return;
+    setState(() => _reading = null);
     if (completed) await _scrollToNextIncomplete(after: dhikr.id);
   }
 
@@ -321,6 +369,9 @@ class _SessionScreenState extends State<SessionScreen>
   void _onVolumeDown() {
     if (!mounted || _editing) return;
     if (ModalRoute.of(context)?.isCurrent == false) return;
+    // While reading a surah nothing should count — not the surah (Done is
+    // deliberate) and certainly not some card behind the overlay.
+    if (_reading != null) return;
     if (_focused != null) {
       _onFocusTap();
       return;
@@ -480,6 +531,8 @@ class _SessionScreenState extends State<SessionScreen>
     _focusScrim.dispose();
     _focusAnim.dispose();
     _focusController.dispose();
+    _readerAnim.dispose();
+    _readerController.dispose();
     _scrollController.dispose();
     _editScrollController.dispose();
     super.dispose();
@@ -492,10 +545,12 @@ class _SessionScreenState extends State<SessionScreen>
     final l10n = AppLocalizations.of(context)!;
 
     return PopScope(
-      canPop: !_editing && _focused == null,
+      canPop: !_editing && _focused == null && _reading == null,
       onPopInvokedWithResult: (didPop, _) {
         if (didPop) return;
-        if (_focused != null) {
+        if (_reading != null) {
+          _dismissReader();
+        } else if (_focused != null) {
           _dismissFocus();
         } else {
           _stopEditing();
@@ -557,8 +612,51 @@ class _SessionScreenState extends State<SessionScreen>
             ),
           ),
           if (_focused != null) _focusOverlay(context),
+          if (_reading != null) _readerOverlay(context),
         ],
       ),
+    );
+  }
+
+  /// Full-screen mushaf reader for a surah-form dhikr: an opaque backdrop
+  /// in the theme surface fades in (no blurred see-through — the list
+  /// showing behind long text is distracting) and the card-styled reader
+  /// fades and slides in over it (no shared-element flight — the body text
+  /// has no on-card counterpart to fly from).
+  Widget _readerOverlay(BuildContext context) {
+    final dhikr = _reading!;
+    final surface = Theme.of(context).colorScheme.surface;
+    return AnimatedBuilder(
+      animation: _readerController,
+      builder: (context, _) {
+        final t = _readerAnim.value;
+        return Material(
+          type: MaterialType.transparency,
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: Opacity(
+                  opacity: t,
+                  child: ColoredBox(color: surface),
+                ),
+              ),
+              Positioned.fill(
+                child: Opacity(
+                  opacity: t,
+                  child: Transform.translate(
+                    offset: Offset(0, 24 * (1 - t)),
+                    child: SurahReader(
+                      dhikr: dhikr,
+                      onDone: _completeReading,
+                      onDismiss: _dismissReader,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 

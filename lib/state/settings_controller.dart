@@ -19,6 +19,7 @@ class SettingsController extends ChangeNotifier {
   int _focusBgVariant;
   bool _showTranslation;
   bool _showTransliteration;
+  double _quranFontSize;
 
   SettingsController(this._store)
       : _locale = _store.loadLocaleOverride(),
@@ -27,7 +28,8 @@ class SettingsController extends ChangeNotifier {
         _volumeKeyCounting = _store.loadVolumeKeyCounting(),
         _focusBgVariant = _store.loadFocusBgVariant(),
         _showTranslation = _store.loadShowTranslation(),
-        _showTransliteration = _store.loadShowTransliteration();
+        _showTransliteration = _store.loadShowTransliteration(),
+        _quranFontSize = _store.loadQuranFontSize();
 
   Locale? get locale => _locale;
 
@@ -83,6 +85,15 @@ class SettingsController extends ChangeNotifier {
   void setFocusBgVariant(int variant) {
     _focusBgVariant = variant;
     _store.saveFocusBgVariant(variant);
+    notifyListeners();
+  }
+
+  /// Body text size of the surah reader's Quran text.
+  double get quranFontSize => _quranFontSize;
+
+  void setQuranFontSize(double size) {
+    _quranFontSize = size;
+    _store.saveQuranFontSize(size);
     notifyListeners();
   }
 }

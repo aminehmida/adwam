@@ -177,8 +177,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aboutBody =>
-      'Daily adhkar. Sources: Hisn al-Muslim (hisnmuslim.com) and the Seen-Arabic Morning & Evening Adhkar database.';
+      'Daily adhkar. Sources: Hisn al-Muslim (hisnmuslim.com), the Seen-Arabic Morning & Evening Adhkar database, and the Quran text from Tanzil (tanzil.net).';
 
   @override
   String get tapAnywhereToCount => 'Tap anywhere to count · swipe to close';
+
+  @override
+  String get doneReading => 'Done';
+
+  @override
+  String get quranFontSize => 'Quran font size';
+
+  @override
+  String get quranFontSizeBody => 'Text size when reading a full surah.';
 }

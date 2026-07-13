@@ -60,6 +60,9 @@
   "resetCustomizations": "استعادة جميع التخصيصات",
   "resetCustomizationsBody": "سيعود ترتيب القوائم والأذكار المخفية إلى الوضع الافتراضي.",
   "about": "حول التطبيق",
-  "aboutBody": "أذكار اليوم والليلة. المصادر: حصن المسلم (hisnmuslim.com) وقاعدة بيانات أذكار الصباح والمساء (Seen-Arabic).",
-  "tapAnywhereToCount": "انقر في أي مكان للعدّ · اسحب للإغلاق"
+  "aboutBody": "أذكار اليوم والليلة. المصادر: حصن المسلم (hisnmuslim.com) وقاعدة بيانات أذكار الصباح والمساء (Seen-Arabic) ونص القرآن من مشروع تنزيل (tanzil.net).",
+  "tapAnywhereToCount": "انقر في أي مكان للعدّ · اسحب للإغلاق",
+  "doneReading": "تم",
+  "quranFontSize": "حجم خط القرآن",
+  "quranFontSizeBody": "حجم النص عند قراءة سورة كاملة."
 }
