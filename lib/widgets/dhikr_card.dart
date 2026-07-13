@@ -112,17 +112,19 @@ class DhikrCard extends StatelessWidget {
                   ),
                 ),
               ),
-              if (nonArabicUi && (showTranslation || showTransliteration)) ...[
+              if ((nonArabicUi && (showTranslation || showTransliteration)) ||
+                  dhikr.benefit != null) ...[
                 const SizedBox(height: 4),
-                _TranslationExpander(
-                  dhikr: dhikr,
-                  showTranslation: showTranslation,
-                  showTransliteration: showTransliteration,
-                ),
-              ],
-              if (dhikr.benefit != null) ...[
-                const SizedBox(height: 4),
-                _BenefitExpander(dhikr: dhikr),
+                _CardExpanders(items: [
+                  if (nonArabicUi && (showTranslation || showTransliteration))
+                    _translationItem(
+                      context,
+                      dhikr: dhikr,
+                      showTranslation: showTranslation,
+                      showTransliteration: showTransliteration,
+                    ),
+                  if (dhikr.benefit != null) _benefitItem(context, dhikr),
+                ]),
               ],
               const SizedBox(height: 10),
               _counterRow(context, colors, accent),
@@ -220,26 +222,33 @@ class DhikrCard extends StatelessWidget {
 
 }
 
-/// Compact expander. Unlike [ExpansionTile], the tap target is only as wide
-/// as its icon + label, so taps elsewhere on the row fall through to the
-/// card's counter tap.
-class _CardExpander extends StatefulWidget {
+class _ExpanderItem {
   final IconData icon;
   final String label;
   final Widget body;
 
-  const _CardExpander({
+  const _ExpanderItem({
     required this.icon,
     required this.label,
     required this.body,
   });
-
-  @override
-  State<_CardExpander> createState() => _CardExpanderState();
 }
 
-class _CardExpanderState extends State<_CardExpander> {
-  bool _expanded = false;
+/// Compact expanders sharing one header row (e.g. Translation next to
+/// Virtue), each toggling its own body below. Unlike [ExpansionTile], every
+/// tap target is only as wide as its icon + label, so taps elsewhere on the
+/// row fall through to the card's counter tap.
+class _CardExpanders extends StatefulWidget {
+  final List<_ExpanderItem> items;
+
+  const _CardExpanders({required this.items});
+
+  @override
+  State<_CardExpanders> createState() => _CardExpandersState();
+}
+
+class _CardExpandersState extends State<_CardExpanders> {
+  final Set<int> _expanded = {};
 
   @override
   Widget build(BuildContext context) {
@@ -249,104 +258,60 @@ class _CardExpanderState extends State<_CardExpander> {
       children: [
         Align(
           alignment: AlignmentDirectional.centerStart,
-          child: InkWell(
-            borderRadius: BorderRadius.circular(8),
-            onTap: () => setState(() => _expanded = !_expanded),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(widget.icon, size: 16, color: colors.tertiary),
-                  const SizedBox(width: 8),
-                  Text(
-                    widget.label,
-                    style: TextStyle(
-                      fontFamily: 'Amiri',
-                      fontSize: 15,
-                      color: colors.tertiary,
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  AnimatedRotation(
-                    turns: _expanded ? .5 : 0,
-                    duration: const Duration(milliseconds: 200),
-                    child: Icon(
-                      Icons.expand_more,
-                      size: 18,
-                      color: colors.tertiary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (var i = 0; i < widget.items.length; i++) ...[
+                if (i > 0) const SizedBox(width: 10),
+                _header(i, colors),
+              ],
+            ],
           ),
         ),
-        AnimatedSize(
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeInOut,
-          alignment: Alignment.topCenter,
-          child: !_expanded
-              ? const SizedBox(width: double.infinity)
-              : Padding(
-                  padding: const EdgeInsets.only(top: 4, bottom: 8),
-                  child: widget.body,
-                ),
-        ),
+        for (var i = 0; i < widget.items.length; i++)
+          AnimatedSize(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeInOut,
+            alignment: Alignment.topCenter,
+            child: !_expanded.contains(i)
+                ? const SizedBox(width: double.infinity)
+                : Padding(
+                    padding: const EdgeInsets.only(top: 4, bottom: 8),
+                    child: widget.items[i].body,
+                  ),
+          ),
       ],
     );
   }
-}
 
-/// "Virtue" expander: the benefit text follows the UI language (falling back
-/// to Arabic when no translation exists); the dhikr text itself always stays
-/// Arabic.
-class _BenefitExpander extends StatelessWidget {
-  final Dhikr dhikr;
-
-  const _BenefitExpander({required this.dhikr});
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    final arabicUi = Localizations.localeOf(context).languageCode == 'ar';
-    final text =
-        arabicUi ? dhikr.benefit! : (dhikr.benefitEn ?? dhikr.benefit!);
-    final source = arabicUi
-        ? dhikr.benefitSource
-        : (dhikr.benefitSourceEn ?? dhikr.benefitSource);
-    final showingArabic = arabicUi || dhikr.benefitEn == null;
-
-    return Directionality(
-      textDirection: showingArabic ? TextDirection.rtl : TextDirection.ltr,
-      child: _CardExpander(
-        icon: Icons.auto_awesome,
-        label: AppLocalizations.of(context)!.virtue,
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _header(int i, ColorScheme colors) {
+    final item = widget.items[i];
+    final open = _expanded.contains(i);
+    return InkWell(
+      borderRadius: BorderRadius.circular(8),
+      onTap: () =>
+          setState(() => open ? _expanded.remove(i) : _expanded.add(i)),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
+            Icon(item.icon, size: 16, color: colors.tertiary),
+            const SizedBox(width: 8),
             Text(
-              text,
-              style: showingArabic
-                  ? TextStyle(
-                      fontFamily: 'Amiri',
-                      fontSize: 17,
-                      height: 1.7,
-                      color: colors.onSurfaceVariant,
-                    )
-                  : TextStyle(
-                      fontSize: 14.5,
-                      height: 1.5,
-                      color: colors.onSurfaceVariant,
-                    ),
-            ),
-            if (source != null) ...[
-              const SizedBox(height: 4),
-              Text(
-                source,
-                style: TextStyle(fontSize: 12, color: colors.outline),
+              item.label,
+              style: TextStyle(
+                fontFamily: 'Amiri',
+                fontSize: 15,
+                color: colors.tertiary,
               ),
-            ],
+            ),
+            const SizedBox(width: 4),
+            AnimatedRotation(
+              turns: open ? .5 : 0,
+              duration: const Duration(milliseconds: 200),
+              child: Icon(Icons.expand_more, size: 18, color: colors.tertiary),
+            ),
           ],
         ),
       ),
@@ -354,55 +319,94 @@ class _BenefitExpander extends StatelessWidget {
   }
 }
 
-/// "Translation" expander shown on non-Arabic UIs: transliteration first
-/// (recitation aid), then the meaning. Which of the two appear is controlled
-/// by the settings toggles.
-class _TranslationExpander extends StatelessWidget {
-  final Dhikr dhikr;
-  final bool showTranslation;
-  final bool showTransliteration;
+/// "Virtue" expander item: the benefit text follows the UI language (falling
+/// back to Arabic when no translation exists); the dhikr text itself always
+/// stays Arabic.
+_ExpanderItem _benefitItem(BuildContext context, Dhikr dhikr) {
+  final colors = Theme.of(context).colorScheme;
+  final arabicUi = Localizations.localeOf(context).languageCode == 'ar';
+  final text = arabicUi ? dhikr.benefit! : (dhikr.benefitEn ?? dhikr.benefit!);
+  final source = arabicUi
+      ? dhikr.benefitSource
+      : (dhikr.benefitSourceEn ?? dhikr.benefitSource);
+  final showingArabic = arabicUi || dhikr.benefitEn == null;
 
-  const _TranslationExpander({
-    required this.dhikr,
-    required this.showTranslation,
-    required this.showTransliteration,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    return Directionality(
-      textDirection: TextDirection.ltr,
-      child: _CardExpander(
-        icon: Icons.translate,
-        label: AppLocalizations.of(context)!.translation,
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (showTransliteration)
-              Text(
-                dhikr.transliteration!,
-                style: TextStyle(
-                  fontSize: 14.5,
-                  height: 1.5,
-                  fontStyle: FontStyle.italic,
-                  color: colors.onSurfaceVariant,
-                ),
-              ),
-            if (showTransliteration && showTranslation)
-              const SizedBox(height: 6),
-            if (showTranslation)
-              Text(
-                dhikr.translation!,
-                style: TextStyle(
-                  fontSize: 14.5,
-                  height: 1.5,
-                  color: colors.onSurfaceVariant,
-                ),
-              ),
+  return _ExpanderItem(
+    icon: Icons.auto_awesome,
+    label: AppLocalizations.of(context)!.virtue,
+    body: Directionality(
+      textDirection: showingArabic ? TextDirection.rtl : TextDirection.ltr,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            text,
+            style: showingArabic
+                ? TextStyle(
+                    fontFamily: 'Amiri',
+                    fontSize: 17,
+                    height: 1.7,
+                    color: colors.onSurfaceVariant,
+                  )
+                : TextStyle(
+                    fontSize: 14.5,
+                    height: 1.5,
+                    color: colors.onSurfaceVariant,
+                  ),
+          ),
+          if (source != null) ...[
+            const SizedBox(height: 4),
+            Text(
+              source,
+              style: TextStyle(fontSize: 12, color: colors.outline),
+            ),
           ],
-        ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
+
+/// "Translation" expander item shown on non-Arabic UIs: transliteration
+/// first (recitation aid), then the meaning. Which of the two appear is
+/// controlled by the settings toggles.
+_ExpanderItem _translationItem(
+  BuildContext context, {
+  required Dhikr dhikr,
+  required bool showTranslation,
+  required bool showTransliteration,
+}) {
+  final colors = Theme.of(context).colorScheme;
+  return _ExpanderItem(
+    icon: Icons.translate,
+    label: AppLocalizations.of(context)!.translation,
+    body: Directionality(
+      textDirection: TextDirection.ltr,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (showTransliteration)
+            Text(
+              dhikr.transliteration!,
+              style: TextStyle(
+                fontSize: 14.5,
+                height: 1.5,
+                fontStyle: FontStyle.italic,
+                color: colors.onSurfaceVariant,
+              ),
+            ),
+          if (showTransliteration && showTranslation) const SizedBox(height: 6),
+          if (showTranslation)
+            Text(
+              dhikr.translation!,
+              style: TextStyle(
+                fontSize: 14.5,
+                height: 1.5,
+                color: colors.onSurfaceVariant,
+              ),
+            ),
+        ],
+      ),
+    ),
+  );
 }

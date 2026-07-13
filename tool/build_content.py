@@ -102,8 +102,11 @@ def build():
                                   or (en.get("source") or "").strip() or None),
             "translation": (cur.get("translation_override")
                             or (en.get("translation") or "").strip() or None),
+            # The source transliterations carry a stray unbalanced quote
+            # before "Qul" in the three Quls — drop it.
             "transliteration": (cur.get("transliteration_override")
-                                or (en.get("transliteration") or "").strip() or None),
+                                or (en.get("transliteration") or "")
+                                .replace('"', "").strip() or None),
             **({"sort_hint": cur["sort_hint"]} if "sort_hint" in cur else {}),
         })
 
