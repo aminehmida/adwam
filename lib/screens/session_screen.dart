@@ -511,8 +511,8 @@ class _SessionScreenState extends State<SessionScreen>
                   child: ClipRect(
                     child: BackdropFilter(
                       filter: ImageFilter.blur(
-                        sigmaX: 8 * scrimT,
-                        sigmaY: 8 * scrimT,
+                        sigmaX: 6 * scrimT,
+                        sigmaY: 6 * scrimT,
                       ),
                       child: _focusBackground(scrimT, bgVariant),
                     ),
@@ -654,8 +654,8 @@ class _SessionScreenState extends State<SessionScreen>
               center: const Alignment(0, .1),
               radius: 1.2,
               colors: [
-                Colors.black.withValues(alpha: .45 * t),
-                Colors.black.withValues(alpha: .85 * t),
+                Colors.black.withValues(alpha: .38 * t),
+                Colors.black.withValues(alpha: .72 * t),
               ],
             ),
           ),
@@ -665,13 +665,13 @@ class _SessionScreenState extends State<SessionScreen>
         return CustomPaint(
           foregroundPainter: _GeometricPatternPainter(.05 * t),
           child: ColoredBox(
-            color: Colors.black.withValues(alpha: .6 * t),
+            color: Colors.black.withValues(alpha: .5 * t),
             child: const SizedBox.expand(),
           ),
         );
       default: // Blur only.
         return ColoredBox(
-          color: Colors.black.withValues(alpha: .6 * t),
+          color: Colors.black.withValues(alpha: .5 * t),
           child: const SizedBox.expand(),
         );
     }
