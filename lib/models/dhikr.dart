@@ -38,6 +38,10 @@ const _sessionNames = {
   'sleep': SessionType.sleep,
 };
 
+/// Ids of user-created dhikrs (see ListConfigController.addCustom); the
+/// built-in content uses source-derived ids like `me-01`.
+const customIdPrefix = 'custom-';
+
 class Dhikr {
   final String id;
   final String arabic;
@@ -81,6 +85,9 @@ class Dhikr {
   /// count in the focus overlay.
   bool get isHighRep => repetitions >= highRepThreshold;
 
+  /// User-created (editable and deletable), as opposed to built-in content.
+  bool get isCustom => id.startsWith(customIdPrefix);
+
   factory Dhikr.fromJson(Map<String, dynamic> json) => Dhikr(
         id: json['id'] as String,
         arabic: json['arabic'] as String,
@@ -99,4 +106,26 @@ class Dhikr {
         sortHint: json['sort_hint'] as int? ?? noSortHint,
         fixedOrder: json['fixed_order'] as int? ?? noFixedOrder,
       );
+
+  /// Inverse of [Dhikr.fromJson] (same keys as assets/adhkar.json), used to
+  /// persist user-created dhikrs.
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'arabic': arabic,
+        'repetitions': repetitions,
+        'form': form.name,
+        'benefit_tier': tier.name,
+        if (benefit != null) 'benefit_text': benefit,
+        if (benefitSource != null) 'benefit_source': benefitSource,
+        if (benefitEn != null) 'benefit_text_en': benefitEn,
+        if (benefitSourceEn != null) 'benefit_source_en': benefitSourceEn,
+        if (translation != null) 'translation': translation,
+        if (transliteration != null) 'transliteration': transliteration,
+        'contexts': [
+          for (final c in contexts)
+            _sessionNames.entries.firstWhere((e) => e.value == c).key,
+        ],
+        if (sortHint != noSortHint) 'sort_hint': sortHint,
+        if (fixedOrder != noFixedOrder) 'fixed_order': fixedOrder,
+      };
 }

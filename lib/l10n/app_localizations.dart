@@ -206,6 +206,78 @@ abstract class AppLocalizations {
   /// **'Reset'**
   String get reset;
 
+  /// No description provided for @myDuas.
+  ///
+  /// In en, this message translates to:
+  /// **'My duas'**
+  String get myDuas;
+
+  /// No description provided for @addCustomDua.
+  ///
+  /// In en, this message translates to:
+  /// **'Add dua'**
+  String get addCustomDua;
+
+  /// No description provided for @customDuaNewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New dua'**
+  String get customDuaNewTitle;
+
+  /// No description provided for @customDuaEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit dua'**
+  String get customDuaEditTitle;
+
+  /// No description provided for @customDuaTextHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Dua text'**
+  String get customDuaTextHint;
+
+  /// No description provided for @customDuaSessions.
+  ///
+  /// In en, this message translates to:
+  /// **'Show in'**
+  String get customDuaSessions;
+
+  /// No description provided for @save.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save;
+
+  /// No description provided for @customDuaDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this dua?'**
+  String get customDuaDeleteTitle;
+
+  /// No description provided for @customDuaDeleteBody.
+  ///
+  /// In en, this message translates to:
+  /// **'It will be removed from every session it appears in.'**
+  String get customDuaDeleteBody;
+
+  /// No description provided for @delete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
+
+  /// No description provided for @editCustomDua.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get editCustomDua;
+
+  /// No description provided for @deleteCustomDua.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get deleteCustomDua;
+
   /// No description provided for @resetSessionTitle.
   ///
   /// In en, this message translates to:

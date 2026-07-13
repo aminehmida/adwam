@@ -64,6 +64,43 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reset => 'Reset';
 
   @override
+  String get myDuas => 'My duas';
+
+  @override
+  String get addCustomDua => 'Add dua';
+
+  @override
+  String get customDuaNewTitle => 'New dua';
+
+  @override
+  String get customDuaEditTitle => 'Edit dua';
+
+  @override
+  String get customDuaTextHint => 'Dua text';
+
+  @override
+  String get customDuaSessions => 'Show in';
+
+  @override
+  String get save => 'Save';
+
+  @override
+  String get customDuaDeleteTitle => 'Delete this dua?';
+
+  @override
+  String get customDuaDeleteBody =>
+      'It will be removed from every session it appears in.';
+
+  @override
+  String get delete => 'Delete';
+
+  @override
+  String get editCustomDua => 'Edit';
+
+  @override
+  String get deleteCustomDua => 'Delete';
+
+  @override
   String get resetSessionTitle => 'Reset progress?';
 
   @override

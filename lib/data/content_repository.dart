@@ -5,9 +5,11 @@ import 'package:flutter/services.dart' show rootBundle;
 import '../models/dhikr.dart';
 
 /// Quran passages pin to the top of a session, then the tiered dhikrs, then
-/// the high-repetition counting dhikrs, and full surahs stay at the very
-/// bottom (the last thing read, e.g. Surah al-Mulk before sleep).
+/// the high-repetition counting dhikrs, then full surahs (the last thing
+/// read, e.g. Surah al-Mulk before sleep), and the user's own duas stay in
+/// their own section at the very bottom.
 int _band(Dhikr d) {
+  if (d.isCustom) return 4;
   if (d.isHighRep) return 2;
   return switch (d.form) {
     DhikrForm.quran => 0,
@@ -62,16 +64,18 @@ class ContentRepository {
         ..sort(compareDhikrs);
 
   /// Dhikrs of [session] in the user's order if one is set, else default.
-  /// Ids in [userOrder] that no longer exist are dropped; dhikrs missing
-  /// from [userOrder] (e.g. added by a content update) are appended in
-  /// default order.
-  List<Dhikr> orderedList(SessionType session, List<String> userOrder) {
-    final defaults = defaultList(session);
-    if (userOrder.isEmpty) return defaults;
-    final byId = {for (final d in defaults) d.id: d};
-    final result = <Dhikr>[
-      for (final id in userOrder) ?byId.remove(id),
-    ];
-    return result..addAll(byId.values);
-  }
+  List<Dhikr> orderedList(SessionType session, List<String> userOrder) =>
+      applyUserOrder(defaultList(session), userOrder);
+}
+
+/// [defaults] rearranged by [userOrder]. Ids in [userOrder] that no longer
+/// exist are dropped; dhikrs missing from [userOrder] (e.g. added by a
+/// content update) are appended in default order.
+List<Dhikr> applyUserOrder(List<Dhikr> defaults, List<String> userOrder) {
+  if (userOrder.isEmpty) return defaults;
+  final byId = {for (final d in defaults) d.id: d};
+  final result = <Dhikr>[
+    for (final id in userOrder) ?byId.remove(id),
+  ];
+  return result..addAll(byId.values);
 }

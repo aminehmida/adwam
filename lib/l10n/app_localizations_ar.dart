@@ -63,6 +63,42 @@ class AppLocalizationsAr extends AppLocalizations {
   String get reset => 'استعادة';
 
   @override
+  String get myDuas => 'أدعيتي';
+
+  @override
+  String get addCustomDua => 'إضافة دعاء';
+
+  @override
+  String get customDuaNewTitle => 'دعاء جديد';
+
+  @override
+  String get customDuaEditTitle => 'تعديل الدعاء';
+
+  @override
+  String get customDuaTextHint => 'نص الدعاء';
+
+  @override
+  String get customDuaSessions => 'يظهر في';
+
+  @override
+  String get save => 'حفظ';
+
+  @override
+  String get customDuaDeleteTitle => 'حذف هذا الدعاء؟';
+
+  @override
+  String get customDuaDeleteBody => 'سيُزال من كل الجلسات التي يظهر فيها.';
+
+  @override
+  String get delete => 'حذف';
+
+  @override
+  String get editCustomDua => 'تعديل';
+
+  @override
+  String get deleteCustomDua => 'حذف';
+
+  @override
   String get resetSessionTitle => 'تصفير التقدّم؟';
 
   @override

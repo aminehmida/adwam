@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:ui';
 
 import 'package:flutter/material.dart' show ThemeMode;
@@ -27,6 +28,18 @@ class PrefsStore {
 
   Future<void> saveConfig(SessionType session, UserListConfig config) =>
       _prefs.setString(_configKey(session), config.toJsonString());
+
+  List<Dhikr> loadCustomDhikrs() {
+    final raw = _prefs.getString('customDhikrs');
+    if (raw == null) return [];
+    return [
+      for (final d in jsonDecode(raw) as List)
+        Dhikr.fromJson(d as Map<String, dynamic>),
+    ];
+  }
+
+  Future<void> saveCustomDhikrs(List<Dhikr> dhikrs) => _prefs.setString(
+      'customDhikrs', jsonEncode([for (final d in dhikrs) d.toJson()]));
 
   DailyProgress? loadProgress() {
     final raw = _prefs.getString('progress');

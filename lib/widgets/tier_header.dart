@@ -13,9 +13,16 @@ String tierLabel(BuildContext context, BenefitTier tier) {
   };
 }
 
-/// Section band for a list run. High-repetition runs and the full-surah band
-/// each get their own label; every other run is labeled by tier.
+/// Section band for a list run. The user's own duas, high-repetition runs
+/// and the full-surah band each get their own label; every other run is
+/// labeled by tier.
 Widget sectionBandFor(BuildContext context, Dhikr dhikr) {
+  if (dhikr.isCustom) {
+    return SectionBand(
+      label: AppLocalizations.of(context)!.myDuas,
+      color: Theme.of(context).colorScheme.primary,
+    );
+  }
   if (dhikr.isHighRep) {
     return SectionBand(
       label: AppLocalizations.of(context)!.tierHighRep,
@@ -35,11 +42,12 @@ Widget sectionBandFor(BuildContext context, Dhikr dhikr) {
 }
 
 /// Whether a section band belongs above [index] — the start of the list or
-/// any change of tier / full-surah / high-repetition run.
+/// any change of tier / full-surah / high-repetition / custom-dua run.
 bool startsSection(List<Dhikr> dhikrs, int index) {
   if (index == 0) return true;
   final prev = dhikrs[index - 1];
   final curr = dhikrs[index];
+  if (prev.isCustom || curr.isCustom) return prev.isCustom != curr.isCustom;
   // High-repetition dhikrs form one section regardless of the tiers inside
   // it: a band only starts when crossing into or out of that run.
   if (prev.isHighRep || curr.isHighRep) return prev.isHighRep != curr.isHighRep;

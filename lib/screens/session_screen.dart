@@ -14,6 +14,7 @@ import '../state/progress_controller.dart';
 import '../state/settings_controller.dart';
 import '../theme.dart';
 import '../widgets/context_card.dart' show sessionTitle;
+import '../widgets/custom_dhikr_dialog.dart';
 import '../widgets/dhikr_card.dart';
 import '../widgets/tier_header.dart';
 
@@ -512,6 +513,11 @@ class _SessionScreenState extends State<SessionScreen>
               ),
               actions: _editing
                   ? [
+                      IconButton(
+                        icon: const Icon(Icons.add),
+                        tooltip: l10n.addCustomDua,
+                        onPressed: _addCustomDhikr,
+                      ),
                       PopupMenuButton<String>(
                         onSelected: (_) => _confirmReset(context),
                         itemBuilder: (menuContext) => [
@@ -946,6 +952,20 @@ class _SessionScreenState extends State<SessionScreen>
                   ),
                 ),
                 const Spacer(),
+                if (dhikr.isCustom) ...[
+                  IconButton(
+                    visualDensity: VisualDensity.compact,
+                    icon: Icon(Icons.edit_outlined, color: colors.secondary),
+                    tooltip: AppLocalizations.of(context)!.editCustomDua,
+                    onPressed: () => _editCustomDhikr(dhikr),
+                  ),
+                  IconButton(
+                    visualDensity: VisualDensity.compact,
+                    icon: Icon(Icons.delete_outline, color: colors.error),
+                    tooltip: AppLocalizations.of(context)!.deleteCustomDua,
+                    onPressed: () => _confirmDeleteCustom(dhikr),
+                  ),
+                ],
                 IconButton(
                   visualDensity: VisualDensity.compact,
                   icon: Icon(
@@ -968,6 +988,53 @@ class _SessionScreenState extends State<SessionScreen>
         );
       },
     );
+  }
+
+  Future<void> _addCustomDhikr() async {
+    final input = await showCustomDhikrDialog(context, session: widget.session);
+    if (input == null || !mounted) return;
+    context.read<ListConfigController>().addCustom(
+          arabic: input.arabic,
+          contexts: input.contexts,
+        );
+  }
+
+  Future<void> _editCustomDhikr(Dhikr dhikr) async {
+    final input = await showCustomDhikrDialog(
+      context,
+      existing: dhikr,
+      session: widget.session,
+    );
+    if (input == null || !mounted) return;
+    context.read<ListConfigController>().updateCustom(
+          dhikr.id,
+          arabic: input.arabic,
+          contexts: input.contexts,
+        );
+  }
+
+  Future<void> _confirmDeleteCustom(Dhikr dhikr) async {
+    final l10n = AppLocalizations.of(context)!;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.customDuaDeleteTitle),
+        content: Text(l10n.customDuaDeleteBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(l10n.delete),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true && mounted) {
+      context.read<ListConfigController>().removeCustom(dhikr.id);
+    }
   }
 
   Future<void> _confirmReset(BuildContext context) async {

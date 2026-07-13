@@ -213,7 +213,9 @@ class DhikrCard extends StatelessWidget {
         ),
         const SizedBox(width: 6),
         Text(
-          tierLabel(context, dhikr.tier),
+          dhikr.isCustom
+              ? AppLocalizations.of(context)!.myDuas
+              : tierLabel(context, dhikr.tier),
           style: TextStyle(fontSize: 12, color: colors.onSurfaceVariant),
         ),
       ],

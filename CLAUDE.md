@@ -42,7 +42,7 @@ Adwam (أدوَم) — Flutter adhkar app (currently released on Android; iOS pl
 
 # Sort rules (final, user-approved — one global comparator `compareDhikrs`)
 
-1. Quran passages first; `surah` form (full surahs, shown by name only) pinned last
+1. Quran passages first; `surah` form (full surahs, shown by name only) pinned last; user-added custom duas (id `custom-*`, added via edit mode, always 1x) pinned after even those, in their own "My duas / أدعيتي" section
 2. Benefit tier: exactly 3 tiers — protection → reward → other/none
 3. Repetitions ascending
 4. Shorter before longer at same count
