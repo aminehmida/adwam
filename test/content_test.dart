@@ -44,31 +44,21 @@ void main() {
     }
   });
 
-  test('full surahs form a contiguous block, trailed only by the '
-      'high-repetition section', () {
+  test('full surahs really are at the end of every session list', () {
     for (final session in SessionType.values) {
       final list = repo.defaultList(session);
       final firstSurah = list.indexWhere((d) => d.form == DhikrForm.surah);
       if (firstSurah == -1) continue;
-      final lastSurah = list.lastIndexWhere((d) => d.form == DhikrForm.surah);
-      // No non-surah wedged inside the surah run.
       expect(
-        list
-            .getRange(firstSurah, lastSurah + 1)
-            .every((d) => d.form == DhikrForm.surah),
-        isTrue,
-        reason: session.name,
-      );
-      // Only high-repetition dhikrs may follow the surahs.
-      expect(
-        list.skip(lastSurah + 1).every((d) => d.isHighRep),
+        list.skip(firstSurah).every((d) => d.form == DhikrForm.surah),
         isTrue,
         reason: session.name,
       );
     }
   });
 
-  test('the high-repetition run sinks to the end and orders its tiers '
+  test('the high-repetition run is contiguous, sits below the tiered dhikrs '
+      'with only full surahs beneath it, and orders its tiers '
       'protection → reward → none, except where a fixed sunnah sequence '
       'pins every entry', () {
     for (final session in SessionType.values) {
@@ -79,8 +69,16 @@ void main() {
       // dhikrs in place, so the high-rep run need not be contiguous or last.
       if (list.first.fixedOrder == noFixedOrder) {
         final firstHigh = list.indexWhere((d) => d.isHighRep);
+        final lastHigh = list.lastIndexWhere((d) => d.isHighRep);
+        // Contiguous run.
         expect(
-          list.skip(firstHigh).every((d) => d.isHighRep),
+          list.getRange(firstHigh, lastHigh + 1).every((d) => d.isHighRep),
+          isTrue,
+          reason: session.name,
+        );
+        // Only full surahs may sit below the high-rep run.
+        expect(
+          list.skip(lastHigh + 1).every((d) => d.form == DhikrForm.surah),
           isTrue,
           reason: session.name,
         );

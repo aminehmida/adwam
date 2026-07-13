@@ -63,16 +63,16 @@ void main() {
     );
   });
 
-  test('high-repetition dhikrs sink below everything but full surahs, '
-      'regardless of their benefit tier', () {
+  test('high-repetition dhikrs sink below the tiered dhikrs but above full '
+      'surahs, ordered protection then reward then none inside', () {
     expect(
       sortedIds([
         d('surah', form: DhikrForm.surah, tier: BenefitTier.protection),
-        d('protection-x100', reps: 100, tier: BenefitTier.protection),
         d('none-x100', reps: 100),
+        d('protection-x100', reps: 100, tier: BenefitTier.protection),
         d('reward-1x', tier: BenefitTier.reward),
       ]),
-      ['reward-1x', 'surah', 'protection-x100', 'none-x100'],
+      ['reward-1x', 'protection-x100', 'none-x100', 'surah'],
     );
   });
 

@@ -4,21 +4,22 @@ import 'package:flutter/services.dart' show rootBundle;
 
 import '../models/dhikr.dart';
 
-/// Quran passages pin to the top of a session, full surahs below the tiered
-/// dhikrs, and high-repetition counting dhikrs to the very bottom.
+/// Quran passages pin to the top of a session, then the tiered dhikrs, then
+/// the high-repetition counting dhikrs, and full surahs stay at the very
+/// bottom (the last thing read, e.g. Surah al-Mulk before sleep).
 int _band(Dhikr d) {
-  if (d.isHighRep) return 3;
+  if (d.isHighRep) return 2;
   return switch (d.form) {
     DhikrForm.quran => 0,
-    DhikrForm.surah => 2,
+    DhikrForm.surah => 3,
     _ => 1,
   };
 }
 
 /// Default sort: an explicit fixed_order (the sunnah sequence of the
 /// post-prayer adhkar) beats everything. Otherwise: Quran passages always
-/// first, then the tiered dhikrs, then full surahs, and high-repetition
-/// dhikrs last of all; then benefit tier (protection, reward, none); then
+/// first, then the tiered dhikrs, then the high-repetition dhikrs, and full
+/// surahs last of all; then benefit tier (protection, reward, none); then
 /// repetition count ascending; short before long at the same count; then
 /// the curated sort_hint (cluster members share one value, e.g. the
 /// أصبحنا/أمسينا dhikrs, so they stay together ahead of their group); and as
