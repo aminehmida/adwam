@@ -136,6 +136,47 @@ void main() {
     expect(find.text('0 / 2'), findsNWidgets(2));
   });
 
+  testWidgets(
+      'reopened finished dhikr stays open on scroll, collapses on tap, '
+      'resets on long-press', (tester) async {
+    tester.view.physicalSize = const Size(420, 420);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+    await openMorning(tester);
+
+    // Finish 'one', then tap 'three' so 'one' stops being active and
+    // collapses.
+    await tester.longPress(find.text('ذكر one'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('ذكر three'));
+    await tester.pumpAndSettle();
+    expect(find.text('2 / 2'), findsNothing);
+
+    // Reopen the finished card: unlike a hidden peek, it survives scrolling.
+    await tester.tap(find.text('ذكر one'));
+    await tester.pumpAndSettle();
+    expect(find.text('2 / 2'), findsOneWidget);
+    await tester.drag(find.byType(CustomScrollView), const Offset(0, -80));
+    await tester.pumpAndSettle();
+    expect(find.text('2 / 2'), findsOneWidget);
+    await tester.drag(find.byType(CustomScrollView), const Offset(0, 80));
+    await tester.pumpAndSettle();
+
+    // A second tap collapses it again (and never counts).
+    await tester.tap(find.text('ذكر one'));
+    await tester.pumpAndSettle();
+    expect(find.text('2 / 2'), findsNothing);
+
+    // Reopen and long-press: the count resets and the card is live again.
+    await tester.tap(find.text('ذكر one'));
+    await tester.pumpAndSettle();
+    await tester.longPress(find.text('ذكر one'));
+    await tester.pumpAndSettle();
+    expect(find.byIcon(Icons.check_circle_rounded), findsNothing);
+    expect(find.text('2 / 2'), findsNothing);
+    expect(find.text('0 / 2'), findsOneWidget); // 'one' back to zero
+  });
+
   testWidgets('long-press marks a dhikr done without counting each tap',
       (tester) async {
     await openMorning(tester);

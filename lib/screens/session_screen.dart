@@ -133,8 +133,10 @@ class _SessionScreenState extends State<SessionScreen>
         .catchError((_) => null, test: (e) => e is MissingPluginException);
   }
 
-  /// Hidden or finished dhikrs the user tapped to read. Cleared on scroll —
-  /// a peek is temporary; unhiding permanently happens in edit mode.
+  /// Hidden or finished dhikrs the user tapped to read. Hidden peeks are
+  /// cleared on scroll — they are temporary; unhiding permanently happens in
+  /// edit mode. A reopened finished dhikr survives scrolling and stays open
+  /// until tapped closed or its count is reset by long-press.
   final Set<String> _peeked = {};
 
   /// Last dhikr the user tapped or long-pressed. A finished dhikr stays
@@ -890,7 +892,13 @@ class _SessionScreenState extends State<SessionScreen>
     if (anchorIndex < 0) anchorIndex = 0;
     return NotificationListener<ScrollStartNotification>(
       onNotification: (_) {
-        if (_peeked.isNotEmpty) setState(_peeked.clear);
+        // Only hidden peeks close on scroll; reopened finished dhikrs stay.
+        final hiddenPeeks = _peeked
+            .where((id) => config.isHidden(widget.session, id))
+            .toList();
+        if (hiddenPeeks.isNotEmpty) {
+          setState(() => _peeked.removeAll(hiddenPeeks));
+        }
         return false;
       },
       // Split at the anchor: items before it live in a reversed sliver that
@@ -939,10 +947,10 @@ class _SessionScreenState extends State<SessionScreen>
     final collapsed = hidden || finished;
     final peeking = collapsed && _peeked.contains(dhikr.id);
     final newSection = startsSection(dhikrs, index);
-    // A peek is a temporary read-only look at a hidden or finished
-    // dhikr; it collapses again on scroll or tap. Unhide permanently
-    // via edit mode. The Opacity wrapper is always present so the
-    // card's element (and its size animation) survives peek toggles.
+    // A peek is a read-only look at a hidden or finished dhikr; a tap
+    // collapses it again (hidden peeks also close on scroll — unhide
+    // permanently via edit mode). The Opacity wrapper is always present so
+    // the card's element (and its size animation) survives peek toggles.
     final focusable = dhikr.isHighRep;
     final card = Opacity(
       opacity: peeking ? 0.6 : 1,
@@ -966,8 +974,20 @@ class _SessionScreenState extends State<SessionScreen>
             : collapsed
             ? () => setState(() => _peeked.add(dhikr.id))
             : () => _onTap(dhikr),
-        onLongPress: collapsed || peeking
+        // Long-press on an expanded card: mark an incomplete dhikr done, or
+        // reset a finished one so it can be recited again.
+        onLongPress: hidden || (collapsed && !peeking)
             ? null
+            : done
+            ? () {
+                HapticFeedback.mediumImpact();
+                _anchorTo(dhikr.id);
+                setState(() => _peeked.remove(dhikr.id));
+                context.read<ProgressController>().resetDhikr(
+                  widget.session,
+                  dhikr.id,
+                );
+              }
             : () {
                 HapticFeedback.mediumImpact();
                 _anchorTo(dhikr.id);

@@ -50,6 +50,21 @@ class ProgressController extends ChangeNotifier {
     _persistAndNotify();
   }
 
+  /// Clears today's count and done-mark for a single dhikr, so it can be
+  /// recited again (long-press on a finished card).
+  void resetDhikr(SessionType session, String dhikrId) {
+    checkDateRollover();
+    final key = DailyProgress.keyFor(session, dhikrId);
+    if (!_progress.counts.containsKey(key) && !_progress.done.contains(key)) {
+      return;
+    }
+    _progress = _progress.copyWith(
+      counts: {..._progress.counts}..remove(key),
+      done: _progress.done.where((k) => k != key).toSet(),
+    );
+    _persistAndNotify();
+  }
+
   /// Clears today's counters and done-marks for one session only.
   void resetSession(SessionType session) {
     checkDateRollover();

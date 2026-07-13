@@ -75,6 +75,23 @@ void main() {
     expect(revived.isDone(SessionType.morning, 'a'), isTrue);
   });
 
+  test('resetDhikr clears only that dhikr in that session', () {
+    controller.markDone(SessionType.morning, _dhikr('a'));
+    controller.markDone(SessionType.morning, _dhikr('b'));
+    controller.markDone(SessionType.evening, _dhikr('a'));
+
+    controller.resetDhikr(SessionType.morning, 'a');
+    expect(controller.isDone(SessionType.morning, 'a'), isFalse);
+    expect(controller.countFor(SessionType.morning, 'a'), 0);
+    expect(controller.isDone(SessionType.morning, 'b'), isTrue);
+    expect(controller.isDone(SessionType.evening, 'a'), isTrue);
+
+    var notified = false;
+    controller.addListener(() => notified = true);
+    controller.resetDhikr(SessionType.morning, 'a'); // already clear: no-op
+    expect(notified, isFalse);
+  });
+
   test('resetSession clears only that session', () {
     controller.markDone(SessionType.morning, _dhikr('a'));
     controller.increment(SessionType.evening, _dhikr('b'));
