@@ -191,6 +191,8 @@ def _hisn_entry(did, contexts, arabic, cur, en, body=None):
                             or clean_hisn_en(en.get("LANGUAGE_ARABIC_TRANSLATED_TEXT"))),
         **({"sort_hint": cur["sort_hint"]} if "sort_hint" in cur else {}),
         **({"fixed_order": cur["fixed_order"]} if "fixed_order" in cur else {}),
+        **({"prayers": cur["prayers"]} if "prayers" in cur else {}),
+        **({"prayers_reps": cur["prayers_reps"]} if "prayers_reps" in cur else {}),
     }
 
 

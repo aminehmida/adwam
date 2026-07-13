@@ -36,6 +36,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String get translation => 'Translation';
 
   @override
+  String afterPrayers(String prayers) {
+    return 'After $prayers';
+  }
+
+  @override
+  String timesAfterPrayers(int count, String prayers) {
+    return '$count× after $prayers';
+  }
+
+  @override
+  String get prayerJoiner => ' & ';
+
+  @override
+  String get prayerFajr => 'Fajr';
+
+  @override
+  String get prayerDhuhr => 'Dhuhr';
+
+  @override
+  String get prayerAsr => 'Asr';
+
+  @override
+  String get prayerMaghrib => 'Maghrib';
+
+  @override
+  String get prayerIsha => 'Isha';
+
+  @override
   String get tierProtection => 'Protection';
 
   @override

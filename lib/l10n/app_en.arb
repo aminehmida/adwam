@@ -9,6 +9,31 @@
   "doneEditing": "Done",
   "virtue": "Virtue",
   "translation": "Translation",
+  "afterPrayers": "After {prayers}",
+  "@afterPrayers": {
+    "placeholders": {
+      "prayers": {
+        "type": "String"
+      }
+    }
+  },
+  "timesAfterPrayers": "{count}× after {prayers}",
+  "@timesAfterPrayers": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "prayers": {
+        "type": "String"
+      }
+    }
+  },
+  "prayerJoiner": " & ",
+  "prayerFajr": "Fajr",
+  "prayerDhuhr": "Dhuhr",
+  "prayerAsr": "Asr",
+  "prayerMaghrib": "Maghrib",
+  "prayerIsha": "Isha",
   "tierProtection": "Protection",
   "tierReward": "Reward",
   "tierOther": "Other benefits",

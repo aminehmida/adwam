@@ -152,6 +152,54 @@ abstract class AppLocalizations {
   /// **'Translation'**
   String get translation;
 
+  /// No description provided for @afterPrayers.
+  ///
+  /// In en, this message translates to:
+  /// **'After {prayers}'**
+  String afterPrayers(String prayers);
+
+  /// No description provided for @timesAfterPrayers.
+  ///
+  /// In en, this message translates to:
+  /// **'{count}× after {prayers}'**
+  String timesAfterPrayers(int count, String prayers);
+
+  /// No description provided for @prayerJoiner.
+  ///
+  /// In en, this message translates to:
+  /// **' & '**
+  String get prayerJoiner;
+
+  /// No description provided for @prayerFajr.
+  ///
+  /// In en, this message translates to:
+  /// **'Fajr'**
+  String get prayerFajr;
+
+  /// No description provided for @prayerDhuhr.
+  ///
+  /// In en, this message translates to:
+  /// **'Dhuhr'**
+  String get prayerDhuhr;
+
+  /// No description provided for @prayerAsr.
+  ///
+  /// In en, this message translates to:
+  /// **'Asr'**
+  String get prayerAsr;
+
+  /// No description provided for @prayerMaghrib.
+  ///
+  /// In en, this message translates to:
+  /// **'Maghrib'**
+  String get prayerMaghrib;
+
+  /// No description provided for @prayerIsha.
+  ///
+  /// In en, this message translates to:
+  /// **'Isha'**
+  String get prayerIsha;
+
   /// No description provided for @tierProtection.
   ///
   /// In en, this message translates to:
