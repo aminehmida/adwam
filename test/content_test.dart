@@ -45,6 +45,18 @@ void main() {
     }
   });
 
+  test('prayer tags use known prayer keys and only on post-prayer dhikrs', () {
+    const known = {'fajr', 'dhuhr', 'asr', 'maghrib', 'isha'};
+    for (final d in repo.all.where((d) => d.prayers.isNotEmpty)) {
+      expect(known.containsAll(d.prayers), isTrue, reason: d.id);
+      expect(d.contexts, contains(SessionType.postPrayer), reason: d.id);
+    }
+    for (final d in repo.all.where((d) => d.prayersReps != null)) {
+      expect(d.prayers, isNotEmpty, reason: d.id);
+      expect(d.prayersReps, greaterThan(d.repetitions), reason: d.id);
+    }
+  });
+
   test('every session has content in each display band it relies on', () {
     for (final session in SessionType.values) {
       expect(repo.defaultList(session), isNotEmpty, reason: session.name);

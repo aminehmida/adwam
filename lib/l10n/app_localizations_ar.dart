@@ -36,6 +36,34 @@ class AppLocalizationsAr extends AppLocalizations {
   String get translation => 'الترجمة';
 
   @override
+  String afterPrayers(String prayers) {
+    return 'بعد $prayers';
+  }
+
+  @override
+  String timesAfterPrayers(int count, String prayers) {
+    return '$count مرات بعد $prayers';
+  }
+
+  @override
+  String get prayerJoiner => ' و';
+
+  @override
+  String get prayerFajr => 'الفجر';
+
+  @override
+  String get prayerDhuhr => 'الظهر';
+
+  @override
+  String get prayerAsr => 'العصر';
+
+  @override
+  String get prayerMaghrib => 'المغرب';
+
+  @override
+  String get prayerIsha => 'العشاء';
+
+  @override
   String get tierProtection => 'الحماية';
 
   @override

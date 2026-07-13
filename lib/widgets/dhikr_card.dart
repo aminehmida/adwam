@@ -97,6 +97,16 @@ class DhikrCard extends StatelessWidget {
                 editControls!,
                 const SizedBox(height: 8),
               ],
+              if (dhikr.prayers.isNotEmpty) ...[
+                Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: _PrayerPill(
+                    prayers: dhikr.prayers,
+                    reps: dhikr.prayersReps,
+                  ),
+                ),
+                const SizedBox(height: 10),
+              ],
               Directionality(
                 textDirection: TextDirection.rtl,
                 child: Opacity(
@@ -222,6 +232,57 @@ class DhikrCard extends StatelessWidget {
     );
   }
 
+}
+
+/// Pill flagging a dhikr said only after specific prayers (e.g. Fajr &
+/// Maghrib), so it stands out from the adhkar of every prayer. With [reps]
+/// the dhikr isn't restricted; it's repeated more after those prayers.
+class _PrayerPill extends StatelessWidget {
+  final List<String> prayers;
+  final int? reps;
+
+  const _PrayerPill({required this.prayers, this.reps});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
+    String name(String key) => switch (key) {
+          'fajr' => l10n.prayerFajr,
+          'dhuhr' => l10n.prayerDhuhr,
+          'asr' => l10n.prayerAsr,
+          'maghrib' => l10n.prayerMaghrib,
+          'isha' => l10n.prayerIsha,
+          _ => key,
+        };
+    final names = prayers.map(name).join(l10n.prayerJoiner);
+    final label = reps == null
+        ? l10n.afterPrayers(names)
+        : l10n.timesAfterPrayers(reps!, names);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 4),
+      decoration: BoxDecoration(
+        color: colors.tertiary.withValues(alpha: .1),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: colors.tertiary.withValues(alpha: .45)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.mosque_outlined, size: 13, color: colors.tertiary),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: colors.tertiary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _ExpanderItem {

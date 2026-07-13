@@ -9,6 +9,31 @@
   "doneEditing": "تم",
   "virtue": "الفضل",
   "translation": "الترجمة",
+  "afterPrayers": "بعد {prayers}",
+  "@afterPrayers": {
+    "placeholders": {
+      "prayers": {
+        "type": "String"
+      }
+    }
+  },
+  "timesAfterPrayers": "{count} مرات بعد {prayers}",
+  "@timesAfterPrayers": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "prayers": {
+        "type": "String"
+      }
+    }
+  },
+  "prayerJoiner": " و",
+  "prayerFajr": "الفجر",
+  "prayerDhuhr": "الظهر",
+  "prayerAsr": "العصر",
+  "prayerMaghrib": "المغرب",
+  "prayerIsha": "العشاء",
   "tierProtection": "الحماية",
   "tierReward": "الثواب",
   "tierOther": "فضائل أخرى",
