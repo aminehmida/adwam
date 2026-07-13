@@ -82,3 +82,10 @@ Color tierColor(BuildContext context, BenefitTier tier) {
       dark ? const Color(0xFF9AA69B) : const Color(0xFF6E7568),
   };
 }
+
+/// Accent for the high-repetitions section band — a calm teal that reads as
+/// distinct from the green/gold tier colours.
+Color highRepColor(BuildContext context) =>
+    Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xFF86B8C0)
+        : const Color(0xFF3D6B77);

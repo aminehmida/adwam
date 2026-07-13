@@ -42,6 +42,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get tierOther => 'فضائل أخرى';
 
   @override
+  String get tierHighRep => 'الأذكار المكرَّرة';
+
+  @override
   String get fullSurahs => 'سور كاملة';
 
   @override

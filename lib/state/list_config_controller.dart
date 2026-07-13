@@ -49,13 +49,16 @@ class ListConfigController extends ChangeNotifier {
   /// [newIndex] is the position after removal (ReorderableListView's
   /// onReorderItem convention — already adjusted).
   ///
-  /// Movement is confined to the dhikr's own benefit-tier section: a drop
-  /// beyond the section edge snaps to it, so tiers stay contiguous and the
-  /// session's category bands keep meaning something.
+  /// Movement is confined to the dhikr's own section: a drop beyond the
+  /// section edge snaps to it, so sections stay contiguous and the session's
+  /// category bands keep meaning something. Sections mirror the visual bands
+  /// (see startsSection): benefit tier, plus the full-surah and
+  /// high-repetition runs, the latter spanning its tiers as one section.
   void reorder(SessionType session, int oldIndex, int newIndex) {
     final list = listFor(session);
-    (BenefitTier, bool) sectionOf(Dhikr d) =>
-        (d.tier, d.form == DhikrForm.surah);
+    (bool, BenefitTier, bool) sectionOf(Dhikr d) => d.isHighRep
+        ? (true, BenefitTier.none, false)
+        : (false, d.tier, d.form == DhikrForm.surah);
     final section = sectionOf(list[oldIndex]);
     var start = oldIndex;
     while (start > 0 && sectionOf(list[start - 1]) == section) {

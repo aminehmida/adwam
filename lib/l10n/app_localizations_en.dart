@@ -42,6 +42,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tierOther => 'Other benefits';
 
   @override
+  String get tierHighRep => 'High repetitions';
+
+  @override
   String get fullSurahs => 'Full surahs';
 
   @override

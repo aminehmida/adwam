@@ -40,10 +40,6 @@ class _SessionScreenState extends State<SessionScreen>
     keepScrollOffset: false,
   );
 
-  /// Dhikrs with at least this many repetitions count in a full-screen
-  /// focus overlay instead of on the card itself.
-  static const _focusThreshold = 100;
-
   /// Dhikr currently counted in the focus overlay; stays set while the
   /// exit animation runs.
   Dhikr? _focused;
@@ -122,7 +118,7 @@ class _SessionScreenState extends State<SessionScreen>
     }
     _anchorTo(dhikr.id);
     if (!completed &&
-        dhikr.repetitions >= _focusThreshold &&
+        dhikr.isHighRep &&
         arabicFrom != null &&
         counterFrom != null) {
       setState(() {
@@ -742,7 +738,7 @@ class _SessionScreenState extends State<SessionScreen>
     // dhikr; it collapses again on scroll or tap. Unhide permanently
     // via edit mode. The Opacity wrapper is always present so the
     // card's element (and its size animation) survives peek toggles.
-    final focusable = dhikr.repetitions >= _focusThreshold;
+    final focusable = dhikr.isHighRep;
     final card = Opacity(
       opacity: peeking ? 0.6 : 1,
       child: DhikrCard(

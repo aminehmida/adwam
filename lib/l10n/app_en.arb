@@ -11,6 +11,7 @@
   "tierProtection": "Protection",
   "tierReward": "Reward",
   "tierOther": "Other benefits",
+  "tierHighRep": "High repetitions",
   "fullSurahs": "Full surahs",
   "resetOrderTitle": "Reset to default order?",
   "resetOrderBody": "This list will be reordered and all adhkar shown again.",

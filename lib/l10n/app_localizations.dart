@@ -164,6 +164,12 @@ abstract class AppLocalizations {
   /// **'Other benefits'**
   String get tierOther;
 
+  /// No description provided for @tierHighRep.
+  ///
+  /// In en, this message translates to:
+  /// **'High repetitions'**
+  String get tierHighRep;
+
   /// No description provided for @fullSurahs.
   ///
   /// In en, this message translates to:

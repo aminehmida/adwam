@@ -26,6 +26,11 @@ const noSortHint = 1 << 20;
 /// happens in practice: a session either fixes every entry or none).
 const noFixedOrder = 1 << 20;
 
+/// Dhikrs repeated at least this many times are grouped into their own
+/// "high repetitions" section at the bottom of a session and counted in the
+/// full-screen focus overlay rather than on the card.
+const highRepThreshold = 100;
+
 const _sessionNames = {
   'morning': SessionType.morning,
   'evening': SessionType.evening,
@@ -67,6 +72,10 @@ class Dhikr {
 
   /// Final sort tiebreak: shorter text first among otherwise equal dhikrs.
   int get wordCount => arabic.trim().split(RegExp(r'\s+')).length;
+
+  /// Repeated enough times to belong in the high-repetitions section and to
+  /// count in the focus overlay.
+  bool get isHighRep => repetitions >= highRepThreshold;
 
   factory Dhikr.fromJson(Map<String, dynamic> json) => Dhikr(
         id: json['id'] as String,

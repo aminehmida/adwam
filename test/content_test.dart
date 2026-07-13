@@ -44,16 +44,55 @@ void main() {
     }
   });
 
-  test('full surahs really are at the end of every session list', () {
+  test('full surahs form a contiguous block, trailed only by the '
+      'high-repetition section', () {
     for (final session in SessionType.values) {
       final list = repo.defaultList(session);
       final firstSurah = list.indexWhere((d) => d.form == DhikrForm.surah);
       if (firstSurah == -1) continue;
+      final lastSurah = list.lastIndexWhere((d) => d.form == DhikrForm.surah);
+      // No non-surah wedged inside the surah run.
       expect(
-        list.skip(firstSurah).every((d) => d.form == DhikrForm.surah),
+        list
+            .getRange(firstSurah, lastSurah + 1)
+            .every((d) => d.form == DhikrForm.surah),
         isTrue,
         reason: session.name,
       );
+      // Only high-repetition dhikrs may follow the surahs.
+      expect(
+        list.skip(lastSurah + 1).every((d) => d.isHighRep),
+        isTrue,
+        reason: session.name,
+      );
+    }
+  });
+
+  test('the high-repetition run sinks to the end and orders its tiers '
+      'protection → reward → none, except where a fixed sunnah sequence '
+      'pins every entry', () {
+    for (final session in SessionType.values) {
+      final list = repo.defaultList(session);
+      final highReps = list.where((d) => d.isHighRep).toList();
+      if (highReps.isEmpty) continue;
+      // A fixed_order session (the post-prayer sunnah sequence) keeps its
+      // dhikrs in place, so the high-rep run need not be contiguous or last.
+      if (list.first.fixedOrder == noFixedOrder) {
+        final firstHigh = list.indexWhere((d) => d.isHighRep);
+        expect(
+          list.skip(firstHigh).every((d) => d.isHighRep),
+          isTrue,
+          reason: session.name,
+        );
+        // Non-decreasing tier index: protection (0), reward (1), none (2).
+        for (var i = 1; i < highReps.length; i++) {
+          expect(
+            highReps[i].tier.index,
+            greaterThanOrEqualTo(highReps[i - 1].tier.index),
+            reason: session.name,
+          );
+        }
+      }
     }
   });
 

@@ -56,10 +56,23 @@ void main() {
       sortedIds([
         d('none-short-1x', reps: 1),
         d('reward-long-1x', form: DhikrForm.long, tier: BenefitTier.reward),
-        d('protection-short-100x', reps: 100, tier: BenefitTier.protection),
+        d('protection-short-1x', tier: BenefitTier.protection),
         d('none-long', form: DhikrForm.long),
       ]),
-      ['protection-short-100x', 'reward-long-1x', 'none-short-1x', 'none-long'],
+      ['protection-short-1x', 'reward-long-1x', 'none-short-1x', 'none-long'],
+    );
+  });
+
+  test('high-repetition dhikrs sink below everything but full surahs, '
+      'regardless of their benefit tier', () {
+    expect(
+      sortedIds([
+        d('surah', form: DhikrForm.surah, tier: BenefitTier.protection),
+        d('protection-x100', reps: 100, tier: BenefitTier.protection),
+        d('none-x100', reps: 100),
+        d('reward-1x', tier: BenefitTier.reward),
+      ]),
+      ['reward-1x', 'surah', 'protection-x100', 'none-x100'],
     );
   });
 

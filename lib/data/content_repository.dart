@@ -4,24 +4,29 @@ import 'package:flutter/services.dart' show rootBundle;
 
 import '../models/dhikr.dart';
 
-/// Quran passages pin to the top of a session, full surahs to the bottom.
-int _band(DhikrForm form) => switch (form) {
-      DhikrForm.quran => 0,
-      DhikrForm.surah => 2,
-      _ => 1,
-    };
+/// Quran passages pin to the top of a session, full surahs below the tiered
+/// dhikrs, and high-repetition counting dhikrs to the very bottom.
+int _band(Dhikr d) {
+  if (d.isHighRep) return 3;
+  return switch (d.form) {
+    DhikrForm.quran => 0,
+    DhikrForm.surah => 2,
+    _ => 1,
+  };
+}
 
 /// Default sort: an explicit fixed_order (the sunnah sequence of the
 /// post-prayer adhkar) beats everything. Otherwise: Quran passages always
-/// first and full surahs always last; then benefit tier (protection,
-/// reward, none); then repetition count ascending; short before long at
-/// the same count; then the curated sort_hint (cluster members share one
-/// value, e.g. the أصبحنا/أمسينا dhikrs, so they stay together ahead of
-/// their group); and as the least rule, fewer words first.
+/// first, then the tiered dhikrs, then full surahs, and high-repetition
+/// dhikrs last of all; then benefit tier (protection, reward, none); then
+/// repetition count ascending; short before long at the same count; then
+/// the curated sort_hint (cluster members share one value, e.g. the
+/// أصبحنا/أمسينا dhikrs, so they stay together ahead of their group); and as
+/// the least rule, fewer words first.
 int compareDhikrs(Dhikr a, Dhikr b) {
   final byFixed = a.fixedOrder.compareTo(b.fixedOrder);
   if (byFixed != 0) return byFixed;
-  final byBand = _band(a.form).compareTo(_band(b.form));
+  final byBand = _band(a).compareTo(_band(b));
   if (byBand != 0) return byBand;
   final byTier = a.tier.index.compareTo(b.tier.index);
   if (byTier != 0) return byTier;
