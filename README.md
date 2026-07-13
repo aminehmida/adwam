@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="logos/export/logo-512.png" alt="Adwam logo" width="160"/>
+</p>
+
 # Adwam (أدوَم) — أذكار اليوم والليلة
 
 > «أحبُّ الأعمالِ إلى الله أدومُها وإن قلّ»
