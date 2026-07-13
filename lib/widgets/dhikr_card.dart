@@ -106,7 +106,7 @@ class DhikrCard extends StatelessWidget {
               ),
               if (dhikr.benefit != null) ...[
                 const SizedBox(height: 4),
-                _benefitExpander(context),
+                _BenefitExpander(dhikr: dhikr),
               ],
               const SizedBox(height: 10),
               _counterRow(context, colors, accent),
@@ -144,64 +144,6 @@ class DhikrCard extends StatelessWidget {
                 ),
               ),
             ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _benefitExpander(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    // Virtue text follows the UI language (falling back to Arabic when no
-    // translation exists); the dhikr text itself always stays Arabic.
-    final arabicUi = Localizations.localeOf(context).languageCode == 'ar';
-    final text =
-        arabicUi ? dhikr.benefit! : (dhikr.benefitEn ?? dhikr.benefit!);
-    final source = arabicUi
-        ? dhikr.benefitSource
-        : (dhikr.benefitSourceEn ?? dhikr.benefitSource);
-    final showingArabic = arabicUi || dhikr.benefitEn == null;
-    return Theme(
-      data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-      child: Directionality(
-        textDirection:
-            showingArabic ? TextDirection.rtl : TextDirection.ltr,
-        child: ExpansionTile(
-          tilePadding: EdgeInsets.zero,
-          childrenPadding: const EdgeInsets.only(bottom: 8),
-          dense: true,
-          leading: Icon(Icons.auto_awesome, size: 16, color: colors.tertiary),
-          title: Text(
-            AppLocalizations.of(context)!.virtue,
-            style: TextStyle(
-              fontFamily: 'Amiri',
-              fontSize: 15,
-              color: colors.tertiary,
-            ),
-          ),
-          children: [
-            Text(
-              text,
-              style: showingArabic
-                  ? TextStyle(
-                      fontFamily: 'Amiri',
-                      fontSize: 17,
-                      height: 1.7,
-                      color: colors.onSurfaceVariant,
-                    )
-                  : TextStyle(
-                      fontSize: 14.5,
-                      height: 1.5,
-                      color: colors.onSurfaceVariant,
-                    ),
-            ),
-            if (source != null) ...[
-              const SizedBox(height: 4),
-              Text(
-                source,
-                style: TextStyle(fontSize: 12, color: colors.outline),
-              ),
-            ],
           ],
         ),
       ),
@@ -260,4 +202,120 @@ class DhikrCard extends StatelessWidget {
     );
   }
 
+}
+
+/// Compact "virtue" expander. Unlike [ExpansionTile], the tap target is only
+/// as wide as its icon + label, so taps elsewhere on the row fall through to
+/// the card's counter tap.
+class _BenefitExpander extends StatefulWidget {
+  final Dhikr dhikr;
+
+  const _BenefitExpander({required this.dhikr});
+
+  @override
+  State<_BenefitExpander> createState() => _BenefitExpanderState();
+}
+
+class _BenefitExpanderState extends State<_BenefitExpander> {
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final dhikr = widget.dhikr;
+    // Virtue text follows the UI language (falling back to Arabic when no
+    // translation exists); the dhikr text itself always stays Arabic.
+    final arabicUi = Localizations.localeOf(context).languageCode == 'ar';
+    final text =
+        arabicUi ? dhikr.benefit! : (dhikr.benefitEn ?? dhikr.benefit!);
+    final source = arabicUi
+        ? dhikr.benefitSource
+        : (dhikr.benefitSourceEn ?? dhikr.benefitSource);
+    final showingArabic = arabicUi || dhikr.benefitEn == null;
+
+    return Directionality(
+      textDirection: showingArabic ? TextDirection.rtl : TextDirection.ltr,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(8),
+              onTap: () => setState(() => _expanded = !_expanded),
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.auto_awesome, size: 16, color: colors.tertiary),
+                    const SizedBox(width: 8),
+                    Text(
+                      AppLocalizations.of(context)!.virtue,
+                      style: TextStyle(
+                        fontFamily: 'Amiri',
+                        fontSize: 15,
+                        color: colors.tertiary,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    AnimatedRotation(
+                      turns: _expanded ? .5 : 0,
+                      duration: const Duration(milliseconds: 200),
+                      child: Icon(
+                        Icons.expand_more,
+                        size: 18,
+                        color: colors.tertiary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          AnimatedSize(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeInOut,
+            alignment: Alignment.topCenter,
+            child: !_expanded
+                ? const SizedBox(width: double.infinity)
+                : Padding(
+                    padding: const EdgeInsets.only(top: 4, bottom: 8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          text,
+                          style: showingArabic
+                              ? TextStyle(
+                                  fontFamily: 'Amiri',
+                                  fontSize: 17,
+                                  height: 1.7,
+                                  color: colors.onSurfaceVariant,
+                                )
+                              : TextStyle(
+                                  fontSize: 14.5,
+                                  height: 1.5,
+                                  color: colors.onSurfaceVariant,
+                                ),
+                        ),
+                        if (source != null) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            source,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: colors.outline,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
 }
