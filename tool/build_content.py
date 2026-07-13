@@ -4,11 +4,17 @@
 Sources (content/sources/):
   seen_arabic_ar.json   Morning/evening adhkar (Seen-Arabic DB, MIT). Fields:
                         order, content, count, fadl, source, hadith_text, type (0 both / 1 morning / 2 evening)
+  seen_arabic_en.json   English companion (matched by order): translation,
+                        transliteration, translated virtues (fadl/source)
   hisn_postprayer.json  hisnmuslim.com API ch. 25 (text only)
   hisn_sleep.json       hisnmuslim.com API ch. 28 (text only)
+  hisn_*_en.json        hisnmuslim.com API en/25 + en/28 (matched by ID):
+                        TRANSLATED_TEXT, LANGUAGE_ARABIC_TRANSLATED_TEXT
 
-Overlay (content/curation.json): per-id form, benefit_tier, and for hisn items
-repetitions/benefit_text/benefit_source. Claude-drafted, human-reviewed.
+Overlay (content/curation.json): per-id form, benefit_tier, fixed_order, and
+for hisn items repetitions/benefit_text/benefit_source; translation_override /
+transliteration_override where the English source is missing or is an
+instruction rather than a rendering. Claude-drafted, human-reviewed.
 """
 import json
 import re
@@ -55,6 +61,19 @@ def clean_hisn(text):
     return text.strip()
 
 
+def clean_hisn_en(text):
+    """Strip the single ( ) wrapper of the English hisnmuslim.com strings.
+
+    Only strips when the text both starts and ends with the wrapper, so
+    interior parentheses (e.g. "(three times)") are left alone.
+    """
+    text = (text or "").strip()
+    if text.startswith("(") and re.search(r"\)\s*\.?\s*$", text):
+        text = re.sub(r"^\(\s*", "", text)
+        text = re.sub(r"\)\s*\.?\s*$", "", text)
+    return text.strip() or None
+
+
 def build():
     curation = {k: v for k, v in load(ROOT / "content" / "curation.json").items()
                 if not k.startswith("_")}
@@ -81,23 +100,37 @@ def build():
                                 or ((en.get("fadl") or "").strip() or None if benefit else None)),
             "benefit_source_en": (cur.get("benefit_source_override_en")
                                   or (en.get("source") or "").strip() or None),
+            "translation": (cur.get("translation_override")
+                            or (en.get("translation") or "").strip() or None),
+            "transliteration": (cur.get("transliteration_override")
+                                or (en.get("transliteration") or "").strip() or None),
             **({"sort_hint": cur["sort_hint"]} if "sort_hint" in cur else {}),
         })
 
-    # Post-prayer + sleep (hisnmuslim.com)
-    for fname, prefix, context in [("hisn_postprayer.json", "pp", "post_prayer"),
-                                   ("hisn_sleep.json", "sl", "sleep")]:
+    # Post-prayer + sleep (hisnmuslim.com); *_en.json carries the English
+    # rendering, matched by the same ID.
+    for fname, en_fname, prefix, context in [
+            ("hisn_postprayer.json", "hisn_postprayer_en.json", "pp", "post_prayer"),
+            ("hisn_sleep.json", "hisn_sleep_en.json", "sl", "sleep")]:
         chapter = next(iter(load(SRC / fname).values()))
+        en_by_id = {x["ID"]: x for x in next(iter(load(SRC / en_fname).values()))}
         for item in chapter:
             did = f"{prefix}-{item['ID']}"
             if did in SPLIT:
+                # Split cards take all their text, English included, from curation.
                 for split_id, ctx in SPLIT[did]:
                     cur = curation[split_id]
-                    dhikrs.append(_hisn_entry(split_id, [ctx], cur["arabic"], cur))
+                    dhikrs.append(_hisn_entry(split_id, [ctx], cur["arabic"], cur, {}))
                 continue
             cur = curation[did]
             dhikrs.append(_hisn_entry(
-                did, [context], clean_hisn(item["ARABIC_TEXT"]), cur))
+                did, [context], clean_hisn(item["ARABIC_TEXT"]), cur,
+                en_by_id.get(item["ID"], {})))
+
+    missing = [d["id"] for d in dhikrs
+               if not d["translation"] or not d["transliteration"]]
+    if missing:
+        raise SystemExit(f"missing translation/transliteration: {missing}")
 
     out = {"version": 1, "dhikrs": dhikrs}
     assets = ROOT / "assets"
@@ -109,7 +142,7 @@ def build():
     print(f"Wrote {len(dhikrs)} dhikrs -> assets/adhkar.json + content/REVIEW.md")
 
 
-def _hisn_entry(did, contexts, arabic, cur):
+def _hisn_entry(did, contexts, arabic, cur, en):
     return {
         "id": did,
         "contexts": contexts,
@@ -122,7 +155,12 @@ def _hisn_entry(did, contexts, arabic, cur):
         "benefit_text_en": cur.get("benefit_text_en"),
         "benefit_source_en": (cur.get("benefit_source_en")
                               or source_en(cur.get("benefit_source"))),
+        "translation": (cur.get("translation_override")
+                        or clean_hisn_en(en.get("TRANSLATED_TEXT"))),
+        "transliteration": (cur.get("transliteration_override")
+                            or clean_hisn_en(en.get("LANGUAGE_ARABIC_TRANSLATED_TEXT"))),
         **({"sort_hint": cur["sort_hint"]} if "sort_hint" in cur else {}),
+        **({"fixed_order": cur["fixed_order"]} if "fixed_order" in cur else {}),
     }
 
 

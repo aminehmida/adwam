@@ -33,6 +33,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get virtue => 'Virtue';
 
   @override
+  String get translation => 'Translation';
+
+  @override
   String get tierProtection => 'Protection';
 
   @override
@@ -104,6 +107,20 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get volumeKeyCountingBody =>
       'Pressing volume down counts the current dhikr; the volume itself won\'t change while counting.';
+
+  @override
+  String get showTranslation => 'Show translation';
+
+  @override
+  String get showTranslationBody =>
+      'English meaning inside each dhikr\'s Translation section.';
+
+  @override
+  String get showTransliteration => 'Show transliteration';
+
+  @override
+  String get showTransliterationBody =>
+      'Latin-letter pronunciation guide inside the Translation section.';
 
   @override
   String get resetTodayProgress => 'Reset today\'s progress';

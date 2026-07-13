@@ -146,6 +146,12 @@ abstract class AppLocalizations {
   /// **'Virtue'**
   String get virtue;
 
+  /// No description provided for @translation.
+  ///
+  /// In en, this message translates to:
+  /// **'Translation'**
+  String get translation;
+
   /// No description provided for @tierProtection.
   ///
   /// In en, this message translates to:
@@ -283,6 +289,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pressing volume down counts the current dhikr; the volume itself won\'t change while counting.'**
   String get volumeKeyCountingBody;
+
+  /// No description provided for @showTranslation.
+  ///
+  /// In en, this message translates to:
+  /// **'Show translation'**
+  String get showTranslation;
+
+  /// No description provided for @showTranslationBody.
+  ///
+  /// In en, this message translates to:
+  /// **'English meaning inside each dhikr\'s Translation section.'**
+  String get showTranslationBody;
+
+  /// No description provided for @showTransliteration.
+  ///
+  /// In en, this message translates to:
+  /// **'Show transliteration'**
+  String get showTransliteration;
+
+  /// No description provided for @showTransliterationBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Latin-letter pronunciation guide inside the Translation section.'**
+  String get showTransliterationBody;
 
   /// No description provided for @resetTodayProgress.
   ///

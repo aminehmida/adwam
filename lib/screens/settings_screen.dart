@@ -63,6 +63,22 @@ class SettingsScreen extends StatelessWidget {
               value: settings.volumeKeyCounting,
               onChanged: settings.setVolumeKeyCounting,
             ),
+          if (Localizations.localeOf(context).languageCode != 'ar') ...[
+            SwitchListTile(
+              secondary: const Icon(Icons.translate),
+              title: Text(l10n.showTranslation),
+              subtitle: Text(l10n.showTranslationBody),
+              value: settings.showTranslation,
+              onChanged: settings.setShowTranslation,
+            ),
+            SwitchListTile(
+              secondary: const Icon(Icons.spellcheck),
+              title: Text(l10n.showTransliteration),
+              subtitle: Text(l10n.showTransliterationBody),
+              value: settings.showTransliteration,
+              onChanged: settings.setShowTransliteration,
+            ),
+          ],
           const Divider(),
           ListTile(
             leading: const Icon(Icons.restart_alt),

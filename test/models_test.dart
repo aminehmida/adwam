@@ -17,6 +17,8 @@ void main() {
         'benefit_source': 'مسلم',
         'benefit_text_en': 'Virtue text',
         'benefit_source_en': 'Muslim',
+        'translation': 'Meaning',
+        'transliteration': 'Ayatul-Kursi',
         'contexts': ['morning', 'evening', 'post_prayer', 'sleep'],
         'sort_hint': 3,
       });
@@ -26,6 +28,8 @@ void main() {
       expect(dhikr.benefit, 'نص الفضل');
       expect(dhikr.benefitEn, 'Virtue text');
       expect(dhikr.benefitSourceEn, 'Muslim');
+      expect(dhikr.translation, 'Meaning');
+      expect(dhikr.transliteration, 'Ayatul-Kursi');
       expect(dhikr.contexts, SessionType.values.toSet());
       expect(dhikr.sortHint, 3);
     });

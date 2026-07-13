@@ -31,6 +31,13 @@ void main() {
     }
   });
 
+  test('every dhikr has an English translation and transliteration', () {
+    for (final d in repo.all) {
+      expect(d.translation?.trim(), isNotEmpty, reason: d.id);
+      expect(d.transliteration?.trim(), isNotEmpty, reason: d.id);
+    }
+  });
+
   test('a benefit tier implies benefit text with a source', () {
     for (final d in repo.all.where((d) => d.tier != BenefitTier.none)) {
       expect(d.benefit, isNotNull, reason: d.id);

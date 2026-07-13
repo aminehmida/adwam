@@ -8,7 +8,8 @@ import '../data/prefs_store.dart';
 /// App-level settings: the locale override (null = follow system), the
 /// theme mode, whether the long-press session-reset confirmation has been
 /// muted, whether the volume-down key counts the current dhikr (Android),
-/// and the focus-overlay background variant.
+/// the focus-overlay background variant, and whether the translation /
+/// transliteration texts show on cards (non-Arabic UIs only).
 class SettingsController extends ChangeNotifier {
   final PrefsStore _store;
   Locale? _locale;
@@ -16,13 +17,17 @@ class SettingsController extends ChangeNotifier {
   bool _skipSessionResetConfirm;
   bool _volumeKeyCounting;
   int _focusBgVariant;
+  bool _showTranslation;
+  bool _showTransliteration;
 
   SettingsController(this._store)
       : _locale = _store.loadLocaleOverride(),
         _themeMode = _store.loadThemeMode(),
         _skipSessionResetConfirm = _store.loadSkipSessionResetConfirm(),
         _volumeKeyCounting = _store.loadVolumeKeyCounting(),
-        _focusBgVariant = _store.loadFocusBgVariant();
+        _focusBgVariant = _store.loadFocusBgVariant(),
+        _showTranslation = _store.loadShowTranslation(),
+        _showTransliteration = _store.loadShowTransliteration();
 
   Locale? get locale => _locale;
 
@@ -53,6 +58,22 @@ class SettingsController extends ChangeNotifier {
   void setVolumeKeyCounting(bool value) {
     _volumeKeyCounting = value;
     _store.saveVolumeKeyCounting(value);
+    notifyListeners();
+  }
+
+  bool get showTranslation => _showTranslation;
+
+  void setShowTranslation(bool value) {
+    _showTranslation = value;
+    _store.saveShowTranslation(value);
+    notifyListeners();
+  }
+
+  bool get showTransliteration => _showTransliteration;
+
+  void setShowTransliteration(bool value) {
+    _showTransliteration = value;
+    _store.saveShowTransliteration(value);
     notifyListeners();
   }
 

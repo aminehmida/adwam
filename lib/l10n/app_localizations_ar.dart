@@ -33,6 +33,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get virtue => 'الفضل';
 
   @override
+  String get translation => 'الترجمة';
+
+  @override
   String get tierProtection => 'الحماية';
 
   @override
@@ -103,6 +106,20 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get volumeKeyCountingBody =>
       'الضغط على زر خفض الصوت يعدّ الذكر الحالي، ولن يتغيّر مستوى الصوت أثناء العدّ.';
+
+  @override
+  String get showTranslation => 'عرض الترجمة';
+
+  @override
+  String get showTranslationBody =>
+      'عرض معنى الذكر بالإنجليزية داخل قسم الترجمة.';
+
+  @override
+  String get showTransliteration => 'عرض النطق بالحروف اللاتينية';
+
+  @override
+  String get showTransliterationBody =>
+      'دليل نطق الذكر بالحروف اللاتينية داخل قسم الترجمة.';
 
   @override
   String get resetTodayProgress => 'تصفير عدّادات اليوم';

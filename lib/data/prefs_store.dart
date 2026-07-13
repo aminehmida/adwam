@@ -66,6 +66,17 @@ class PrefsStore {
   Future<void> saveVolumeKeyCounting(bool value) =>
       _prefs.setBool('volumeKeyCounting', value);
 
+  bool loadShowTranslation() => _prefs.getBool('showTranslation') ?? true;
+
+  Future<void> saveShowTranslation(bool value) =>
+      _prefs.setBool('showTranslation', value);
+
+  bool loadShowTransliteration() =>
+      _prefs.getBool('showTransliteration') ?? true;
+
+  Future<void> saveShowTransliteration(bool value) =>
+      _prefs.setBool('showTransliteration', value);
+
   int loadFocusBgVariant() => _prefs.getInt('focusBgVariant') ?? 0;
 
   Future<void> saveFocusBgVariant(int variant) =>
