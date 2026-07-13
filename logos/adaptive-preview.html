@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Adaptive icon simulation</title>
+<style>
+ body{font-family:-apple-system,sans-serif;background:#e8e8e8;padding:2rem;display:flex;gap:3rem;flex-wrap:wrap}
+ .tile{text-align:center}
+ .icon{width:160px;height:160px;position:relative;overflow:hidden;background:#0B3B32}
+ .circle{border-radius:50%}.squircle{border-radius:38px}.square{border-radius:12px}
+ .icon img{position:absolute;inset:-9%;width:118%;height:118%}
+ .fg{padding:16%;box-sizing:border-box}
+ .label{margin-top:.6rem;font-size:.85rem}
+ .themed{background:#cfe3d8}
+ .themed img{filter:brightness(0) saturate(100%) invert(23%) sepia(20%) saturate(900%) hue-rotate(120deg)}
+</style></head><body>
+<div class="tile"><div class="icon circle"><img src="../assets/icon/icon_foreground.png" style="inset:16%;width:68%;height:68%"></div><div class="label">Pixel circle mask</div></div>
+<div class="tile"><div class="icon squircle"><img src="../assets/icon/icon_foreground.png" style="inset:16%;width:68%;height:68%"></div><div class="label">Samsung squircle</div></div>
+<div class="tile"><div class="icon square"><img src="../assets/icon/icon_foreground.png" style="inset:16%;width:68%;height:68%"></div><div class="label">Rounded square</div></div>
+<div class="tile"><div class="icon circle themed"><img src="../assets/icon/icon_monochrome.png" style="inset:16%;width:68%;height:68%"></div><div class="label">Android 13+ themed</div></div>
+<div class="tile"><img src="../logos/export/logo-192.png" width="160" style="border-radius:16px"><div class="label">Play Store / legacy</div></div>
+</body></html>

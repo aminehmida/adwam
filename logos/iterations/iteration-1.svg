@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <g id="icon">
+    <rect x="443" y="69" width="34" height="34" fill="#D9A441" stroke="#D9A441" stroke-width="0.75"/>
+    <rect x="443" y="137" width="34" height="238" fill="#0E4F44" stroke="#0E4F44" stroke-width="0.75"/>
+    <rect x="307" y="239" width="102" height="34" fill="#0E4F44" stroke="#0E4F44" stroke-width="0.75"/>
+    <rect x="375" y="239" width="34" height="136" fill="#0E4F44" stroke="#0E4F44" stroke-width="0.75"/>
+    <rect x="307" y="341" width="102" height="34" fill="#0E4F44" stroke="#0E4F44" stroke-width="0.75"/>
+    <rect x="171" y="273" width="102" height="34" fill="#0E4F44" stroke="#0E4F44" stroke-width="0.75"/>
+    <rect x="171" y="341" width="102" height="34" fill="#0E4F44" stroke="#0E4F44" stroke-width="0.75"/>
+    <rect x="171" y="307" width="34" height="34" fill="#0E4F44" stroke="#0E4F44" stroke-width="0.75"/>
+    <rect x="239" y="307" width="34" height="34" fill="#0E4F44" stroke="#0E4F44" stroke-width="0.75"/>
+    <rect x="171" y="375" width="34" height="68" fill="#0E4F44" stroke="#0E4F44" stroke-width="0.75"/>
+    <rect x="103" y="409" width="102" height="34" fill="#0E4F44" stroke="#0E4F44" stroke-width="0.75"/>
+    <rect x="35" y="273" width="102" height="34" fill="#0E4F44" stroke="#0E4F44" stroke-width="0.75"/>
+    <rect x="35" y="341" width="102" height="34" fill="#0E4F44" stroke="#0E4F44" stroke-width="0.75"/>
+    <rect x="35" y="307" width="34" height="34" fill="#0E4F44" stroke="#0E4F44" stroke-width="0.75"/>
+    <rect x="103" y="307" width="34" height="34" fill="#0E4F44" stroke="#0E4F44" stroke-width="0.75"/>
+    <rect x="35" y="375" width="34" height="68" fill="#0E4F44" stroke="#0E4F44" stroke-width="0.75"/>
+  </g>
+</svg>

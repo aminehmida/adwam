@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <g id="icon">
+    <rect x="388" y="124" width="24" height="24" fill="#D9A441" stroke="#D9A441" stroke-width="0.75"/>
+    <rect x="388" y="172" width="24" height="168" fill="#F3EAD3" stroke="#F3EAD3" stroke-width="0.75"/>
+    <rect x="292" y="244" width="72" height="24" fill="#F3EAD3" stroke="#F3EAD3" stroke-width="0.75"/>
+    <rect x="340" y="244" width="24" height="96" fill="#F3EAD3" stroke="#F3EAD3" stroke-width="0.75"/>
+    <rect x="292" y="316" width="72" height="24" fill="#F3EAD3" stroke="#F3EAD3" stroke-width="0.75"/>
+    <rect x="196" y="268" width="72" height="24" fill="#F3EAD3" stroke="#F3EAD3" stroke-width="0.75"/>
+    <rect x="196" y="316" width="72" height="24" fill="#F3EAD3" stroke="#F3EAD3" stroke-width="0.75"/>
+    <rect x="196" y="292" width="24" height="24" fill="#F3EAD3" stroke="#F3EAD3" stroke-width="0.75"/>
+    <rect x="244" y="292" width="24" height="24" fill="#F3EAD3" stroke="#F3EAD3" stroke-width="0.75"/>
+    <rect x="196" y="340" width="24" height="48" fill="#F3EAD3" stroke="#F3EAD3" stroke-width="0.75"/>
+    <rect x="148" y="364" width="72" height="24" fill="#F3EAD3" stroke="#F3EAD3" stroke-width="0.75"/>
+    <rect x="100" y="268" width="72" height="24" fill="#F3EAD3" stroke="#F3EAD3" stroke-width="0.75"/>
+    <rect x="100" y="316" width="72" height="24" fill="#F3EAD3" stroke="#F3EAD3" stroke-width="0.75"/>
+    <rect x="100" y="292" width="24" height="24" fill="#F3EAD3" stroke="#F3EAD3" stroke-width="0.75"/>
+    <rect x="148" y="292" width="24" height="24" fill="#F3EAD3" stroke="#F3EAD3" stroke-width="0.75"/>
+    <rect x="100" y="340" width="24" height="48" fill="#F3EAD3" stroke="#F3EAD3" stroke-width="0.75"/>
+  </g>
+</svg>

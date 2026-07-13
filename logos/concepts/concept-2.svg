@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect id="badge" x="0" y="0" width="512" height="512" rx="112" fill="#0B3B32"/>
+  <g id="icon">
+    <rect x="400" y="58" width="36" height="180" fill="#F3EAD3" stroke="#F3EAD3" stroke-width="0.75"/>
+    <rect x="184" y="94" width="144" height="36" fill="#F3EAD3" stroke="#F3EAD3" stroke-width="0.75"/>
+    <rect x="292" y="94" width="36" height="144" fill="#F3EAD3" stroke="#F3EAD3" stroke-width="0.75"/>
+    <rect x="184" y="202" width="144" height="36" fill="#F3EAD3" stroke="#F3EAD3" stroke-width="0.75"/>
+    <rect x="328" y="274" width="108" height="36" fill="#F3EAD3" stroke="#F3EAD3" stroke-width="0.75"/>
+    <rect x="328" y="346" width="108" height="36" fill="#F3EAD3" stroke="#F3EAD3" stroke-width="0.75"/>
+    <rect x="328" y="310" width="36" height="36" fill="#F3EAD3" stroke="#F3EAD3" stroke-width="0.75"/>
+    <rect x="400" y="310" width="36" height="36" fill="#F3EAD3" stroke="#F3EAD3" stroke-width="0.75"/>
+    <rect x="328" y="382" width="36" height="72" fill="#F3EAD3" stroke="#F3EAD3" stroke-width="0.75"/>
+    <rect x="256" y="418" width="108" height="36" fill="#F3EAD3" stroke="#F3EAD3" stroke-width="0.75"/>
+    <rect x="76" y="274" width="108" height="36" fill="#F3EAD3" stroke="#F3EAD3" stroke-width="0.75"/>
+    <rect x="76" y="346" width="108" height="36" fill="#F3EAD3" stroke="#F3EAD3" stroke-width="0.75"/>
+    <rect x="76" y="310" width="36" height="36" fill="#F3EAD3" stroke="#F3EAD3" stroke-width="0.75"/>
+    <rect x="148" y="310" width="36" height="36" fill="#F3EAD3" stroke="#F3EAD3" stroke-width="0.75"/>
+    <rect x="76" y="382" width="36" height="72" fill="#F3EAD3" stroke="#F3EAD3" stroke-width="0.75"/>
+  </g>
+</svg>

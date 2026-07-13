@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <g id="icon" transform="rotate(-18 256 256)">
+    <circle cx="208.1" cy="356.6" r="15" fill="#0E4F44"/>
+    <circle cx="168.2" cy="334.1" r="15" fill="#0E4F44"/>
+    <circle cx="137.7" cy="299.9" r="15" fill="#0E4F44"/>
+    <circle cx="119.9" cy="257.8" r="15" fill="#0E4F44"/>
+    <circle cx="116.6" cy="212.1" r="15" fill="#0E4F44"/>
+    <circle cx="128.2" cy="167.8" r="20" fill="#D9A441"/>
+    <circle cx="153.5" cy="129.6" r="15" fill="#0E4F44"/>
+    <circle cx="189.8" cy="101.7" r="15" fill="#0E4F44"/>
+    <circle cx="233.1" cy="86.9" r="15" fill="#0E4F44"/>
+    <circle cx="278.9" cy="86.9" r="15" fill="#0E4F44"/>
+    <circle cx="322.2" cy="101.7" r="15" fill="#0E4F44"/>
+    <circle cx="358.5" cy="129.6" r="15" fill="#0E4F44"/>
+    <circle cx="383.8" cy="167.8" r="20" fill="#D9A441"/>
+    <circle cx="395.4" cy="212.1" r="15" fill="#0E4F44"/>
+    <circle cx="392.1" cy="257.8" r="15" fill="#0E4F44"/>
+    <circle cx="374.3" cy="299.9" r="15" fill="#0E4F44"/>
+    <circle cx="343.8" cy="334.1" r="15" fill="#0E4F44"/>
+    <circle cx="303.9" cy="356.6" r="15" fill="#0E4F44"/>
+    <line x1="256" y1="352" x2="256" y2="440" stroke="#D9A441" stroke-width="40" stroke-linecap="round"/>
+  </g>
+</svg>

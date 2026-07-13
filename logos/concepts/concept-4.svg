@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 512">
+  <g id="wordmark">
+    <text x="512" y="300" text-anchor="middle" direction="rtl"
+          font-family="Geeza Pro, Al Bayan, Amiri, Traditional Arabic, serif"
+          font-size="230" font-weight="700" fill="#0E4F44">&#x623;&#x62F;&#x648;&#x064E;&#x645;</text>
+    <text x="512" y="400" dx="11" text-anchor="middle"
+          font-family="Avenir Next, Helvetica, Arial, sans-serif"
+          font-size="46" font-weight="500" letter-spacing="22" fill="#D9A441">ADWAM</text>
+  </g>
+</svg>
