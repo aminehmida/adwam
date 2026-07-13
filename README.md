@@ -1,50 +1,68 @@
 # Adwam (أدوَم) — أذكار اليوم والليلة
 
-> «أحبُّ الأعمالِ إلى الله أدومُها وإن قلّ» — the name: the most *lasting* deeds.
+> «أحبُّ الأعمالِ إلى الله أدومُها وإن قلّ»
 
-Offline daily adhkar app (Flutter, Android). Four sessions — morning, evening,
-post-prayer, before-sleep — with a principled default ordering and full
-per-session customization.
+The most beloved deeds to Allah are the most lasting, even if small. The app is named after this hadith and built around it: a simple, fully offline app for the daily adhkar of the Prophet ﷺ, covering morning, evening, after prayer, and before sleep.
 
-## Default ordering
+## Ordering
 
-Within each session:
+All of the Prophet's adhkar are beneficial, but on a busy day you may not get through the whole session. Adwam orders each session so that the time you do have counts:
 
-1. **Quran passages** always first
-2. **Benefit tier** from the virtue hadith: protection → reward → none
-   (a long reward dua outranks every no-benefit dhikr)
-3. **Repetition count** ascending (1, 3, 4, 7, 10, … 100)
-4. **Form**: short before long, breaking ties at the same count
-5. Curated `sort_hint` — cluster members share one value (e.g. the
-   أصبحنا/أمسينا dhikrs) so they stay together ahead of their group
-6. **Word count** ascending as the final tiebreak
+1. Adhkar whose virtue is protection come first, so you are covered as early as possible.
+2. Short adhkar with large promised rewards come before longer ones, so more good deeds are earned early in the session.
+3. If you only have a couple of minutes, you have still done the most important part. If you have more time, keep going down the list.
 
-Drag-to-reorder and hide (collapse-in-place) override the defaults per session;
-"reset to default order" brings them back.
+The order also keeps related adhkar next to each other, which makes the session easier to memorize over time.
+
+## Stopping and picking up
+
+When you return to a session, the adhkar you already completed are collapsed, so the remaining ones are easy to see. Progress resets at midnight.
+
+## Counting
+
+- Tap a dhikr to count one repetition, with haptic feedback.
+- The volume-down button also counts, so you can keep going without touching the screen.
+- The list scrolls to the next unfinished dhikr automatically.
+- Long-press to mark a dhikr as done.
+- Each dhikr has a "الفضل / Virtue" expander showing the hadith about its reward.
+
+## Customization
+
+- Drag adhkar to reorder them however you prefer.
+- Hide adhkar you don't need, for example to focus on memorizing a subset, and unhide them later.
+- One tap restores the default order.
+
+## Languages
+
+Arabic and English interface, with right-to-left layout in Arabic. The adhkar themselves are always in Arabic.
+
+## Installing on Android
+
+The app is not on an app store yet. To install it, download the APK from the
+[latest release](https://github.com/aminehmida/adwam/releases/latest) and open
+it on your phone. Android will ask you to allow installing apps from unknown
+sources the first time. Pick `adwam-<version>-arm64-v8a.apk` for most modern
+phones, or `adwam-<version>-universal.apk` if the first one doesn't install.
+
+## What's next
+
+Features under consideration:
+
+- More adhkar categories
+- More interface and translation/transliteration languages
+- iOS support
+- Releasing on Google Play and the Apple App Store, and potentially other open stores
 
 ## Content
 
-55 adhkar compiled by `tool/build_content.py` into `assets/adhkar.json` from:
-
-- [Seen-Arabic Morning-And-Evening-Adhkar-DB](https://github.com/Seen-Arabic/Morning-And-Evening-Adhkar-DB) (MIT) — morning/evening, incl. virtue text + hadith sources
-- [hisnmuslim.com API](http://www.hisnmuslim.com) — post-prayer (ch. 25) and sleep (ch. 28)
-
-Form and benefit-tier classification lives in `content/curation.json`
-(drafted by Claude, human-reviewed — see `content/REVIEW.md`). To change
-content or classification, edit those inputs and rerun the script.
+55 adhkar, hand-reviewed, sourced from the [Seen-Arabic Morning-And-Evening-Adhkar-DB](https://github.com/Seen-Arabic/Morning-And-Evening-Adhkar-DB) (MIT) and the [hisnmuslim.com](http://www.hisnmuslim.com) collection (Hisn al-Muslim).
 
 ## Development
 
-Toolchain is pinned via [mise](https://mise.jdx.dev) (`mise.toml`: Java 17,
-Flutter). Android SDK via `brew install --cask android-commandlinetools`
-(`sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0"`).
+Flutter app (currently on Android; iOS planned). Toolchain pinned via [mise](https://mise.jdx.dev).
 
 ```sh
 flutter pub get
-flutter test          # sort logic, daily rollover, counting flow
-flutter run           # on a USB device
-flutter build apk --release --split-per-abi
+flutter test
+flutter run
 ```
-
-Daily progress persists via shared_preferences and resets at local midnight
-(date-stamp comparison — no timers).
