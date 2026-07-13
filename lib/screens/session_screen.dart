@@ -31,6 +31,15 @@ class _SessionScreenState extends State<SessionScreen>
   final ScrollController _scrollController = ScrollController();
   bool _editing = false;
 
+  /// Edit-mode twins of [_itemKeys] and [_scrollController]: the count and
+  /// edit lists briefly coexist during the mode cross-fade, so they cannot
+  /// share GlobalKeys or a scroll position. Offsets are re-derived on every
+  /// mode switch, so there is nothing worth restoring across route visits.
+  final Map<String, GlobalKey> _editKeys = {};
+  final ScrollController _editScrollController = ScrollController(
+    keepScrollOffset: false,
+  );
+
   /// Dhikrs with at least this many repetitions count in a full-screen
   /// focus overlay instead of on the card itself.
   static const _focusThreshold = 100;
@@ -243,12 +252,134 @@ class _SessionScreenState extends State<SessionScreen>
     }
   }
 
+  /// The first item visible in [controller]'s viewport among [keys]' built
+  /// items, with how far its top sits from the viewport's leading edge
+  /// (<= 0 while partially scrolled off). This is the fixpoint of a mode
+  /// switch: the same card stays at the same place on screen.
+  ({String id, double delta})? _topVisibleItem(
+    Map<String, GlobalKey> keys,
+    List<Dhikr> dhikrs,
+    ScrollController controller,
+  ) {
+    if (!controller.hasClients) return null;
+    final pixels = controller.position.pixels;
+    for (final dhikr in dhikrs) {
+      final object = keys[dhikr.id]?.currentContext?.findRenderObject();
+      if (object == null || !object.attached) continue;
+      final viewport = RenderAbstractViewport.maybeOf(object);
+      if (viewport == null) continue;
+      final top = viewport.getOffsetToReveal(object, 0).offset;
+      final height = object is RenderBox && object.hasSize
+          ? object.size.height
+          : 0.0;
+      final delta = top - pixels;
+      if (delta + height > 0) return (id: dhikr.id, delta: delta);
+    }
+    return null;
+  }
+
+  /// Swap to the edit list, keeping the card at the top of the count list
+  /// in place instead of opening at the top.
+  void _startEditing() {
+    final dhikrs = context.read<ListConfigController>().listFor(widget.session);
+    final anchor = _topVisibleItem(_itemKeys, dhikrs, _scrollController);
+    var estimate = 0.0;
+    if (anchor != null) {
+      final position = _scrollController.position;
+      final total =
+          position.maxScrollExtent -
+          position.minScrollExtent +
+          position.viewportDimension;
+      final index = dhikrs.indexWhere((d) => d.id == anchor.id);
+      estimate = math.max(0, index * total / dhikrs.length);
+    }
+    setState(() => _editing = true);
+    if (anchor != null) _alignEditListTo(anchor, estimate);
+  }
+
+  /// Bring [anchor]'s edit card to the viewport spot it occupied in the
+  /// count list. The edit list builds lazily from the top, so jump to an
+  /// estimated offset and step until the card exists, then align exactly;
+  /// the mode cross-fade covers the intermediate jumps.
+  Future<void> _alignEditListTo(
+    ({String id, double delta}) anchor,
+    double estimate,
+  ) async {
+    final dhikrs = context.read<ListConfigController>().listFor(widget.session);
+    final targetIndex = dhikrs.indexWhere((d) => d.id == anchor.id);
+    if (targetIndex == -1) return;
+    var jumped = false;
+    for (var attempt = 0; attempt < 20; attempt++) {
+      await WidgetsBinding.instance.endOfFrame;
+      if (!mounted || !_editing || !_editScrollController.hasClients) return;
+      final position = _editScrollController.position;
+      final object = _editKeys[anchor.id]?.currentContext?.findRenderObject();
+      final viewport = RenderAbstractViewport.maybeOf(object);
+      if (object != null && object.attached && viewport != null) {
+        final top = viewport.getOffsetToReveal(object, 0).offset;
+        position.jumpTo(
+          (top - anchor.delta).clamp(
+            position.minScrollExtent,
+            position.maxScrollExtent,
+          ),
+        );
+        return;
+      }
+      if (!jumped) {
+        jumped = true;
+        position.jumpTo(
+          estimate.clamp(position.minScrollExtent, position.maxScrollExtent),
+        );
+        continue;
+      }
+      // Still not built: step a viewport at a time, towards wherever the
+      // target sits relative to what is currently on screen.
+      final probe = _topVisibleItem(_editKeys, dhikrs, _editScrollController);
+      final probeIndex = probe == null
+          ? -1
+          : dhikrs.indexWhere((d) => d.id == probe.id);
+      final next =
+          (probeIndex >= 0 && probeIndex < targetIndex
+                  ? position.pixels + position.viewportDimension
+                  : position.pixels - position.viewportDimension)
+              .clamp(position.minScrollExtent, position.maxScrollExtent);
+      if ((next - position.pixels).abs() < 1) return;
+      position.jumpTo(next);
+    }
+  }
+
+  /// Swap back to the count list, re-anchored on whichever card is at the
+  /// top of the edit list so the switch happens in place.
+  void _stopEditing() {
+    final dhikrs = context.read<ListConfigController>().listFor(widget.session);
+    final anchor = _topVisibleItem(_editKeys, dhikrs, _editScrollController);
+    setState(() {
+      _editing = false;
+      if (anchor != null) _anchorId = anchor.id;
+    });
+    if (anchor == null) return;
+    // The anchor card sits at offset 0 by construction; shift by the delta
+    // it had in the edit list. Runs post-frame so the rebuilt count list has
+    // laid out (the cross-fade hides the first mis-positioned frame).
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _editing || !_scrollController.hasClients) return;
+      final position = _scrollController.position;
+      position.jumpTo(
+        (-anchor.delta).clamp(
+          position.minScrollExtent,
+          position.maxScrollExtent,
+        ),
+      );
+    });
+  }
+
   @override
   void dispose() {
     _focusScrim.dispose();
     _focusAnim.dispose();
     _focusController.dispose();
     _scrollController.dispose();
+    _editScrollController.dispose();
     super.dispose();
   }
 
@@ -265,7 +396,7 @@ class _SessionScreenState extends State<SessionScreen>
         if (_focused != null) {
           _dismissFocus();
         } else {
-          setState(() => _editing = false);
+          _stopEditing();
         }
       },
       // The focus overlay sits above the whole Scaffold (app bar included)
@@ -294,20 +425,29 @@ class _SessionScreenState extends State<SessionScreen>
                       IconButton(
                         icon: const Icon(Icons.check),
                         tooltip: l10n.doneEditing,
-                        onPressed: () => setState(() => _editing = false),
+                        onPressed: _stopEditing,
                       ),
                     ]
                   : [
                       IconButton(
                         icon: const Icon(Icons.tune),
                         tooltip: l10n.editList,
-                        onPressed: () => setState(() => _editing = true),
+                        onPressed: _startEditing,
                       ),
                     ],
             ),
-            body: _editing
-                ? _editList(config, dhikrs)
-                : _countList(config, dhikrs),
+            body: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 220),
+              child: _editing
+                  ? KeyedSubtree(
+                      key: const ValueKey('edit'),
+                      child: _editList(config, dhikrs),
+                    )
+                  : KeyedSubtree(
+                      key: const ValueKey('count'),
+                      child: _countList(config, dhikrs),
+                    ),
+            ),
           ),
           if (_focused != null) _focusOverlay(context),
         ],
@@ -649,11 +789,36 @@ class _SessionScreenState extends State<SessionScreen>
     final colors = Theme.of(context).colorScheme;
     return ReorderableListView.builder(
       buildDefaultDragHandles: false,
+      scrollController: _editScrollController,
       padding: const EdgeInsets.fromLTRB(14, 4, 14, 32),
       itemCount: dhikrs.length,
       onReorderItem: (oldIndex, newIndex) => context
           .read<ListConfigController>()
           .reorder(widget.session, oldIndex, newIndex),
+      // Subtle lift while dragging: a slight grow plus a soft shadow.
+      proxyDecorator: (child, index, animation) => AnimatedBuilder(
+        animation: animation,
+        builder: (context, child) {
+          final t = Curves.easeOut.transform(animation.value);
+          return Transform.scale(
+            scale: lerpDouble(1, 1.02, t)!,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: .18 * t),
+                    blurRadius: 14,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: child,
+            ),
+          );
+        },
+        child: child,
+      ),
       itemBuilder: (context, index) {
         final dhikr = dhikrs[index];
         final hidden = config.isHidden(widget.session, dhikr.id);
@@ -695,7 +860,7 @@ class _SessionScreenState extends State<SessionScreen>
           ),
         );
         return KeyedSubtree(
-          key: ValueKey(dhikr.id),
+          key: _editKeys.putIfAbsent(dhikr.id, GlobalKey.new),
           child: newSection
               ? Column(children: [sectionBandFor(context, dhikr), card])
               : card,

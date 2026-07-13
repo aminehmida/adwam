@@ -129,6 +129,51 @@ void main() {
     expect(find.text('Morning adhkar'), findsOneWidget); // back home
   });
 
+  testWidgets('toggling edit mode keeps the list in place', (tester) async {
+    tester.view.physicalSize = const Size(420, 800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+    SharedPreferences.setMockInitialValues({});
+    final repo = ContentRepository([
+      for (var i = 1; i <= 20; i++) _dhikr('a${i.toString().padLeft(2, '0')}'),
+    ]);
+    await tester.pumpWidget(
+        DhikrApp(repo: repo, store: await PrefsStore.open()));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Morning adhkar'));
+    await tester.pumpAndSettle();
+
+    Set<String> built() => {
+          for (var i = 1; i <= 20; i++)
+            if (find
+                .text('ذكر a${i.toString().padLeft(2, '0')}')
+                .evaluate()
+                .isNotEmpty)
+              'a${i.toString().padLeft(2, '0')}',
+        };
+
+    // Scroll deep into the list, away from the top.
+    await tester.scrollUntilVisible(find.text('ذكر a20'), 400);
+    await tester.pumpAndSettle();
+    final beforeEdit = built();
+    expect(beforeEdit, isNot(contains('a01')));
+
+    // Entering edit mode stays where the count list was, not at the top.
+    // Edit cards are taller, so fewer fit — but the window must overlap.
+    await tester.tap(find.byIcon(Icons.tune));
+    await tester.pumpAndSettle();
+    final inEdit = built();
+    expect(inEdit.intersection(beforeEdit), isNotEmpty);
+    expect(inEdit, isNot(contains('a01')));
+
+    // Leaving edit mode stays in place too.
+    await tester.tap(find.byIcon(Icons.check));
+    await tester.pumpAndSettle();
+    final afterEdit = built();
+    expect(afterEdit.intersection(inEdit), isNotEmpty);
+    expect(afterEdit, isNot(contains('a01')));
+  });
+
   testWidgets('hiding a card in edit mode removes it from the home badge',
       (tester) async {
     await openMorning(tester);
