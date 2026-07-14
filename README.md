@@ -59,12 +59,7 @@ phones, or `adwam-<version>-universal.apk` if the first one doesn't install.
 
 ## What's next
 
-Features under consideration:
-
-- More adhkar categories
-- More interface and translation/transliteration languages
-- iOS support
-- Releasing on Google Play and the Apple App Store, and potentially other open stores
+Features under consideration are tracked in [IDEAS.md](IDEAS.md).
 
 ## Content
 
