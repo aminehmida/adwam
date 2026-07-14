@@ -1,6 +1,7 @@
 # Workflow
 
 - Always work in a git worktree (via EnterWorktree) when starting a new feature or fixing an issue — never work directly on `main`.
+- Land every releasable change via a pull request, merged into `main` — don't push feature commits straight to `main`. The release workflow builds change logs from merged PRs (`generate_release_notes: true`), so a clean, descriptive PR title becomes the release-notes line. Keep PRs scoped to one logical change and title them the way you'd want them to read in a release. Trivial non-releasable chores (version bumps, docs typos) may go directly to `main`.
 - **Cross-platform rule: the app currently ships on Android, but iOS is planned and other platforms may follow. Do NOT introduce anything platform-specific (Android or otherwise) — in Dart code, plugins, or design decisions — unless the user explicitly allows it for that case.** Platform-specific build/test tooling below (adb, APKs, emulator) is fine; it's the app itself that must stay portable.
 - After every change, the user usually wants the release APK installed and launched on his Samsung Galaxy S24 Ultra, verified with a screenshot.
 - Tests: only what is useful — no coverage padding.
@@ -29,6 +30,7 @@ Adwam (أدوَم) — Flutter adhkar app (currently released on Android; iOS pl
 # Releasing on GitHub
 
 - Cut a release by pushing a `v*` tag (`git tag v1.0.1 && git push origin v1.0.1`) — `.github/workflows/release.yml` runs analyze + tests, builds, and publishes a GitHub Release with two APKs: `adwam-<tag>-arm64-v8a.apk` (17MB, any modern phone) and `adwam-<tag>-universal.apk` (46MB, all ABIs). `workflow_dispatch` runs build the artifact only, no Release.
+- Release notes: the workflow uses `generate_release_notes: true`, which builds the "What's Changed" list from PRs merged since the previous tag — so the merge-via-PR rule above is what makes for a clean change log. If commits landed directly on `main` (no PR), the auto notes are thin; curate afterward with `gh release edit <tag> --notes-file <file>` (group into New features / Improvements / Packaging & docs, and link a `compare/<prev>...<tag>` full changelog).
 - Versioning: versionName comes from the tag (`v1.2.0` → `1.2.0`); versionCode is `3000 + run_number`, so CI APKs install over local 2xxx builds — a local `--build-number` deploy after installing a CI release must exceed the CI number.
 - CI signs with the real upload key via repo secrets `KEYSTORE_BASE64`/`KEYSTORE_PASSWORD`/`KEY_PASSWORD`/`KEY_ALIAS` (from local `android/key.properties` + keystore; re-set with `gh secret set` if the key rotates). Without them it silently falls back to debug signing — verify with `apksigner verify --print-certs` (cert CN=Amine Hmida, OU=Dhikr) if in doubt.
 - Workflow gotcha: the `secrets` context is not allowed in a step-level `if` — pass secrets via `env` and guard in bash.
