@@ -43,10 +43,14 @@ Widget sectionBandFor(BuildContext context, Dhikr dhikr) {
 
 /// Whether a section band belongs above [index] — the start of the list or
 /// any change of tier / full-surah / high-repetition / custom-dua run.
+/// Fixed-order dhikrs follow their sunnah sequence rather than the tier
+/// grouping, so no bands appear over that run.
 bool startsSection(List<Dhikr> dhikrs, int index) {
+  final curr = dhikrs[index];
+  if (curr.hasFixedOrder) return false;
   if (index == 0) return true;
   final prev = dhikrs[index - 1];
-  final curr = dhikrs[index];
+  if (prev.hasFixedOrder) return true;
   if (prev.isCustom || curr.isCustom) return prev.isCustom != curr.isCustom;
   // High-repetition dhikrs form one section regardless of the tiers inside
   // it: a band only starts when crossing into or out of that run.

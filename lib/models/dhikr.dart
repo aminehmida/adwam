@@ -4,7 +4,7 @@ enum DhikrForm { quran, short, long, surah }
 
 enum BenefitTier { protection, reward, none }
 
-enum SessionType { morning, evening, postPrayer, sleep }
+enum SessionType { morning, evening, postPrayer, sleep, waking }
 
 const _formNames = {
   'quran': DhikrForm.quran,
@@ -36,6 +36,7 @@ const _sessionNames = {
   'evening': SessionType.evening,
   'post_prayer': SessionType.postPrayer,
   'sleep': SessionType.sleep,
+  'waking': SessionType.waking,
 };
 
 /// Ids of user-created dhikrs (see ListConfigController.addCustom); the
@@ -100,6 +101,10 @@ class Dhikr {
   /// Repeated enough times to belong in the high-repetitions section and to
   /// count in the focus overlay.
   bool get isHighRep => repetitions >= highRepThreshold;
+
+  /// Part of an explicitly ordered sunnah sequence (the post-prayer adhkar):
+  /// sorted by that sequence and shown without category bands.
+  bool get hasFixedOrder => fixedOrder != noFixedOrder;
 
   /// User-created (editable and deletable), as opposed to built-in content.
   bool get isCustom => id.startsWith(customIdPrefix);
