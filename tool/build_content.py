@@ -8,7 +8,8 @@ Sources (content/sources/):
                         transliteration, translated virtues (fadl/source)
   hisn_postprayer.json  hisnmuslim.com API ch. 25 (text only)
   hisn_sleep.json       hisnmuslim.com API ch. 28 (text only)
-  hisn_*_en.json        hisnmuslim.com API en/25 + en/28 (matched by ID):
+  hisn_waking.json      hisnmuslim.com API ch. 1 (text only)
+  hisn_*_en.json        hisnmuslim.com API en/25 + en/28 + en/1 (matched by ID):
                         TRANSLATED_TEXT, LANGUAGE_ARABIC_TRANSLATED_TEXT
   tanzil_uthmani.json   Tanzil Uthmani text of the full surahs read before
                         sleep (chapters 32, 67) — ayah text verbatim per the
@@ -35,6 +36,10 @@ NO_HINT = 1 << 20
 # Cards synthesized from a split source item: shown by surah name, read in
 # full from the mushaf. Their id must have a full entry in curation.json.
 SPLIT = {"sl-110": [("sl-110a", "sleep"), ("sl-110b", "sleep")]}
+
+# In the printed Hisn al-Muslim but missing from the hisnmuslim.com API dump;
+# text, English and metadata live entirely in curation.json.
+EXTRA = {"pp-74": ["post_prayer"], "pp-75": ["post_prayer"]}
 
 # English rendering of the short hadith citations used for pp-*/sl-* sources,
 # applied when curation carries no explicit benefit_source_en.
@@ -133,7 +138,8 @@ def build():
     # rendering, matched by the same ID.
     for fname, en_fname, prefix, context in [
             ("hisn_postprayer.json", "hisn_postprayer_en.json", "pp", "post_prayer"),
-            ("hisn_sleep.json", "hisn_sleep_en.json", "sl", "sleep")]:
+            ("hisn_sleep.json", "hisn_sleep_en.json", "sl", "sleep"),
+            ("hisn_waking.json", "hisn_waking_en.json", "wk", "waking")]:
         chapter = next(iter(load(SRC / fname).values()))
         en_by_id = {x["ID"]: x for x in next(iter(load(SRC / en_fname).values()))}
         for item in chapter:
@@ -150,6 +156,10 @@ def build():
             dhikrs.append(_hisn_entry(
                 did, [context], clean_hisn(item["ARABIC_TEXT"]), cur,
                 en_by_id.get(item["ID"], {})))
+
+    for did, contexts in EXTRA.items():
+        cur = curation[did]
+        dhikrs.append(_hisn_entry(did, contexts, cur["arabic"], cur, {}))
 
     missing = [d["id"] for d in dhikrs
                if not d["translation"] or not d["transliteration"]]
@@ -197,11 +207,14 @@ def _hisn_entry(did, contexts, arabic, cur, en, body=None):
 
 
 def default_sort_key(d):
-    # Quran passages always first, full surahs always last; then benefit
-    # tier; then repetitions ascending; short-before-long at the same
-    # count; then cluster hint; least rule: fewer words first.
+    # An explicit fixed_order (the sunnah sequence of the post-prayer
+    # adhkar) beats everything. Otherwise: Quran passages always first,
+    # full surahs always last; then benefit tier; then repetitions
+    # ascending; short-before-long at the same count; then cluster hint;
+    # least rule: fewer words first.
     band = {"quran": 0, "surah": 2}.get(d["form"], 1)
-    return (band,
+    return (d.get("fixed_order", NO_HINT),
+            band,
             TIER_ORDER[d["benefit_tier"]],
             d["repetitions"],
             FORM_ORDER[d["form"]],
@@ -220,7 +233,8 @@ def write_review(dhikrs, curation):
         "",
     ]
     for context, title in [("morning", "أذكار الصباح"), ("evening", "أذكار المساء"),
-                           ("post_prayer", "أذكار بعد الصلاة"), ("sleep", "أذكار النوم")]:
+                           ("post_prayer", "أذكار بعد الصلاة"), ("sleep", "أذكار النوم"),
+                           ("waking", "أذكار الاستيقاظ")]:
         items = sorted((d for d in dhikrs if context in d["contexts"]), key=default_sort_key)
         lines += [f"## {title} ({len(items)})", "",
                   "| # | id | الذكر | تكرار | نوع | فضل | مصدر الفضل | ملاحظة |",

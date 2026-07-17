@@ -8,9 +8,13 @@ import '../models/user_list_config.dart';
 /// The edit-mode section a dhikr belongs to; mirrors the visual bands
 /// (see startsSection): benefit tier, plus the full-surah, high-repetition
 /// and custom-dua runs, the high-rep one spanning its tiers as one section.
-(bool, BenefitTier, bool, bool) _sectionOf(Dhikr d) => d.isHighRep
-    ? (true, BenefitTier.none, false, false)
-    : (false, d.tier, d.form == DhikrForm.surah, d.isCustom);
+/// A fixed-order run (the post-prayer sunnah sequence) has no bands and is
+/// one section, so drag-reorder moves freely across all of it.
+(bool, bool, BenefitTier, bool, bool) _sectionOf(Dhikr d) => d.hasFixedOrder
+    ? (true, false, BenefitTier.none, false, false)
+    : d.isHighRep
+        ? (false, true, BenefitTier.none, false, false)
+        : (false, false, d.tier, d.form == DhikrForm.surah, d.isCustom);
 
 /// Per-context order and hidden set, plus the user's own dhikrs,
 /// persisted on every change.

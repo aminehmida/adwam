@@ -266,7 +266,7 @@ void main() {
     await tester.pageBack();
     await tester.pumpAndSettle();
     expect(find.text('0 / 1'), findsOneWidget); // morning: 1 visible left
-    expect(find.text('0 / 3'), findsNWidgets(3)); // other sessions untouched
+    expect(find.text('0 / 3'), findsNWidgets(4)); // other sessions untouched
   });
 
   testWidgets('volume-down counts like a tap and skips finished dhikrs',
