@@ -79,6 +79,11 @@ class PrefsStore {
   Future<void> saveVolumeKeyCounting(bool value) =>
       _prefs.setBool('volumeKeyCounting', value);
 
+  bool loadBundleThreeQuls() => _prefs.getBool('bundleThreeQuls') ?? false;
+
+  Future<void> saveBundleThreeQuls(bool value) =>
+      _prefs.setBool('bundleThreeQuls', value);
+
   bool loadShowTranslation() => _prefs.getBool('showTranslation') ?? true;
 
   Future<void> saveShowTranslation(bool value) =>

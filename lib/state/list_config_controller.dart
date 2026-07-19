@@ -4,6 +4,7 @@ import '../data/content_repository.dart';
 import '../data/prefs_store.dart';
 import '../models/dhikr.dart';
 import '../models/user_list_config.dart';
+import 'settings_controller.dart';
 
 /// The edit-mode section a dhikr belongs to; mirrors the visual bands
 /// (see startsSection): benefit tier, plus the full-surah, high-repetition
@@ -21,22 +22,53 @@ import '../models/user_list_config.dart';
 class ListConfigController extends ChangeNotifier {
   final PrefsStore _store;
   final ContentRepository _repo;
+  final SettingsController _settings;
   final Map<SessionType, UserListConfig> _configs;
   final List<Dhikr> _customs;
 
-  ListConfigController(this._store, this._repo)
+  /// Last-seen value of [SettingsController.bundleThreeQuls], so a change to
+  /// it (which reshapes every session's list) re-notifies our listeners while
+  /// unrelated setting changes don't.
+  late bool _bundleThreeQuls;
+
+  ListConfigController(this._store, this._repo, this._settings)
       : _configs = {
           for (final s in SessionType.values) s: _store.loadConfig(s),
         },
-        _customs = _store.loadCustomDhikrs();
+        _customs = _store.loadCustomDhikrs() {
+    _bundleThreeQuls = _settings.bundleThreeQuls;
+    _settings.addListener(_onSettingsChanged);
+  }
+
+  void _onSettingsChanged() {
+    if (_settings.bundleThreeQuls != _bundleThreeQuls) {
+      _bundleThreeQuls = _settings.bundleThreeQuls;
+      notifyListeners();
+    }
+  }
+
+  @override
+  void dispose() {
+    _settings.removeListener(_onSettingsChanged);
+    super.dispose();
+  }
 
   UserListConfig configFor(SessionType session) => _configs[session]!;
 
+  /// Whether [d] is shown given the three-Quls setting: entries tagged with a
+  /// [QulVariant] appear only in the selected shape (separate vs bundle); the
+  /// other shape is dropped. Everything else always shows.
+  bool _matchesQulMode(Dhikr d) =>
+      d.qulVariant == null ||
+      d.qulVariant ==
+          (_settings.bundleThreeQuls ? QulVariant.bundle : QulVariant.separate);
+
   /// Built-in and custom dhikrs of [session] in default sort order.
   List<Dhikr> _defaultsFor(SessionType session) {
+    final builtins = _repo.defaultList(session).where(_matchesQulMode);
     final customs = _customs.where((d) => d.contexts.contains(session));
-    if (customs.isEmpty) return _repo.defaultList(session);
-    return [..._repo.defaultList(session), ...customs]..sort(compareDhikrs);
+    if (customs.isEmpty) return builtins.toList();
+    return [...builtins, ...customs]..sort(compareDhikrs);
   }
 
   /// Effective list for a session: user order if set, else default sort.

@@ -6,6 +6,17 @@ enum BenefitTier { protection, reward, none }
 
 enum SessionType { morning, evening, postPrayer, sleep }
 
+/// The three Quls (Muʿawwidhāt) ship in two interchangeable shapes, chosen by
+/// a global setting: [separate] is one card per surah, [bundle] is a single
+/// card holding all three. Exactly one shape is shown per session (see
+/// ListConfigController); a null variant is an ordinary dhikr.
+enum QulVariant { separate, bundle }
+
+const _qulVariantNames = {
+  'separate': QulVariant.separate,
+  'bundle': QulVariant.bundle,
+};
+
 const _formNames = {
   'quran': DhikrForm.quran,
   'short': DhikrForm.short,
@@ -85,6 +96,10 @@ class Dhikr {
   /// the post-prayer adhkar). Outranks every heuristic sort rule.
   final int fixedOrder;
 
+  /// Set on the three-Quls cards: which shape (separate/bundle) this entry
+  /// belongs to. Null for every other dhikr. See [QulVariant].
+  final QulVariant? qulVariant;
+
   const Dhikr({
     required this.id,
     required this.arabic,
@@ -104,6 +119,7 @@ class Dhikr {
     this.prayersReps,
     this.sortHint = noSortHint,
     this.fixedOrder = noFixedOrder,
+    this.qulVariant,
   });
 
   /// Final sort tiebreak: shorter text first among otherwise equal dhikrs.
@@ -159,6 +175,7 @@ class Dhikr {
         prayersReps: json['prayers_reps'] as int?,
         sortHint: json['sort_hint'] as int? ?? noSortHint,
         fixedOrder: json['fixed_order'] as int? ?? noFixedOrder,
+        qulVariant: _qulVariantNames[json['qul_variant']],
       );
 
   /// Inverse of [Dhikr.fromJson] (same keys as assets/adhkar.json), used to

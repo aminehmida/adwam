@@ -20,6 +20,7 @@ class SettingsController extends ChangeNotifier {
   bool _showTranslation;
   bool _showTransliteration;
   double _quranFontSize;
+  bool _bundleThreeQuls;
 
   SettingsController(this._store)
       : _locale = _store.loadLocaleOverride(),
@@ -29,7 +30,8 @@ class SettingsController extends ChangeNotifier {
         _focusBgVariant = _store.loadFocusBgVariant(),
         _showTranslation = _store.loadShowTranslation(),
         _showTransliteration = _store.loadShowTransliteration(),
-        _quranFontSize = _store.loadQuranFontSize();
+        _quranFontSize = _store.loadQuranFontSize(),
+        _bundleThreeQuls = _store.loadBundleThreeQuls();
 
   Locale? get locale => _locale;
 
@@ -60,6 +62,16 @@ class SettingsController extends ChangeNotifier {
   void setVolumeKeyCounting(bool value) {
     _volumeKeyCounting = value;
     _store.saveVolumeKeyCounting(value);
+    notifyListeners();
+  }
+
+  /// When true, the three Quls (Muʿawwidhāt) show as one combined card per
+  /// session instead of one card per surah. Default false (separate).
+  bool get bundleThreeQuls => _bundleThreeQuls;
+
+  void setBundleThreeQuls(bool value) {
+    _bundleThreeQuls = value;
+    _store.saveBundleThreeQuls(value);
     notifyListeners();
   }
 

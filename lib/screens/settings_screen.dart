@@ -63,6 +63,13 @@ class SettingsScreen extends StatelessWidget {
               value: settings.volumeKeyCounting,
               onChanged: settings.setVolumeKeyCounting,
             ),
+          SwitchListTile(
+            secondary: const Icon(Icons.auto_stories),
+            title: Text(l10n.bundleThreeQuls),
+            subtitle: Text(l10n.bundleThreeQulsBody),
+            value: settings.bundleThreeQuls,
+            onChanged: settings.setBundleThreeQuls,
+          ),
           if (Localizations.localeOf(context).languageCode != 'ar') ...[
             SwitchListTile(
               secondary: const Icon(Icons.translate),

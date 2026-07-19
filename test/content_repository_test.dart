@@ -36,9 +36,10 @@ void main() {
     expect(ordered(['gone', 'c', 'a', 'b']), ['c', 'a', 'b']);
   });
 
-  test('dhikrs missing from the user order are appended in default order', () {
+  test('dhikrs missing from the user order merge into their sorted slot', () {
     // 'a' and 'c' were added by a content update after the user reordered.
-    expect(ordered(['b']), ['b', 'a', 'c']);
+    // 'a' (protection) slots ahead of the reordered 'b'; 'c' (none) after.
+    expect(ordered(['b']), ['a', 'b', 'c']);
   });
 
   test('defaultList filters by session', () {

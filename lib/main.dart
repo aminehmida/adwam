@@ -30,9 +30,9 @@ class DhikrApp extends StatefulWidget {
 
 class _DhikrAppState extends State<DhikrApp> with WidgetsBindingObserver {
   late final ProgressController _progress = ProgressController(widget.store);
-  late final ListConfigController _config =
-      ListConfigController(widget.store, widget.repo);
   late final SettingsController _settings = SettingsController(widget.store);
+  late final ListConfigController _config =
+      ListConfigController(widget.store, widget.repo, _settings);
 
   @override
   void initState() {
