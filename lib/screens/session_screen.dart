@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart' show RenderAbstractViewport;
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:vibration/vibration.dart';
 
 import '../l10n/app_localizations.dart';
 import '../models/dhikr.dart';
@@ -162,6 +163,28 @@ class _SessionScreenState extends State<SessionScreen>
 
   GlobalKey _keyFor(String id) => _itemKeys.putIfAbsent(id, GlobalKey.new);
 
+  /// A dhikr repeated this many times or more gets a longer buzz on its final
+  /// count, so you can feel it's done without watching the counter.
+  static const _longBuzzReps = 10;
+
+  /// Haptic for a finished dhikr: a medium tap normally, a strong sustained
+  /// buzz for the many-repetition ones ([_longBuzzReps]+) so you can feel it's
+  /// done without watching the counter. The built-in haptic primitives are all
+  /// brief low-amplitude taps, so the long buzz uses the device vibrator
+  /// (cross-platform via the `vibration` plugin), falling back to a heavy tap
+  /// where no vibrator is available.
+  Future<void> _completionHaptic(Dhikr dhikr) async {
+    if (dhikr.repetitions < _longBuzzReps) {
+      HapticFeedback.mediumImpact();
+      return;
+    }
+    if (await Vibration.hasVibrator()) {
+      Vibration.vibrate(duration: 400, amplitude: 255);
+    } else {
+      HapticFeedback.heavyImpact();
+    }
+  }
+
   Future<void> _onTap(Dhikr dhikr) async {
     // A surah card opens the reader instead of counting; completion happens
     // via the reader's Done button.
@@ -178,7 +201,7 @@ class _SessionScreenState extends State<SessionScreen>
     final progress = context.read<ProgressController>();
     final completed = progress.increment(widget.session, dhikr);
     if (completed) {
-      HapticFeedback.mediumImpact();
+      _completionHaptic(dhikr);
     } else {
       HapticFeedback.lightImpact();
     }
@@ -212,7 +235,7 @@ class _SessionScreenState extends State<SessionScreen>
       dhikr,
     );
     if (completed) {
-      HapticFeedback.mediumImpact();
+      _completionHaptic(dhikr);
       _dismissFocus(completed: true);
     } else {
       HapticFeedback.lightImpact();
@@ -234,7 +257,7 @@ class _SessionScreenState extends State<SessionScreen>
     final dhikr = _reading;
     if (dhikr == null || _readerDismissing) return;
     context.read<ProgressController>().increment(widget.session, dhikr);
-    HapticFeedback.mediumImpact();
+    _completionHaptic(dhikr);
     _dismissReader(completed: true);
   }
 
