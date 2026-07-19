@@ -616,6 +616,12 @@
       ],
       "arabic": "سُبْحَانَ اللَّهِ، وَالْحَمْدُ لِلَّهِ، وَاللَّهُ أَكْبَرُ (ثلاثاً وثلاثين) لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
       "repetitions": 100,
+      "segments": [
+        33,
+        33,
+        33,
+        1
+      ],
       "form": "short",
       "benefit_tier": "reward",
       "benefit_text": "من سبّح الله دبر كل صلاة ثلاثًا وثلاثين، وحمد الله ثلاثًا وثلاثين، وكبّر الله ثلاثًا وثلاثين، وقال تمام المائة: لا إله إلا الله وحده لا شريك له... غُفرت خطاياه وإن كانت مثل زبد البحر",
@@ -826,6 +832,11 @@
       ],
       "arabic": "سُبْحَانَ اللَّهِ (ثلاثاً وثلاثين) وَالْحَمْدُ لِلَّهِ (ثلاثاً وثلاثين) وَاللَّهُ أَكْبَرُ (أربعاً وثلاثينَ)",
       "repetitions": 100,
+      "segments": [
+        33,
+        33,
+        34
+      ],
       "form": "short",
       "benefit_tier": "reward",
       "benefit_text": "أوصى بها النبي ﷺ فاطمة وعليًا رضي الله عنهما عند النوم وقال: فهو خير لكما من خادم",
@@ -934,70 +945,6 @@
       "benefit_source_en": "Al-Bukhari 247, Muslim 2710",
       "translation": "O Allah, I submit my soul unto You, and I entrust my affair unto You, and I turn my face towards You, and I totally rely on You, in hope and fear of You.Verily there is no refuge nor safe haven from You except with You.  I believe in Your Book which You have revealed and in Your Prophet whom You have sent.)(If you then die, you will die upon the fitrah.)(fitrah: the religion of Islam, the way of Ibraheem u.",
       "transliteration": "Allahumma aslamtu nafsee ilayk, wafawwadtu amree ilayk, wawajjahtu wajhee ilayk, wa-alja/tu thahree ilayk, raghbatan warahbatan ilayk, la maljaa wala manja minka illa ilayk, amantu bikitabikal-lathee anzalt, wabinabiyyikal-lathee arsalt."
-    },
-    {
-      "id": "wk-1",
-      "contexts": [
-        "waking"
-      ],
-      "arabic": "( الْحَمْدُ للَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا، وَإِلَيْهِ النُّشُورُ )",
-      "repetitions": 1,
-      "form": "short",
-      "benefit_tier": "none",
-      "benefit_text": null,
-      "benefit_source": "البخاري 6312",
-      "benefit_text_en": null,
-      "benefit_source_en": "Al-Bukhari 6312",
-      "translation": "All praise is for Allah who gave us life after having taken it from us and unto Him is the resurrection.",
-      "transliteration": "Alhamdu lillahil-lathee ahyana baAAda ma amatana wa-ilayhin-nushoor."
-    },
-    {
-      "id": "wk-2",
-      "contexts": [
-        "waking"
-      ],
-      "arabic": "( لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَريكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، سُبْحَانَ اللَّهِ، وَالْحَمْدُ للَّهِ، وَلاَ إِلَهَ إِلاَّ اللَّهُ، وَاللَّهُ أَكبَرُ، وَلاَ حَوْلَ وَلاَ قُوَّةَ إِلاَّ بِاللَّهِ الْعَلِيِّ الْعَظِيمِ، رَبِّ اغْفرْ لِي ).",
-      "repetitions": 1,
-      "form": "long",
-      "benefit_tier": "reward",
-      "benefit_text": "من تعارّ من الليل فقالها، ثم قال: اللهم اغفر لي، أو دعا — استُجيب له، فإن توضأ وصلى قُبِلَت صلاته",
-      "benefit_source": "البخاري 1154",
-      "benefit_text_en": "Whoever wakes during the night and says this, then says 'O Allah, forgive me' or supplicates — he is answered; and if he performs wudu and prays, his prayer is accepted.",
-      "benefit_source_en": "Al-Bukhari 1154",
-      "translation": "None has the right to be worshipped except Allah, alone without associate, to Him belongs sovereignty and praise and He is over all things wholly capable.  How perfect Allah is, and all praise is for Allah, and none has the right to be worshipped except Allah, Allah is the greatest and there is no power nor might except with Allah, The Most High, The Supreme.O my Lord forgive me",
-      "transliteration": "La ilaha illal-lahu wahdahu la shareeka lah, lahul-mulku walahul-hamd, wahuwa AAala kulli shay-in qadeer, subhanal-lah, walhamdu lillah, wala  ilaha illal-lah wallahu akbar, wala hawla wala quwwata illa billahil-AAaliyyil AAatheem. Rabbigh-fir lee"
-    },
-    {
-      "id": "wk-3",
-      "contexts": [
-        "waking"
-      ],
-      "arabic": "( الْحَمْدُ لِلَّهِ الَّذِي عَافَانِي فِي جَسَدِي، وَرَدَّ عَلَيَّ رُوحِي، وَأَذِنَ لي بِذِكْرِهِ )",
-      "repetitions": 1,
-      "form": "short",
-      "benefit_tier": "none",
-      "benefit_text": null,
-      "benefit_source": "الترمذي 3401، وحسنه الألباني",
-      "benefit_text_en": null,
-      "benefit_source_en": "At-Tirmidhi 3401, وحسنه الألباني",
-      "translation": "All praise is for Allah who restored to me my health and returned my soul and  has allowed me to remember Him.",
-      "transliteration": "Alhamdu lillahil-lathee AAafanee fee jasadee waradda AAalayya roohee wa-athina lee bithikrih."
-    },
-    {
-      "id": "wk-4",
-      "contexts": [
-        "waking"
-      ],
-      "arabic": "﴿إِنَّ فِى خَلْقِ ٱلسَّمَٰوَٰتِ وَٱلْأَرْضِ وَٱخْتِلَٰفِ ٱلَّيْلِ وَٱلنَّهَارِ لَءَايَٰتٍۢ لِّأُو۟لِى ٱلْأَلْبَٰبِ ۝١٩٠ ٱلَّذِينَ يَذْكُرُونَ ٱللَّهَ قِيَٰمًۭا وَقُعُودًۭا وَعَلَىٰ جُنُوبِهِمْ وَيَتَفَكَّرُونَ فِى خَلْقِ ٱلسَّمَٰوَٰتِ وَٱلْأَرْضِ رَبَّنَا مَا خَلَقْتَ هَٰذَا بَٰطِلًۭا سُبْحَٰنَكَ فَقِنَا عَذَابَ ٱلنَّارِ ۝١٩١ رَبَّنَآ إِنَّكَ مَن تُدْخِلِ ٱلنَّارَ فَقَدْ أَخْزَيْتَهُۥ ۖ وَمَا لِلظَّٰلِمِينَ مِنْ أَنصَارٍۢ ۝١٩٢ رَّبَّنَآ إِنَّنَا سَمِعْنَا مُنَادِيًۭا يُنَادِى لِلْإِيمَٰنِ أَنْ ءَامِنُوا۟ بِرَبِّكُمْ فَـَٔامَنَّا ۚ رَبَّنَا فَٱغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّـَٔاتِنَا وَتَوَفَّنَا مَعَ ٱلْأَبْرَارِ ۝١٩٣ رَبَّنَا وَءَاتِنَا مَا وَعَدتَّنَا عَلَىٰ رُسُلِكَ وَلَا تُخْزِنَا يَوْمَ ٱلْقِيَٰمَةِ ۗ إِنَّكَ لَا تُخْلِفُ ٱلْمِيعَادَ ۝١٩٤ فَٱسْتَجَابَ لَهُمْ رَبُّهُمْ أَنِّى لَآ أُضِيعُ عَمَلَ عَٰمِلٍۢ مِّنكُم مِّن ذَكَرٍ أَوْ أُنثَىٰ ۖ بَعْضُكُم مِّنۢ بَعْضٍۢ ۖ فَٱلَّذِينَ هَاجَرُوا۟ وَأُخْرِجُوا۟ مِن دِيَٰرِهِمْ وَأُوذُوا۟ فِى سَبِيلِى وَقَٰتَلُوا۟ وَقُتِلُوا۟ لَأُكَفِّرَنَّ عَنْهُمْ سَيِّـَٔاتِهِمْ وَلَأُدْخِلَنَّهُمْ جَنَّٰتٍۢ تَجْرِى مِن تَحْتِهَا ٱلْأَنْهَٰرُ ثَوَابًۭا مِّنْ عِندِ ٱللَّهِ ۗ وَٱللَّهُ عِندَهُۥ حُسْنُ ٱلثَّوَابِ ۝١٩٥ لَا يَغُرَّنَّكَ تَقَلُّبُ ٱلَّذِينَ كَفَرُوا۟ فِى ٱلْبِلَٰدِ ۝١٩٦ مَتَٰعٌۭ قَلِيلٌۭ ثُمَّ مَأْوَىٰهُمْ جَهَنَّمُ ۚ وَبِئْسَ ٱلْمِهَادُ ۝١٩٧ لَٰكِنِ ٱلَّذِينَ ٱتَّقَوْا۟ رَبَّهُمْ لَهُمْ جَنَّٰتٌۭ تَجْرِى مِن تَحْتِهَا ٱلْأَنْهَٰرُ خَٰلِدِينَ فِيهَا نُزُلًۭا مِّنْ عِندِ ٱللَّهِ ۗ وَمَا عِندَ ٱللَّهِ خَيْرٌۭ لِّلْأَبْرَارِ ۝١٩٨ وَإِنَّ مِنْ أَهْلِ ٱلْكِتَٰبِ لَمَن يُؤْمِنُ بِٱللَّهِ وَمَآ أُنزِلَ إِلَيْكُمْ وَمَآ أُنزِلَ إِلَيْهِمْ خَٰشِعِينَ لِلَّهِ لَا يَشْتَرُونَ بِـَٔايَٰتِ ٱللَّهِ ثَمَنًۭا قَلِيلًا ۗ أُو۟لَٰٓئِكَ لَهُمْ أَجْرُهُمْ عِندَ رَبِّهِمْ ۗ إِنَّ ٱللَّهَ سَرِيعُ ٱلْحِسَابِ ۝١٩٩ يَٰٓأَيُّهَا ٱلَّذِينَ ءَامَنُوا۟ ٱصْبِرُوا۟ وَصَابِرُوا۟ وَرَابِطُوا۟ وَٱتَّقُوا۟ ٱللَّهَ لَعَلَّكُمْ تُفْلِحُونَ ۝٢٠٠﴾",
-      "repetitions": 1,
-      "form": "quran",
-      "benefit_tier": "none",
-      "benefit_text": "كان النبي ﷺ إذا استيقظ من الليل يمسح النوم عن وجهه ثم يقرأ هذه الآيات الخواتيم من سورة آل عمران",
-      "benefit_source": "البخاري 4569، ومسلم 763",
-      "benefit_text_en": "When the Prophet ﷺ woke during the night, he would wipe the sleep from his face and recite these closing verses of Surat Al 'Imran.",
-      "benefit_source_en": "Al-Bukhari 4569, وMuslim 763",
-      "translation": "( 190 )   Indeed, in the creation of the heavens and the earth and the alternation of the night and the day are signs for those of understanding.( 191 )   Who remember Allah while standing or sitting or [lying] on their sides and give thought to the creation of the heavens and the earth, [saying], Our Lord, You did not create this aimlessly; exalted are You [above such a thing]; then protect us from the punishment of the Fire.( 192 )   Our Lord, indeed whoever You admit to the Fire - You have disgraced him, and for the wrongdoers there are no helpers.( 193 )   Our Lord, indeed we have heard a caller calling to faith, [saying], 'Believe in your Lord,' and we have believed. Our Lord, so forgive us our sins and remove from us our misdeeds and cause us to die with the righteous.( 194 )   Our Lord, and grant us what You promised us through Your messengers and do not disgrace us on the Day of Resurrection. Indeed, You do not fail in [Your] promise.( 195 )   And their Lord responded to them, Never will I allow to be lost the work of [any] worker among you, whether male or female; you are of one another. So those who emigrated or were evicted from their homes or were harmed in My cause or fought or were killed - I will surely remove from them their misdeeds, and I will surely admit them to gardens beneath which rivers flow as reward from Allah, and Allah has with Him the best reward.( 196 )   Be not deceived by the [uninhibited] movement of the disbelievers throughout the land.( 197 )   [It is but] a small enjoyment; then their [final] refuge is Hell, and wretched is the resting place.( 198 )   But those who feared their Lord will have gardens beneath which rivers flow, abiding eternally therein, as accommodation from Allah. And that which is with Allah is best for the righteous.( 199 )   And indeed, among the People of the Scripture are those who believe in Allah and what was revealed to you and what was revealed to them, [being] humbly submissive to Allah. They do not exchange the verses of Allah for a small price.Those will have their reward with their Lord. Indeed, Allah is swift in account.( 200 )   O you who have believed, persevere and endure and remain stationed and fear Allah that you may be successful.",
-      "transliteration": "Inna fee khalqis-samawati wal-ardi wakhtilafil-layli wan-nahari la'ayatin li'ulil-albab (190) Alladheena yadhkuroonal-laha qiyaman wa qu'oodan wa 'ala junoobihim wa yatafakkaroona fee khalqis-samawati wal-ard, rabbana ma khalaqta hadha batilan subhanaka faqina 'adhaban-nar (191) Rabbana innaka man tudkhilin-nara faqad akhzaytah, wa ma lidh-dhalimeena min ansar (192) Rabbana innana sami'na munadiyan yunadee lil-eemani an aminoo birabbikum fa'amanna, rabbana faghfir lana dhunoobana wa kaffir 'anna sayyi'atina wa tawaffana ma'al-abrar (193) Rabbana wa atina ma wa'adtana 'ala rusulika wa la tukhzina yawmal-qiyamah, innaka la tukhliful-mi'ad (194) Fastajaba lahum rabbuhum annee la udee'u 'amala 'amilin minkum min dhakarin aw untha, ba'dukum min ba'd, falladheena hajaroo wa ukhrijoo min diyarihim wa oodhoo fee sabeelee wa qataloo wa qutiloo la'ukaffiranna 'anhum sayyi'atihim wa la'udkhilannahum jannatin tajree min tahtihal-anharu thawaban min 'indil-lah, wallahu 'indahu husnuth-thawab (195) La yaghurrannaka taqallubul-ladheena kafaroo fil-bilad (196) Mata'un qaleelun thumma ma'wahum jahannamu wa bi'sal-mihad (197) Lakinil-ladheenat-taqaw rabbahum lahum jannatun tajree min tahtihal-anharu khalideena feeha nuzulan min 'indil-lah, wa ma 'indal-lahi khayrun lil-abrar (198) Wa inna min ahlil-kitabi laman yu'minu billahi wa ma unzila ilaykum wa ma unzila ilayhim khashi'eena lillahi la yashtaroona bi'ayatil-lahi thamanan qaleela, ula'ika lahum ajruhum 'inda rabbihim, innal-laha saree'ul-hisab (199) Ya ayyuhal-ladheena amanus-biroo wa sabiroo wa rabitoo wattaqul-laha la'allakum tuflihoon (200)"
     },
     {
       "id": "pp-74",

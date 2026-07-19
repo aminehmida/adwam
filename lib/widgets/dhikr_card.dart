@@ -5,6 +5,7 @@ import '../l10n/app_localizations.dart';
 import '../models/dhikr.dart';
 import '../state/settings_controller.dart';
 import '../theme.dart';
+import 'count_progress_ring.dart';
 import 'tier_header.dart' show tierLabel;
 
 const arabicTextStyle = TextStyle(
@@ -204,17 +205,12 @@ class DhikrCard extends StatelessWidget {
               if (done)
                 Icon(Icons.check_circle_rounded, size: 26, color: colors.primary)
               else
-                SizedBox(
-                  width: 26,
-                  height: 26,
-                  child: CircularProgressIndicator(
-                    value:
-                        dhikr.repetitions == 0 ? 1 : count / dhikr.repetitions,
-                    strokeWidth: 3,
-                    strokeCap: StrokeCap.round,
-                    color: accent,
-                    backgroundColor: colors.surfaceContainerHighest,
-                  ),
+                CountProgressRing(
+                  value: dhikr.repetitions == 0 ? 1 : count / dhikr.repetitions,
+                  color: accent,
+                  stops: [
+                    for (final s in dhikr.segmentStops) s / dhikr.repetitions,
+                  ],
                 ),
               const SizedBox(width: 12),
               Text(

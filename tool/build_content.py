@@ -8,8 +8,7 @@ Sources (content/sources/):
                         transliteration, translated virtues (fadl/source)
   hisn_postprayer.json  hisnmuslim.com API ch. 25 (text only)
   hisn_sleep.json       hisnmuslim.com API ch. 28 (text only)
-  hisn_waking.json      hisnmuslim.com API ch. 1 (text only)
-  hisn_*_en.json        hisnmuslim.com API en/25 + en/28 + en/1 (matched by ID):
+  hisn_*_en.json        hisnmuslim.com API en/25 + en/28 (matched by ID):
                         TRANSLATED_TEXT, LANGUAGE_ARABIC_TRANSLATED_TEXT
   tanzil_uthmani.json   Tanzil Uthmani text (full tashkeel + waqf marks) for
                         every Quranic passage in the app: full surahs (32, 67,
@@ -190,8 +189,7 @@ def build():
     # rendering, matched by the same ID.
     for fname, en_fname, prefix, context in [
             ("hisn_postprayer.json", "hisn_postprayer_en.json", "pp", "post_prayer"),
-            ("hisn_sleep.json", "hisn_sleep_en.json", "sl", "sleep"),
-            ("hisn_waking.json", "hisn_waking_en.json", "wk", "waking")]:
+            ("hisn_sleep.json", "hisn_sleep_en.json", "sl", "sleep")]:
         chapter = next(iter(load(SRC / fname).values()))
         en_by_id = {x["ID"]: x for x in next(iter(load(SRC / en_fname).values()))}
         for item in chapter:
@@ -249,6 +247,7 @@ def _hisn_entry(did, contexts, arabic, cur, en, body=None):
         "arabic": arabic,
         **({"body": body} if body else {}),
         "repetitions": cur["repetitions"],
+        **({"segments": cur["segments"]} if "segments" in cur else {}),
         "form": cur["form"],
         "benefit_tier": cur["benefit_tier"],
         "benefit_text": cur.get("benefit_text"),
@@ -295,8 +294,7 @@ def write_review(dhikrs, curation):
         "",
     ]
     for context, title in [("morning", "أذكار الصباح"), ("evening", "أذكار المساء"),
-                           ("post_prayer", "أذكار بعد الصلاة"), ("sleep", "أذكار النوم"),
-                           ("waking", "أذكار الاستيقاظ")]:
+                           ("post_prayer", "أذكار بعد الصلاة"), ("sleep", "أذكار النوم")]:
         items = sorted((d for d in dhikrs if context in d["contexts"]), key=default_sort_key)
         lines += [f"## {title} ({len(items)})", "",
                   "| # | id | الذكر | تكرار | نوع | فضل | مصدر الفضل | ملاحظة |",

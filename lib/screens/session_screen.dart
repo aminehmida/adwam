@@ -15,6 +15,7 @@ import '../state/progress_controller.dart';
 import '../state/settings_controller.dart';
 import '../theme.dart';
 import '../widgets/context_card.dart' show sessionTitle;
+import '../widgets/count_progress_ring.dart';
 import '../widgets/custom_dhikr_dialog.dart';
 import '../widgets/dhikr_card.dart';
 import '../widgets/surah_reader.dart';
@@ -75,6 +76,13 @@ class _SessionScreenState extends State<SessionScreen>
   late final AnimationController _readerController;
   late final CurvedAnimation _readerAnim;
 
+  /// Drives the surah reader's scroll. Owned here (not in [SurahReader]) so
+  /// the hardware volume-down key can page it down. `keepScrollOffset` is
+  /// off so each surah opens at the top rather than where the last one left.
+  final ScrollController _readerScrollController = ScrollController(
+    keepScrollOffset: false,
+  );
+
   @override
   void initState() {
     super.initState();
@@ -122,21 +130,27 @@ class _SessionScreenState extends State<SessionScreen>
   }
 
   Future<dynamic> _onVolumeCall(MethodCall call) async {
-    if (call.method == 'volumeDown') _onVolumeDown();
+    // The argument is the key's auto-repeat count: 0 on the initial press,
+    // rising while the button is held down.
+    final repeat = (call.arguments as int?) ?? 0;
+    if (call.method == 'volumeDown') _onVolumeDown(repeat);
+    if (call.method == 'volumeUp') _onVolumeUp(repeat);
   }
 
   /// Intercept only while counting makes sense: setting on and not editing.
-  /// Everywhere else the button keeps its normal volume behavior.
+  /// Everywhere else the button keeps its normal volume behavior. Volume-up
+  /// is additionally scoped to the reader, where it pages up.
   void _syncVolumeIntercept() {
     if (!_volumeKeysSupported) return;
     final enabled = _settingsForVolume?.volumeKeyCounting ?? false;
-    _setIntercept(enabled && !_editing);
+    _setIntercept('setIntercept', enabled && !_editing);
+    _setIntercept('setInterceptUp', enabled && !_editing && _reading != null);
   }
 
-  void _setIntercept(bool value) {
+  void _setIntercept(String method, bool value) {
     // Widget tests run with an Android defaultTargetPlatform but no host.
     _volumeChannel
-        .invokeMethod('setIntercept', value)
+        .invokeMethod(method, value)
         .catchError((_) => null, test: (e) => e is MissingPluginException);
   }
 
@@ -169,25 +183,40 @@ class _SessionScreenState extends State<SessionScreen>
 
   GlobalKey _keyFor(String id) => _itemKeys.putIfAbsent(id, GlobalKey.new);
 
-  /// A dhikr repeated this many times or more gets a longer buzz on its final
-  /// count, so you can feel it's done without watching the counter.
-  static const _longBuzzReps = 10;
+  /// Amplitude of the completion buzz (1-255). Tuned below full strength to
+  /// match a typical notification vibration rather than a jarring max buzz.
+  static const _longBuzzAmplitude = 128;
 
-  /// Haptic for a finished dhikr: a medium tap normally, a strong sustained
-  /// buzz for the many-repetition ones ([_longBuzzReps]+) so you can feel it's
-  /// done without watching the counter. The built-in haptic primitives are all
-  /// brief low-amplitude taps, so the long buzz uses the device vibrator
+  /// Haptic for a finished dhikr: a medium tap normally, a sustained buzz for
+  /// the many-repetition ones (the focusable [Dhikr.isFocusable] dhikrs, the
+  /// same ones counted in the focus overlay) so you can feel it's done without
+  /// watching the counter. The built-in haptic primitives are all brief
+  /// low-amplitude taps, so the long buzz uses the device vibrator
   /// (cross-platform via the `vibration` plugin), falling back to a heavy tap
   /// where no vibrator is available.
   Future<void> _completionHaptic(Dhikr dhikr) async {
-    if (dhikr.repetitions < _longBuzzReps) {
+    if (!dhikr.isFocusable) {
       HapticFeedback.mediumImpact();
       return;
     }
     if (await Vibration.hasVibrator()) {
-      Vibration.vibrate(duration: 400, amplitude: 255);
+      Vibration.vibrate(duration: 400, amplitude: _longBuzzAmplitude);
     } else {
       HapticFeedback.heavyImpact();
+    }
+  }
+
+  /// A crisp double-tick when a compound dhikr crosses from one phrase run to
+  /// the next (e.g. after the 33rd tasbih), so the change of words is felt
+  /// without watching. Distinct from the single light count tap and the longer
+  /// completion buzz.
+  Future<void> _segmentTransitionHaptic() async {
+    if (await Vibration.hasVibrator()) {
+      Vibration.vibrate(duration: 60, amplitude: _longBuzzAmplitude);
+      await Future.delayed(const Duration(milliseconds: 80));
+      Vibration.vibrate(duration: 60, amplitude: _longBuzzAmplitude);
+    } else {
+      HapticFeedback.mediumImpact();
     }
   }
 
@@ -198,6 +227,7 @@ class _SessionScreenState extends State<SessionScreen>
       HapticFeedback.lightImpact();
       _anchorTo(dhikr.id);
       setState(() => _reading = dhikr);
+      _syncVolumeIntercept(); // take over volume-up for paging while reading
       _readerController.forward(from: 0);
       return;
     }
@@ -208,12 +238,16 @@ class _SessionScreenState extends State<SessionScreen>
     final completed = progress.increment(widget.session, dhikr);
     if (completed) {
       _completionHaptic(dhikr);
+    } else if (dhikr.segmentStops.contains(
+      progress.countFor(widget.session, dhikr.id),
+    )) {
+      _segmentTransitionHaptic();
     } else {
       HapticFeedback.lightImpact();
     }
     _anchorTo(dhikr.id);
     if (!completed &&
-        dhikr.isHighRep &&
+        dhikr.isFocusable &&
         arabicFrom != null &&
         counterFrom != null) {
       setState(() {
@@ -236,13 +270,15 @@ class _SessionScreenState extends State<SessionScreen>
   void _onFocusTap() {
     final dhikr = _focused;
     if (dhikr == null || _focusDismissing) return;
-    final completed = context.read<ProgressController>().increment(
-      widget.session,
-      dhikr,
-    );
+    final progress = context.read<ProgressController>();
+    final completed = progress.increment(widget.session, dhikr);
     if (completed) {
       _completionHaptic(dhikr);
       _dismissFocus(completed: true);
+    } else if (dhikr.segmentStops.contains(
+      progress.countFor(widget.session, dhikr.id),
+    )) {
+      _segmentTransitionHaptic();
     } else {
       HapticFeedback.lightImpact();
     }
@@ -275,6 +311,7 @@ class _SessionScreenState extends State<SessionScreen>
     _readerDismissing = false;
     if (!mounted) return;
     setState(() => _reading = null);
+    _syncVolumeIntercept(); // hand volume-up back to the system
     if (completed) await _scrollToNextIncomplete(after: dhikr.id);
   }
 
@@ -397,12 +434,19 @@ class _SessionScreenState extends State<SessionScreen>
   /// and on screen, else the topmost visible incomplete card (so scrolling
   /// past a dhikr skips it, like tapping the next one would), wrapping to
   /// the first incomplete anywhere when nothing ahead is visible.
-  void _onVolumeDown() {
+  void _onVolumeDown(int repeat) {
     if (!mounted || _editing) return;
     if (ModalRoute.of(context)?.isCurrent == false) return;
-    // While reading a surah nothing should count — not the surah (Done is
-    // deliberate) and certainly not some card behind the overlay.
-    if (_reading != null) return;
+    // While reading a surah, volume-down pages the mushaf down instead of
+    // counting: nothing here should count (the surah's Done is deliberate,
+    // and the cards behind the overlay are out of reach). Holding the button
+    // scrolls line after line (repeat > 0).
+    if (_reading != null) {
+      _pageReader(1, continuous: repeat > 0);
+      return;
+    }
+    // Counting is one dhikr per press: ignore the hold's auto-repeats.
+    if (repeat != 0) return;
     if (_focused != null) {
       _onFocusTap();
       return;
@@ -426,6 +470,37 @@ class _SessionScreenState extends State<SessionScreen>
       if (firstIndex != -1) target = dhikrs[firstIndex];
     }
     if (target != null) _onTap(target);
+  }
+
+  /// Volume-up pages the surah reader up; it does nothing elsewhere (and is
+  /// only intercepted while reading, so it keeps raising the volume otherwise).
+  /// Holding scrolls up line after line.
+  void _onVolumeUp(int repeat) {
+    if (!mounted || _editing) return;
+    if (ModalRoute.of(context)?.isCurrent == false) return;
+    if (_reading != null) _pageReader(-1, continuous: repeat > 0);
+  }
+
+  /// Scroll the surah reader one text line in [direction] (+1 down, -1 up),
+  /// stopping at the ends. A single press eases one line; while the button is
+  /// held ([continuous]), successive line steps blend into a smooth glide.
+  void _pageReader(int direction, {bool continuous = false}) {
+    if (!_readerScrollController.hasClients) return;
+    final position = _readerScrollController.position;
+    // The surah body is laid out at line-height 2× the Quran font size.
+    final line = context.read<SettingsController>().quranFontSize * 2;
+    final target = (position.pixels + direction * line).clamp(
+      position.minScrollExtent,
+      position.maxScrollExtent,
+    );
+    if ((target - position.pixels).abs() < 0.5) return;
+    // During a hold the next press arrives before this animation ends, so a
+    // short linear step keeps the motion continuous; a lone press eases out.
+    _readerScrollController.animateTo(
+      target,
+      duration: Duration(milliseconds: continuous ? 90 : 130),
+      curve: continuous ? Curves.linear : Curves.easeOut,
+    );
   }
 
   /// Whether [id]'s card has any part inside the count viewport. Same math
@@ -556,7 +631,8 @@ class _SessionScreenState extends State<SessionScreen>
   void dispose() {
     if (_volumeKeysSupported) {
       _settingsForVolume?.removeListener(_syncVolumeIntercept);
-      _setIntercept(false);
+      _setIntercept('setIntercept', false);
+      _setIntercept('setInterceptUp', false);
       _volumeChannel.setMethodCallHandler(null);
     }
     _focusScrim.dispose();
@@ -564,6 +640,7 @@ class _SessionScreenState extends State<SessionScreen>
     _focusController.dispose();
     _readerAnim.dispose();
     _readerController.dispose();
+    _readerScrollController.dispose();
     _scrollController.dispose();
     _editScrollController.dispose();
     super.dispose();
@@ -678,6 +755,7 @@ class _SessionScreenState extends State<SessionScreen>
                     offset: Offset(0, 24 * (1 - t)),
                     child: SurahReader(
                       dhikr: dhikr,
+                      controller: _readerScrollController,
                       onDone: _completeReading,
                       onDismiss: _dismissReader,
                     ),
@@ -784,16 +862,13 @@ class _SessionScreenState extends State<SessionScreen>
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        SizedBox(
-                          width: 26,
-                          height: 26,
-                          child: CircularProgressIndicator(
-                            value: done ? 1 : count / dhikr.repetitions,
-                            strokeWidth: 3,
-                            strokeCap: StrokeCap.round,
-                            color: accent,
-                            backgroundColor: colors.surfaceContainerHighest,
-                          ),
+                        CountProgressRing(
+                          value: done ? 1 : count / dhikr.repetitions,
+                          color: accent,
+                          stops: [
+                            for (final s in dhikr.segmentStops)
+                              s / dhikr.repetitions,
+                          ],
                         ),
                         const SizedBox(width: 12),
                         Text(
@@ -980,7 +1055,7 @@ class _SessionScreenState extends State<SessionScreen>
     // collapses it again (hidden peeks also close on scroll — unhide
     // permanently via edit mode). The Opacity wrapper is always present so
     // the card's element (and its size animation) survives peek toggles.
-    final focusable = dhikr.isHighRep;
+    final focusable = dhikr.isFocusable;
     final card = Opacity(
       opacity: peeking ? 0.6 : 1,
       child: DhikrCard(
@@ -1141,9 +1216,9 @@ class _SessionScreenState extends State<SessionScreen>
     final input = await showCustomDhikrDialog(context, session: widget.session);
     if (input == null || !mounted) return;
     context.read<ListConfigController>().addCustom(
-          arabic: input.arabic,
-          contexts: input.contexts,
-        );
+      arabic: input.arabic,
+      contexts: input.contexts,
+    );
   }
 
   Future<void> _editCustomDhikr(Dhikr dhikr) async {
@@ -1154,10 +1229,10 @@ class _SessionScreenState extends State<SessionScreen>
     );
     if (input == null || !mounted) return;
     context.read<ListConfigController>().updateCustom(
-          dhikr.id,
-          arabic: input.arabic,
-          contexts: input.contexts,
-        );
+      dhikr.id,
+      arabic: input.arabic,
+      contexts: input.contexts,
+    );
   }
 
   Future<void> _confirmDeleteCustom(Dhikr dhikr) async {

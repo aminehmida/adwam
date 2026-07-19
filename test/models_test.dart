@@ -19,7 +19,7 @@ void main() {
         'benefit_source_en': 'Muslim',
         'translation': 'Meaning',
         'transliteration': 'Ayatul-Kursi',
-        'contexts': ['morning', 'evening', 'post_prayer', 'sleep', 'waking'],
+        'contexts': ['morning', 'evening', 'post_prayer', 'sleep'],
         'sort_hint': 3,
       });
       expect(dhikr.id, 'me-01');

@@ -24,9 +24,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sessionSleep => 'Bedtime adhkar';
 
   @override
-  String get sessionWaking => 'Wake-up adhkar';
-
-  @override
   String get editList => 'Edit list';
 
   @override
@@ -174,7 +171,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get volumeKeyCountingBody =>
-      'Pressing volume down counts the current dhikr; the volume itself won\'t change while counting.';
+      'Pressing volume down counts the current dhikr, or scrolls the page while reading a surah; the volume itself won\'t change.';
 
   @override
   String get bundleThreeQuls => 'Combine the three Quls';

@@ -4,7 +4,7 @@ enum DhikrForm { quran, short, long, surah }
 
 enum BenefitTier { protection, reward, none }
 
-enum SessionType { morning, evening, postPrayer, sleep, waking }
+enum SessionType { morning, evening, postPrayer, sleep }
 
 /// The three Quls (Muʿawwidhāt) ship in two interchangeable shapes, chosen by
 /// a global setting: [separate] is one card per surah, [bundle] is a single
@@ -38,16 +38,21 @@ const noSortHint = 1 << 20;
 const noFixedOrder = 1 << 20;
 
 /// Dhikrs repeated at least this many times are grouped into their own
-/// "high repetitions" section at the bottom of a session and counted in the
-/// full-screen focus overlay rather than on the card.
+/// "high repetitions" section at the bottom of a session.
 const highRepThreshold = 100;
+
+/// Dhikrs repeated at least this many times are counted in the full-screen
+/// focus overlay rather than on the card. Lower than [highRepThreshold] so
+/// that ordinary tasbih runs (e.g. 7x, 10x, 33x) also open the dedicated
+/// counting interface, while list sectioning/sorting stays keyed off the
+/// higher threshold.
+const focusRepThreshold = 7;
 
 const _sessionNames = {
   'morning': SessionType.morning,
   'evening': SessionType.evening,
   'post_prayer': SessionType.postPrayer,
   'sleep': SessionType.sleep,
-  'waking': SessionType.waking,
 };
 
 /// Ids of user-created dhikrs (see ListConfigController.addCustom); the
@@ -62,6 +67,11 @@ class Dhikr {
   /// shown in the reader overlay; [arabic] stays the display name.
   final String? body;
   final int repetitions;
+
+  /// For a compound count (the post-prayer / sleep tasbih) the individual
+  /// phrase runs that make up [repetitions], e.g. `[33, 33, 33, 1]`. Null for
+  /// a plain single-phrase count. Their sum equals [repetitions].
+  final List<int>? segments;
   final DhikrForm form;
   final BenefitTier tier;
   final String? benefit;
@@ -95,6 +105,7 @@ class Dhikr {
     required this.arabic,
     this.body,
     required this.repetitions,
+    this.segments,
     required this.form,
     required this.tier,
     this.benefit,
@@ -114,9 +125,27 @@ class Dhikr {
   /// Final sort tiebreak: shorter text first among otherwise equal dhikrs.
   int get wordCount => arabic.trim().split(RegExp(r'\s+')).length;
 
-  /// Repeated enough times to belong in the high-repetitions section and to
-  /// count in the focus overlay.
+  /// Repeated enough times to belong in the high-repetitions section.
   bool get isHighRep => repetitions >= highRepThreshold;
+
+  /// Repeated enough times to be counted in the full-screen focus overlay
+  /// (the dedicated counting interface) rather than on the card.
+  bool get isFocusable => repetitions >= focusRepThreshold;
+
+  /// Running counts at which one phrase run ends and the next begins, e.g.
+  /// `[33, 66, 99]` for `[33, 33, 33, 1]`. The final run's end (== total, the
+  /// completion) is excluded; empty when there are fewer than two [segments].
+  List<int> get segmentStops {
+    final segs = segments;
+    if (segs == null || segs.length < 2) return const [];
+    final stops = <int>[];
+    var running = 0;
+    for (var i = 0; i < segs.length - 1; i++) {
+      running += segs[i];
+      stops.add(running);
+    }
+    return stops;
+  }
 
   /// Part of an explicitly ordered sunnah sequence (the post-prayer adhkar):
   /// sorted by that sequence and shown without category bands.
@@ -130,6 +159,7 @@ class Dhikr {
         arabic: json['arabic'] as String,
         body: json['body'] as String?,
         repetitions: json['repetitions'] as int,
+        segments: (json['segments'] as List?)?.cast<int>(),
         form: _formNames[json['form']]!,
         tier: _tierNames[json['benefit_tier']]!,
         benefit: json['benefit_text'] as String?,
@@ -154,6 +184,7 @@ class Dhikr {
         'id': id,
         'arabic': arabic,
         'repetitions': repetitions,
+        if (segments != null) 'segments': segments,
         'form': form.name,
         'benefit_tier': tier.name,
         if (benefit != null) 'benefit_text': benefit,

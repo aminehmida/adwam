@@ -266,7 +266,7 @@ void main() {
     await tester.pageBack();
     await tester.pumpAndSettle();
     expect(find.text('0 / 1'), findsOneWidget); // morning: 1 visible left
-    expect(find.text('0 / 3'), findsNWidgets(4)); // other sessions untouched
+    expect(find.text('0 / 3'), findsNWidgets(3)); // other sessions untouched
   });
 
   testWidgets('volume-down counts like a tap and skips finished dhikrs',
@@ -390,6 +390,21 @@ void main() {
     // The surah body is only rendered inside the reader.
     expect(find.text('آية أولى ۝١ آية ثانية ۝٢'), findsOneWidget);
     expect(find.text('0 / 1'), findsOneWidget); // opening never counts
+  });
+
+  testWidgets('volume-down while reading pages the surah, never counting it',
+      (tester) async {
+    await openMorningWithSurah(tester);
+
+    await tester.tap(find.text('سورة big'));
+    await tester.pumpAndSettle();
+    expect(find.text('آية أولى ۝١ آية ثانية ۝٢'), findsOneWidget);
+
+    // Volume-down pages the reader instead of counting: the reader stays
+    // open and the surah's count is untouched (Done is the only way to count).
+    await pressVolumeDown(tester);
+    expect(find.text('آية أولى ۝١ آية ثانية ۝٢'), findsOneWidget);
+    expect(find.text('0 / 1'), findsOneWidget);
   });
 
   testWidgets('the reader\'s Done button completes the surah and closes',

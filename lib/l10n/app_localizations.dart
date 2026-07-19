@@ -128,12 +128,6 @@ abstract class AppLocalizations {
   /// **'Bedtime adhkar'**
   String get sessionSleep;
 
-  /// No description provided for @sessionWaking.
-  ///
-  /// In en, this message translates to:
-  /// **'Wake-up adhkar'**
-  String get sessionWaking;
-
   /// No description provided for @editList.
   ///
   /// In en, this message translates to:
@@ -413,7 +407,7 @@ abstract class AppLocalizations {
   /// No description provided for @volumeKeyCountingBody.
   ///
   /// In en, this message translates to:
-  /// **'Pressing volume down counts the current dhikr; the volume itself won\'t change while counting.'**
+  /// **'Pressing volume down counts the current dhikr, or scrolls the page while reading a surah; the volume itself won\'t change.'**
   String get volumeKeyCountingBody;
 
   /// No description provided for @bundleThreeQuls.

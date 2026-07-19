@@ -24,9 +24,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get sessionSleep => 'أذكار النوم';
 
   @override
-  String get sessionWaking => 'أذكار الاستيقاظ';
-
-  @override
   String get editList => 'تعديل القائمة';
 
   @override
@@ -172,7 +169,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get volumeKeyCountingBody =>
-      'الضغط على زر خفض الصوت يعدّ الذكر الحالي، ولن يتغيّر مستوى الصوت أثناء العدّ.';
+      'الضغط على زر خفض الصوت يعدّ الذكر الحالي، أو يُمرّر الصفحة أثناء قراءة سورة، ولن يتغيّر مستوى الصوت.';
 
   @override
   String get bundleThreeQuls => 'جمع المعوّذات الثلاث';

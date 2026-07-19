@@ -213,6 +213,7 @@
   "pp-69": {
     "form": "short",
     "repetitions": 100,
+    "segments": [33, 33, 33, 1],
     "benefit_tier": "reward",
     "benefit_text": "من سبّح الله دبر كل صلاة ثلاثًا وثلاثين، وحمد الله ثلاثًا وثلاثين، وكبّر الله ثلاثًا وثلاثين، وقال تمام المائة: لا إله إلا الله وحده لا شريك له... غُفرت خطاياه وإن كانت مثل زبد البحر",
     "benefit_source": "مسلم 597",
@@ -411,6 +412,7 @@
   "sl-106": {
     "form": "short",
     "repetitions": 100,
+    "segments": [33, 33, 34],
     "benefit_tier": "reward",
     "benefit_text": "أوصى بها النبي ﷺ فاطمة وعليًا رضي الله عنهما عند النوم وقال: فهو خير لكما من خادم",
     "benefit_source": "البخاري 3705، مسلم 2727",
@@ -472,36 +474,5 @@
     "benefit_text_en": "The Prophet ﷺ would not sleep until he recited as-Sajdah and al-Mulk; Surat al-Mulk is the Preventer — it intercedes for its companion until he is forgiven, and saves from the punishment of the grave.",
     "translation_override": "Sūrat al-Mulk (The Sovereignty, chapter 67) — recited in full before sleep.",
     "transliteration_override": "Sūrat al-Mulk"
-  },
-  "wk-1": {
-    "form": "short",
-    "repetitions": 1,
-    "benefit_tier": "none",
-    "benefit_source": "البخاري 6312"
-  },
-  "wk-2": {
-    "form": "long",
-    "repetitions": 1,
-    "benefit_tier": "reward",
-    "benefit_text": "من تعارّ من الليل فقالها، ثم قال: اللهم اغفر لي، أو دعا — استُجيب له، فإن توضأ وصلى قُبِلَت صلاته",
-    "benefit_source": "البخاري 1154",
-    "benefit_text_en": "Whoever wakes during the night and says this, then says 'O Allah, forgive me' or supplicates — he is answered; and if he performs wudu and prays, his prayer is accepted.",
-    "note": "وردت فيمن تعارّ من الليل؛ الباب في حصن المسلم يجمعها مع أذكار الاستيقاظ"
-  },
-  "wk-3": {
-    "form": "short",
-    "repetitions": 1,
-    "benefit_tier": "none",
-    "benefit_source": "الترمذي 3401، وحسنه الألباني"
-  },
-  "wk-4": {
-    "form": "quran",
-    "repetitions": 1,
-    "benefit_tier": "none",
-    "benefit_text": "كان النبي ﷺ إذا استيقظ من الليل يمسح النوم عن وجهه ثم يقرأ هذه الآيات الخواتيم من سورة آل عمران",
-    "benefit_source": "البخاري 4569، ومسلم 763",
-    "benefit_text_en": "When the Prophet ﷺ woke during the night, he would wipe the sleep from his face and recite these closing verses of Surat Al 'Imran.",
-    "note": "خواتيم آل عمران ١٩٠–٢٠٠",
-    "transliteration_override": "Inna fee khalqis-samawati wal-ardi wakhtilafil-layli wan-nahari la'ayatin li'ulil-albab (190) Alladheena yadhkuroonal-laha qiyaman wa qu'oodan wa 'ala junoobihim wa yatafakkaroona fee khalqis-samawati wal-ard, rabbana ma khalaqta hadha batilan subhanaka faqina 'adhaban-nar (191) Rabbana innaka man tudkhilin-nara faqad akhzaytah, wa ma lidh-dhalimeena min ansar (192) Rabbana innana sami'na munadiyan yunadee lil-eemani an aminoo birabbikum fa'amanna, rabbana faghfir lana dhunoobana wa kaffir 'anna sayyi'atina wa tawaffana ma'al-abrar (193) Rabbana wa atina ma wa'adtana 'ala rusulika wa la tukhzina yawmal-qiyamah, innaka la tukhliful-mi'ad (194) Fastajaba lahum rabbuhum annee la udee'u 'amala 'amilin minkum min dhakarin aw untha, ba'dukum min ba'd, falladheena hajaroo wa ukhrijoo min diyarihim wa oodhoo fee sabeelee wa qataloo wa qutiloo la'ukaffiranna 'anhum sayyi'atihim wa la'udkhilannahum jannatin tajree min tahtihal-anharu thawaban min 'indil-lah, wallahu 'indahu husnuth-thawab (195) La yaghurrannaka taqallubul-ladheena kafaroo fil-bilad (196) Mata'un qaleelun thumma ma'wahum jahannamu wa bi'sal-mihad (197) Lakinil-ladheenat-taqaw rabbahum lahum jannatun tajree min tahtihal-anharu khalideena feeha nuzulan min 'indil-lah, wa ma 'indal-lahi khayrun lil-abrar (198) Wa inna min ahlil-kitabi laman yu'minu billahi wa ma unzila ilaykum wa ma unzila ilayhim khashi'eena lillahi la yashtaroona bi'ayatil-lahi thamanan qaleela, ula'ika lahum ajruhum 'inda rabbihim, innal-laha saree'ul-hisab (199) Ya ayyuhal-ladheena amanus-biroo wa sabiroo wa rabitoo wattaqul-laha la'allakum tuflihoon (200)"
   }
 }
