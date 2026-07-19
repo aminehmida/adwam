@@ -183,22 +183,19 @@ class _SessionScreenState extends State<SessionScreen>
 
   GlobalKey _keyFor(String id) => _itemKeys.putIfAbsent(id, GlobalKey.new);
 
-  /// A dhikr repeated this many times or more gets a longer buzz on its final
-  /// count, so you can feel it's done without watching the counter.
-  static const _longBuzzReps = 10;
-
   /// Amplitude of the completion buzz (1-255). Tuned below full strength to
   /// match a typical notification vibration rather than a jarring max buzz.
   static const _longBuzzAmplitude = 128;
 
   /// Haptic for a finished dhikr: a medium tap normally, a sustained buzz for
-  /// the many-repetition ones ([_longBuzzReps]+) so you can feel it's done
-  /// without watching the counter. The built-in haptic primitives are all
-  /// brief low-amplitude taps, so the long buzz uses the device vibrator
+  /// the many-repetition ones (the focusable [Dhikr.isFocusable] dhikrs, the
+  /// same ones counted in the focus overlay) so you can feel it's done without
+  /// watching the counter. The built-in haptic primitives are all brief
+  /// low-amplitude taps, so the long buzz uses the device vibrator
   /// (cross-platform via the `vibration` plugin), falling back to a heavy tap
   /// where no vibrator is available.
   Future<void> _completionHaptic(Dhikr dhikr) async {
-    if (dhikr.repetitions < _longBuzzReps) {
+    if (!dhikr.isFocusable) {
       HapticFeedback.mediumImpact();
       return;
     }
@@ -250,7 +247,7 @@ class _SessionScreenState extends State<SessionScreen>
     }
     _anchorTo(dhikr.id);
     if (!completed &&
-        dhikr.isHighRep &&
+        dhikr.isFocusable &&
         arabicFrom != null &&
         counterFrom != null) {
       setState(() {
@@ -1058,7 +1055,7 @@ class _SessionScreenState extends State<SessionScreen>
     // collapses it again (hidden peeks also close on scroll — unhide
     // permanently via edit mode). The Opacity wrapper is always present so
     // the card's element (and its size animation) survives peek toggles.
-    final focusable = dhikr.isHighRep;
+    final focusable = dhikr.isFocusable;
     final card = Opacity(
       opacity: peeking ? 0.6 : 1,
       child: DhikrCard(

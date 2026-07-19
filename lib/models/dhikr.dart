@@ -27,9 +27,15 @@ const noSortHint = 1 << 20;
 const noFixedOrder = 1 << 20;
 
 /// Dhikrs repeated at least this many times are grouped into their own
-/// "high repetitions" section at the bottom of a session and counted in the
-/// full-screen focus overlay rather than on the card.
+/// "high repetitions" section at the bottom of a session.
 const highRepThreshold = 100;
+
+/// Dhikrs repeated at least this many times are counted in the full-screen
+/// focus overlay rather than on the card. Lower than [highRepThreshold] so
+/// that ordinary tasbih runs (e.g. 7x, 10x, 33x) also open the dedicated
+/// counting interface, while list sectioning/sorting stays keyed off the
+/// higher threshold.
+const focusRepThreshold = 7;
 
 const _sessionNames = {
   'morning': SessionType.morning,
@@ -104,9 +110,12 @@ class Dhikr {
   /// Final sort tiebreak: shorter text first among otherwise equal dhikrs.
   int get wordCount => arabic.trim().split(RegExp(r'\s+')).length;
 
-  /// Repeated enough times to belong in the high-repetitions section and to
-  /// count in the focus overlay.
+  /// Repeated enough times to belong in the high-repetitions section.
   bool get isHighRep => repetitions >= highRepThreshold;
+
+  /// Repeated enough times to be counted in the full-screen focus overlay
+  /// (the dedicated counting interface) rather than on the card.
+  bool get isFocusable => repetitions >= focusRepThreshold;
 
   /// Running counts at which one phrase run ends and the next begins, e.g.
   /// `[33, 66, 99]` for `[33, 33, 33, 1]`. The final run's end (== total, the
