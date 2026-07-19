@@ -733,7 +733,7 @@ class _SessionScreenState extends State<SessionScreen>
                     textDirection: TextDirection.rtl,
                     child: Text(
                       dhikr.arabic,
-                      style: arabicTextStyle.copyWith(
+                      style: arabicStyleFor(dhikr.form).copyWith(
                         // Tint follows the scrim, not the flight: the text
                         // turns white at its card position while the
                         // background darkens, anchoring the eye to the

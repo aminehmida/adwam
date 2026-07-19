@@ -11,9 +11,15 @@ Sources (content/sources/):
   hisn_waking.json      hisnmuslim.com API ch. 1 (text only)
   hisn_*_en.json        hisnmuslim.com API en/25 + en/28 + en/1 (matched by ID):
                         TRANSLATED_TEXT, LANGUAGE_ARABIC_TRANSLATED_TEXT
-  tanzil_uthmani.json   Tanzil Uthmani text of the full surahs read before
-                        sleep (chapters 32, 67) — ayah text verbatim per the
-                        Tanzil license; becomes the surah cards' `body`
+  tanzil_uthmani.json   Tanzil Uthmani text (full tashkeel + waqf marks) for
+                        every Quranic passage in the app: full surahs (32, 67,
+                        112, 113, 114) as ayat lists and the individual ayat of
+                        chapters 2 and 3 under `verses`. Ayah text verbatim per
+                        the Tanzil license.
+
+Scaffold (content/quran_scaffold.json): the non-Quran text (isti'adha,
+basmala, narration, citations) wrapping each Quranic quote, with {N}
+placeholders that build fills with the roundel'd Uthmani ayat of a span.
 
 Overlay (content/curation.json): per-id form, benefit_tier, fixed_order, and
 for hisn items repetitions/benefit_text/benefit_source; translation_override /
@@ -65,13 +71,41 @@ def arabic_digits(n):
     return "".join(chr(0x0660 + int(d)) for d in str(n))
 
 
+def roundel_flow(pairs):
+    """Join (ayah-text, verse-number) pairs into one mushaf-flow string. Each
+    ayah is closed by U+06DD ARABIC END OF AYAH followed immediately (no space)
+    by its verse number — Amiri's contextual shaping encloses the digits in the
+    mark. The ayah text is Tanzil's Uthmani, verbatim (license: no changes)."""
+    return " ".join(f"{text} ۝{arabic_digits(n)}" for text, n in pairs)
+
+
 def surah_body(ayat):
-    """Join a surah's ayat into one mushaf-flow string. Each ayah ends with
-    U+06DD ARABIC END OF AYAH followed immediately (no space) by the verse
-    number — Amiri's contextual shaping encloses the digits in the mark.
-    The ayah text itself is Tanzil's, verbatim (license: no changes)."""
-    return " ".join(f"{aya} ۝{arabic_digits(i)}"
-                    for i, aya in enumerate(ayat, 1))
+    """A full surah's mushaf-flow body (ayat numbered 1..n) for the reader."""
+    return roundel_flow([(a, i) for i, a in enumerate(ayat, 1)])
+
+
+def ayah_text(tanzil, chapter, n):
+    """Uthmani text of chapter:n — from a stored full surah (ayat list) or,
+    for the partial chapters, from the `verses` map keyed "chapter:ayah"."""
+    key = str(chapter)
+    if key in tanzil["chapters"]:
+        return tanzil["chapters"][key]["ayat"][n - 1]
+    return tanzil["verses"][f"{chapter}:{n}"]
+
+
+def quran_arabic(tanzil, scaffold):
+    """Arabic for every Quran-form dhikr: fill each scaffold template's {N}
+    with the roundel'd Uthmani text of its span [chapter, first, last]. The
+    verse number in each ۝ roundel is the real mushaf ayah number."""
+    out = {}
+    for did, spec in scaffold.items():
+        if did.startswith("_"):
+            continue
+        spans = [roundel_flow([(ayah_text(tanzil, ch, n), n)
+                               for n in range(start, last + 1)])
+                 for ch, start, last in spec["spans"]]
+        out[did] = spec["template"].format(*spans)
+    return out
 
 
 def clean_hisn(text):
@@ -100,6 +134,13 @@ def build():
                 if not k.startswith("_")}
     dhikrs = []
 
+    # Quranic passages are rendered from the Tanzil Uthmani text (full
+    # tashkeel + waqf marks), composed via content/quran_scaffold.json, and
+    # override whatever Arabic the raw source carried for that dhikr.
+    tanzil = load(SRC / "tanzil_uthmani.json")
+    scaffold = load(ROOT / "content" / "quran_scaffold.json")
+    quran = quran_arabic(tanzil, scaffold)
+
     # Morning/evening (Seen-Arabic); en.json carries the translated virtues.
     type_contexts = {0: ["morning", "evening"], 1: ["morning"], 2: ["evening"]}
     en_by_order = {x["order"]: x for x in load(SRC / "seen_arabic_en.json")}
@@ -111,7 +152,7 @@ def build():
         dhikrs.append({
             "id": did,
             "contexts": type_contexts[item["type"]],
-            "arabic": item["content"].strip(),
+            "arabic": quran.get(did) or item["content"].strip(),
             "repetitions": item["count"],
             "form": cur["form"],
             "benefit_tier": cur["benefit_tier"],
@@ -130,9 +171,6 @@ def build():
                                 .replace('"', "").strip() or None),
             **({"sort_hint": cur["sort_hint"]} if "sort_hint" in cur else {}),
         })
-
-    # Full-surah bodies (Tanzil Uthmani text, chapters keyed by number).
-    tanzil = load(SRC / "tanzil_uthmani.json")
 
     # Post-prayer + sleep (hisnmuslim.com); *_en.json carries the English
     # rendering, matched by the same ID.
@@ -154,8 +192,8 @@ def build():
                 continue
             cur = curation[did]
             dhikrs.append(_hisn_entry(
-                did, [context], clean_hisn(item["ARABIC_TEXT"]), cur,
-                en_by_id.get(item["ID"], {})))
+                did, [context], quran.get(did) or clean_hisn(item["ARABIC_TEXT"]),
+                cur, en_by_id.get(item["ID"], {})))
 
     for did, contexts in EXTRA.items():
         cur = curation[did]
@@ -165,6 +203,15 @@ def build():
                if not d["translation"] or not d["transliteration"]]
     if missing:
         raise SystemExit(f"missing translation/transliteration: {missing}")
+
+    # Every Quran-form dhikr must get its Arabic from the Uthmani scaffold,
+    # and no scaffold entry should go unused.
+    quran_ids = {d["id"] for d in dhikrs if d["form"] == "quran"}
+    scaffold_ids = {k for k in scaffold if not k.startswith("_")}
+    if quran_ids != scaffold_ids:
+        raise SystemExit("quran scaffold mismatch: "
+                         f"missing {quran_ids - scaffold_ids}, "
+                         f"extra {scaffold_ids - quran_ids}")
 
     bodyless = [d["id"] for d in dhikrs
                 if d["form"] == "surah" and not d.get("body")]

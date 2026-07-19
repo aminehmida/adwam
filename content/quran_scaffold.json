@@ -1,0 +1,133 @@
+{
+  "_comment": "Scaffolding for the Quran-form adhkar: the non-Quran text (isti'adha, basmala, narration, citation) around each Quranic quote, extracted verbatim from the reviewed adhkar text. Each {N} is filled by tool/build_content.py with the Uthmani text of spans[N] (chapter, first ayah, last ayah) — full tashkeel, waqf marks and ۝ ayah roundels. Brackets ﴿ ﴾ and separators are part of the template. Edit build_content.py, not this file, to change how quotes render.",
+  "me-02": {
+    "template": "أَعُوذُ بِاللَّهِ مِنَ الشَّيطَانِ الرَّجِيمِ ﴿{0}﴾",
+    "spans": [
+      [
+        2,
+        255,
+        255
+      ]
+    ]
+  },
+  "me-03": {
+    "template": "أَعُوذُ بِاللَّهِ مِنَ الشَّيطَانِ الرَّجِيمِ ﴿{0}﴾. [البقرة 285 - 286]",
+    "spans": [
+      [
+        2,
+        285,
+        286
+      ]
+    ]
+  },
+  "me-04": {
+    "template": "{0}",
+    "spans": [
+      [
+        112,
+        1,
+        4
+      ]
+    ]
+  },
+  "me-05": {
+    "template": "{0}",
+    "spans": [
+      [
+        113,
+        1,
+        5
+      ]
+    ]
+  },
+  "me-06": {
+    "template": "{0}",
+    "spans": [
+      [
+        114,
+        1,
+        6
+      ]
+    ]
+  },
+  "pp-70": {
+    "template": "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ ﴿{0}﴾، بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ ﴿{1}﴾،بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ ﴿{2}﴾ بَعْدَ كُلِّ صَلاَةٍ.",
+    "spans": [
+      [
+        112,
+        1,
+        4
+      ],
+      [
+        113,
+        1,
+        5
+      ],
+      [
+        114,
+        1,
+        6
+      ]
+    ]
+  },
+  "pp-71": {
+    "template": "﴿{0}﴾ عَقِبَ كلِّ صَلاَةٍ.",
+    "spans": [
+      [
+        2,
+        255,
+        255
+      ]
+    ]
+  },
+  "sl-99": {
+    "template": "يَجْمَعُ كَفَّيْهِ ثُمَّ يَنْفُثُ فِيهِمَا فَيَقْرَأُ فِيهِمَا:بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ ﴿{0}﴾.  بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ ﴿{1}﴾.  بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ ﴿{2}﴾ ثُمَّ يَمْسَحُ بِهِمَا مَا اسْتَطَاعَ مِنْ جَسَدِهِ يَبْدَأُ بِهِمَا عَلَى رَأْسِهِ وَوَجْهِهِ وَمَا أَقبَلَ مِنْ جَسَدِهِ)) (يفعلُ ذلك ثلاثَ مرَّاتٍ).",
+    "spans": [
+      [
+        112,
+        1,
+        4
+      ],
+      [
+        113,
+        1,
+        5
+      ],
+      [
+        114,
+        1,
+        6
+      ]
+    ]
+  },
+  "sl-100": {
+    "template": "﴿{0}﴾.",
+    "spans": [
+      [
+        2,
+        255,
+        255
+      ]
+    ]
+  },
+  "sl-101": {
+    "template": "﴿{0}﴾.",
+    "spans": [
+      [
+        2,
+        285,
+        286
+      ]
+    ]
+  },
+  "wk-4": {
+    "template": "﴿{0}﴾",
+    "spans": [
+      [
+        3,
+        190,
+        200
+      ]
+    ]
+  }
+}
