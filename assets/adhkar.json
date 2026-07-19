@@ -2,22 +2,6 @@
   "version": 1,
   "dhikrs": [
     {
-      "id": "me-01",
-      "contexts": [
-        "evening"
-      ],
-      "arabic": "الْحَمْدُ لِلَّهِ وَحْدَهُ، وَالصَّلاَةُ وَالسَّلاَمُ عَلَى مَنْ لاَ نَبِيَّ بَعْدَهُ",
-      "repetitions": 1,
-      "form": "short",
-      "benefit_tier": "none",
-      "benefit_text": "استحباب ابتداء الدعاء بالحمد لله -تعالى- والثناء، ثم الصلاة على رسول الله ﷺ",
-      "benefit_source": "عن أنس يرفعه: ((لأن أقعد مع قوم يذكرون اللَّه تعالى من صلاة الغداة حتى تطلع الشمس أحبُّ إليَّ من أن أُعتق أربعة من ولد إسماعيل، ولأن أقعد مع قوم يذكرون اللَّه من صلاة العصر إلى أن تغرب الشمس أحبّ إليَّ من أن أعتق أربعة)). أبو داود، برقم 3667، وحسنه الألباني، في صحيح أبي داود، 2/698 .",
-      "benefit_text_en": "The recommendation to begin supplication with praise to Allah the Exalted and extolling Him, followed by prayers upon the Messenger of Allah ﷺ.",
-      "benefit_source_en": "Anas (RA) said that he heard the Prophet (ﷺ) say: \"That I sit with people remembering Almighty Allah from the morning (Fajr) prayer until sunrise is more beloved to me than freeing four slaves from among the Children of Isma'il. That I sit with people remembering Allah from the afternoon ('Asr) prayer, until the sun sets, is more beloved to me than freeing four slaves from among the Children of Isma'il.\"This was reported by Abu Dawud (No. 3667). Al-Albani graded it good in Sahih Abu Dawud 2/698.",
-      "translation": "All praise is due to Allah alone, and peace and blessings be upon him after whom there is no other Prophet.",
-      "transliteration": "Alḥamdulillahi waḥdah waṣ-ṣalatu was-salam `alā man lā nabiyya ba`dah."
-    },
-    {
       "id": "me-02",
       "contexts": [
         "morning",
