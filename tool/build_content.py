@@ -240,6 +240,7 @@ def _hisn_entry(did, contexts, arabic, cur, en, body=None):
         "arabic": arabic,
         **({"body": body} if body else {}),
         "repetitions": cur["repetitions"],
+        **({"segments": cur["segments"]} if "segments" in cur else {}),
         "form": cur["form"],
         "benefit_tier": cur["benefit_tier"],
         "benefit_text": cur.get("benefit_text"),

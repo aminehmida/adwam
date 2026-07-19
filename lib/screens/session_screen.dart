@@ -15,6 +15,7 @@ import '../state/progress_controller.dart';
 import '../state/settings_controller.dart';
 import '../theme.dart';
 import '../widgets/context_card.dart' show sessionTitle;
+import '../widgets/count_progress_ring.dart';
 import '../widgets/custom_dhikr_dialog.dart';
 import '../widgets/dhikr_card.dart';
 import '../widgets/surah_reader.dart';
@@ -195,6 +196,20 @@ class _SessionScreenState extends State<SessionScreen>
     }
   }
 
+  /// A crisp double-tick when a compound dhikr crosses from one phrase run to
+  /// the next (e.g. after the 33rd tasbih), so the change of words is felt
+  /// without watching. Distinct from the single light count tap and the longer
+  /// completion buzz.
+  Future<void> _segmentTransitionHaptic() async {
+    if (await Vibration.hasVibrator()) {
+      Vibration.vibrate(duration: 60, amplitude: _longBuzzAmplitude);
+      await Future.delayed(const Duration(milliseconds: 80));
+      Vibration.vibrate(duration: 60, amplitude: _longBuzzAmplitude);
+    } else {
+      HapticFeedback.mediumImpact();
+    }
+  }
+
   Future<void> _onTap(Dhikr dhikr) async {
     // A surah card opens the reader instead of counting; completion happens
     // via the reader's Done button.
@@ -212,6 +227,10 @@ class _SessionScreenState extends State<SessionScreen>
     final completed = progress.increment(widget.session, dhikr);
     if (completed) {
       _completionHaptic(dhikr);
+    } else if (dhikr.segmentStops.contains(
+      progress.countFor(widget.session, dhikr.id),
+    )) {
+      _segmentTransitionHaptic();
     } else {
       HapticFeedback.lightImpact();
     }
@@ -240,13 +259,15 @@ class _SessionScreenState extends State<SessionScreen>
   void _onFocusTap() {
     final dhikr = _focused;
     if (dhikr == null || _focusDismissing) return;
-    final completed = context.read<ProgressController>().increment(
-      widget.session,
-      dhikr,
-    );
+    final progress = context.read<ProgressController>();
+    final completed = progress.increment(widget.session, dhikr);
     if (completed) {
       _completionHaptic(dhikr);
       _dismissFocus(completed: true);
+    } else if (dhikr.segmentStops.contains(
+      progress.countFor(widget.session, dhikr.id),
+    )) {
+      _segmentTransitionHaptic();
     } else {
       HapticFeedback.lightImpact();
     }
@@ -788,16 +809,13 @@ class _SessionScreenState extends State<SessionScreen>
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        SizedBox(
-                          width: 26,
-                          height: 26,
-                          child: CircularProgressIndicator(
-                            value: done ? 1 : count / dhikr.repetitions,
-                            strokeWidth: 3,
-                            strokeCap: StrokeCap.round,
-                            color: accent,
-                            backgroundColor: colors.surfaceContainerHighest,
-                          ),
+                        CountProgressRing(
+                          value: done ? 1 : count / dhikr.repetitions,
+                          color: accent,
+                          stops: [
+                            for (final s in dhikr.segmentStops)
+                              s / dhikr.repetitions,
+                          ],
                         ),
                         const SizedBox(width: 12),
                         Text(

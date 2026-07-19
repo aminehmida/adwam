@@ -51,6 +51,11 @@ class Dhikr {
   /// shown in the reader overlay; [arabic] stays the display name.
   final String? body;
   final int repetitions;
+
+  /// For a compound count (the post-prayer / sleep tasbih) the individual
+  /// phrase runs that make up [repetitions], e.g. `[33, 33, 33, 1]`. Null for
+  /// a plain single-phrase count. Their sum equals [repetitions].
+  final List<int>? segments;
   final DhikrForm form;
   final BenefitTier tier;
   final String? benefit;
@@ -80,6 +85,7 @@ class Dhikr {
     required this.arabic,
     this.body,
     required this.repetitions,
+    this.segments,
     required this.form,
     required this.tier,
     this.benefit,
@@ -102,6 +108,21 @@ class Dhikr {
   /// count in the focus overlay.
   bool get isHighRep => repetitions >= highRepThreshold;
 
+  /// Running counts at which one phrase run ends and the next begins, e.g.
+  /// `[33, 66, 99]` for `[33, 33, 33, 1]`. The final run's end (== total, the
+  /// completion) is excluded; empty when there are fewer than two [segments].
+  List<int> get segmentStops {
+    final segs = segments;
+    if (segs == null || segs.length < 2) return const [];
+    final stops = <int>[];
+    var running = 0;
+    for (var i = 0; i < segs.length - 1; i++) {
+      running += segs[i];
+      stops.add(running);
+    }
+    return stops;
+  }
+
   /// Part of an explicitly ordered sunnah sequence (the post-prayer adhkar):
   /// sorted by that sequence and shown without category bands.
   bool get hasFixedOrder => fixedOrder != noFixedOrder;
@@ -114,6 +135,7 @@ class Dhikr {
         arabic: json['arabic'] as String,
         body: json['body'] as String?,
         repetitions: json['repetitions'] as int,
+        segments: (json['segments'] as List?)?.cast<int>(),
         form: _formNames[json['form']]!,
         tier: _tierNames[json['benefit_tier']]!,
         benefit: json['benefit_text'] as String?,
@@ -137,6 +159,7 @@ class Dhikr {
         'id': id,
         'arabic': arabic,
         'repetitions': repetitions,
+        if (segments != null) 'segments': segments,
         'form': form.name,
         'benefit_tier': tier.name,
         if (benefit != null) 'benefit_text': benefit,
