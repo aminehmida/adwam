@@ -16,6 +16,7 @@ dependencies:
   provider: ^6.1.2
   shared_preferences: ^2.3.0
   cupertino_icons: ^1.0.8
+  vibration: ^3.2.0
 
 dev_dependencies:
   flutter_test:
@@ -46,3 +47,9 @@ flutter:
         - asset: assets/fonts/Amiri-Regular.ttf
         - asset: assets/fonts/Amiri-Bold.ttf
           weight: 700
+    # Quran-specific cut of Amiri (same authors, SIL OFL): tashkeel and waqf
+    # marks are positioned tightly over their letters for mushaf typesetting.
+    # Used only for Quranic passages/surahs.
+    - family: Amiri Quran
+      fonts:
+        - asset: assets/fonts/AmiriQuran-Regular.ttf
