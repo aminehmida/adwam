@@ -147,11 +147,16 @@ def build():
     for item in load(SRC / "seen_arabic_ar.json"):
         did = f"me-{item['order']:02d}"
         cur = curation[did]
+        # contexts_override replaces the source-derived contexts; an explicit
+        # empty list drops the dhikr from every session, so it is omitted.
+        contexts = cur.get("contexts_override", type_contexts[item["type"]])
+        if not contexts:
+            continue
         en = en_by_order.get(item["order"], {})
         benefit = cur.get("benefit_text_override") or (item.get("fadl") or "").strip() or None
         dhikrs.append({
             "id": did,
-            "contexts": cur.get("contexts_override") or type_contexts[item["type"]],
+            "contexts": contexts,
             "arabic": quran.get(did) or item["content"].strip(),
             "repetitions": item["count"],
             "form": cur["form"],
