@@ -151,7 +151,7 @@ def build():
         benefit = cur.get("benefit_text_override") or (item.get("fadl") or "").strip() or None
         dhikrs.append({
             "id": did,
-            "contexts": type_contexts[item["type"]],
+            "contexts": cur.get("contexts_override") or type_contexts[item["type"]],
             "arabic": quran.get(did) or item["content"].strip(),
             "repetitions": item["count"],
             "form": cur["form"],
