@@ -24,9 +24,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sessionSleep => 'Bedtime adhkar';
 
   @override
-  String get sessionWaking => 'Wake-up adhkar';
-
-  @override
   String get editList => 'Edit list';
 
   @override

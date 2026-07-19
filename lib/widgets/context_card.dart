@@ -10,7 +10,6 @@ String sessionTitle(BuildContext context, SessionType session) {
     SessionType.evening => l10n.sessionEvening,
     SessionType.postPrayer => l10n.sessionPostPrayer,
     SessionType.sleep => l10n.sessionSleep,
-    SessionType.waking => l10n.sessionWaking,
   };
 }
 
@@ -19,7 +18,6 @@ const sessionIcons = {
   SessionType.evening: Icons.wb_twilight,
   SessionType.postPrayer: Icons.mosque_outlined,
   SessionType.sleep: Icons.bedtime_outlined,
-  SessionType.waking: Icons.alarm_outlined,
 };
 
 /// Full-width session card: icon medallion, Arabic title, progress bar.
