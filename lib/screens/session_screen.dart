@@ -112,6 +112,12 @@ class _SessionScreenState extends State<SessionScreen>
         ..addListener(_syncVolumeIntercept);
       _syncVolumeIntercept();
     }
+    // Opening a session may be the first interaction after a long gap — clear
+    // an expired post-prayer session now so the list shows fresh, rather than
+    // waiting for the first tap. Deferred so it can safely notify listeners.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) context.read<ProgressController>().refresh();
+    });
   }
 
   Future<dynamic> _onVolumeCall(MethodCall call) async {
