@@ -49,7 +49,7 @@ class _DhikrAppState extends State<DhikrApp> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      _progress.checkDateRollover();
+      _progress.refresh();
     }
   }
 
