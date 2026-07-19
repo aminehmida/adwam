@@ -413,7 +413,7 @@ abstract class AppLocalizations {
   /// No description provided for @volumeKeyCountingBody.
   ///
   /// In en, this message translates to:
-  /// **'Pressing volume down counts the current dhikr; the volume itself won\'t change while counting.'**
+  /// **'Pressing volume down counts the current dhikr, or scrolls the page while reading a surah; the volume itself won\'t change.'**
   String get volumeKeyCountingBody;
 
   /// No description provided for @showTranslation.

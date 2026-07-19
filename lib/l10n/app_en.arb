@@ -76,7 +76,7 @@
   "themeLight": "Light",
   "themeDark": "Dark",
   "volumeKeyCounting": "Count with volume button",
-  "volumeKeyCountingBody": "Pressing volume down counts the current dhikr; the volume itself won't change while counting.",
+  "volumeKeyCountingBody": "Pressing volume down counts the current dhikr, or scrolls the page while reading a surah; the volume itself won't change.",
   "showTranslation": "Show translation",
   "showTranslationBody": "English meaning inside each dhikr's Translation section.",
   "showTransliteration": "Show transliteration",

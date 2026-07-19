@@ -76,7 +76,7 @@
   "themeLight": "فاتح",
   "themeDark": "داكن",
   "volumeKeyCounting": "العدّ بزر الصوت",
-  "volumeKeyCountingBody": "الضغط على زر خفض الصوت يعدّ الذكر الحالي، ولن يتغيّر مستوى الصوت أثناء العدّ.",
+  "volumeKeyCountingBody": "الضغط على زر خفض الصوت يعدّ الذكر الحالي، أو يُمرّر الصفحة أثناء قراءة سورة، ولن يتغيّر مستوى الصوت.",
   "showTranslation": "عرض الترجمة",
   "showTranslationBody": "عرض معنى الذكر بالإنجليزية داخل قسم الترجمة.",
   "showTransliteration": "عرض النطق بالحروف اللاتينية",

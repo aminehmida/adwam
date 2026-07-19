@@ -172,7 +172,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get volumeKeyCountingBody =>
-      'الضغط على زر خفض الصوت يعدّ الذكر الحالي، ولن يتغيّر مستوى الصوت أثناء العدّ.';
+      'الضغط على زر خفض الصوت يعدّ الذكر الحالي، أو يُمرّر الصفحة أثناء قراءة سورة، ولن يتغيّر مستوى الصوت.';
 
   @override
   String get showTranslation => 'عرض الترجمة';
