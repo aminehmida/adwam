@@ -25,7 +25,12 @@ List<TextSpan> _bodySpans(String body, Color gold) {
     if (m.start > last) {
       spans.add(TextSpan(text: body.substring(last, m.start)));
     }
-    spans.add(TextSpan(text: m[0], style: TextStyle(color: gold)));
+    spans.add(
+      TextSpan(
+        text: m[0],
+        style: TextStyle(color: gold),
+      ),
+    );
     last = m.end;
   }
   if (last < body.length) spans.add(TextSpan(text: body.substring(last)));
@@ -41,11 +46,17 @@ class SurahReader extends StatefulWidget {
   final VoidCallback onDone;
   final VoidCallback onDismiss;
 
+  /// Owned by the host (SessionScreen) so the hardware volume-down key can
+  /// page the reader down. The reader only reads its position (for the
+  /// progress line) and never disposes it.
+  final ScrollController controller;
+
   const SurahReader({
     super.key,
     required this.dhikr,
     required this.onDone,
     required this.onDismiss,
+    required this.controller,
   });
 
   @override
@@ -53,15 +64,31 @@ class SurahReader extends StatefulWidget {
 }
 
 class _SurahReaderState extends State<SurahReader> {
-  final _scrollController = ScrollController();
-
   /// Accumulated pull-down at the top edge; past the threshold the reader
   /// closes without completing (mirrors the focus overlay's 48px swipe).
   double _overscroll = 0;
 
+  /// How far through the surah the reader has scrolled, 0..1 — drives the
+  /// gilded progress line along the top of the page.
+  double _progress = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    if (!widget.controller.hasClients) return;
+    final position = widget.controller.position;
+    final max = position.maxScrollExtent;
+    final value = max > 0 ? (position.pixels / max).clamp(0.0, 1.0) : 0.0;
+    if (value != _progress) setState(() => _progress = value);
+  }
+
   @override
   void dispose() {
-    _scrollController.dispose();
+    widget.controller.removeListener(_onScroll);
     super.dispose();
   }
 
@@ -90,89 +117,117 @@ class _SurahReaderState extends State<SurahReader> {
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(10),
-          // Styled like the session cards — the card fill inside a gold
-          // contour over the plain surface behind — so the reader feels
-          // like a page of the same manuscript.
-          child: Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).cardTheme.color,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: gold.withValues(alpha: .6)),
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: NotificationListener<OverscrollNotification>(
-              onNotification: _onOverscroll,
-              child: SingleChildScrollView(
-                controller: _scrollController,
-                // Clamping physics so pull-down at the top surfaces as
-                // overscroll notifications (bouncing physics would swallow
-                // them).
-                physics: const ClampingScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text(
-                      widget.dhikr.arabic,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontFamily: 'Amiri',
-                        fontSize: 28,
-                        fontWeight: FontWeight.w700,
-                        color: gold,
+          child: Column(
+            children: [
+              // A gilded reading-progress bar in its own band above the page,
+              // centred and filling from the leading (right, in RTL) edge as
+              // the surah scrolls — a ribbon marking one's place.
+              Padding(
+                padding: const EdgeInsets.only(top: 2, bottom: 10),
+                child: Center(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(3),
+                    child: Container(
+                      width: 140,
+                      height: 6,
+                      color: gold.withValues(alpha: .18),
+                      alignment: AlignmentDirectional.centerStart,
+                      child: FractionallySizedBox(
+                        widthFactor: _progress,
+                        child: Container(color: gold),
                       ),
                     ),
-                    const SizedBox(height: 12),
-                    Text(
-                      _basmala,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontFamily: 'Amiri Quran',
-                        fontSize: fontSize - 1,
-                        height: 1.8,
-                        color: colors.onSurfaceVariant,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Text.rich(
-                      TextSpan(
-                        children: _bodySpans(widget.dhikr.body!, gold),
-                      ),
-                      textAlign: TextAlign.justify,
-                      style: TextStyle(
-                        // Amiri Quran keeps tashkeel and waqf marks tight over
-                        // their letters; a little evenly-spread leading gives
-                        // the ayah roundels room without stranding the marks.
-                        fontFamily: 'Amiri Quran',
-                        fontSize: fontSize,
-                        height: 2.0,
-                        leadingDistribution: TextLeadingDistribution.even,
-                        color: colors.onSurface,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Center(
-                      child: FilledButton(
-                        onPressed: widget.onDone,
-                        style: FilledButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 48,
-                            vertical: 14,
-                          ),
-                        ),
-                        child: Text(
-                          l10n.doneReading,
-                          style: const TextStyle(
-                            fontFamily: 'Amiri',
-                            fontSize: 18,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
-            ),
+              // The rounded manuscript page fills the rest of the height.
+              // Styled like the session cards — the card fill inside a gold
+              // contour over the plain surface behind.
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).cardTheme.color,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: gold.withValues(alpha: .6)),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: NotificationListener<OverscrollNotification>(
+                    onNotification: _onOverscroll,
+                    child: SingleChildScrollView(
+                      controller: widget.controller,
+                      // Clamping physics so pull-down at the top surfaces as
+                      // overscroll notifications (bouncing physics would
+                      // swallow them).
+                      physics: const ClampingScrollPhysics(),
+                      padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text(
+                            widget.dhikr.arabic,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontFamily: 'Amiri',
+                              fontSize: 28,
+                              fontWeight: FontWeight.w700,
+                              color: gold,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            _basmala,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontFamily: 'Amiri Quran',
+                              fontSize: fontSize - 1,
+                              height: 1.8,
+                              color: colors.onSurfaceVariant,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Text.rich(
+                            TextSpan(
+                              children: _bodySpans(widget.dhikr.body!, gold),
+                            ),
+                            textAlign: TextAlign.justify,
+                            style: TextStyle(
+                              // Amiri Quran keeps tashkeel and waqf marks tight
+                              // over their letters; a little evenly-spread
+                              // leading gives the ayah roundels room without
+                              // stranding the marks.
+                              fontFamily: 'Amiri Quran',
+                              fontSize: fontSize,
+                              height: 2.0,
+                              leadingDistribution: TextLeadingDistribution.even,
+                              color: colors.onSurface,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          Center(
+                            child: FilledButton(
+                              onPressed: widget.onDone,
+                              style: FilledButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 48,
+                                  vertical: 14,
+                                ),
+                              ),
+                              child: Text(
+                                l10n.doneReading,
+                                style: const TextStyle(
+                                  fontFamily: 'Amiri',
+                                  fontSize: 18,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),

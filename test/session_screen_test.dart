@@ -392,6 +392,21 @@ void main() {
     expect(find.text('0 / 1'), findsOneWidget); // opening never counts
   });
 
+  testWidgets('volume-down while reading pages the surah, never counting it',
+      (tester) async {
+    await openMorningWithSurah(tester);
+
+    await tester.tap(find.text('سورة big'));
+    await tester.pumpAndSettle();
+    expect(find.text('آية أولى ۝١ آية ثانية ۝٢'), findsOneWidget);
+
+    // Volume-down pages the reader instead of counting: the reader stays
+    // open and the surah's count is untouched (Done is the only way to count).
+    await pressVolumeDown(tester);
+    expect(find.text('آية أولى ۝١ آية ثانية ۝٢'), findsOneWidget);
+    expect(find.text('0 / 1'), findsOneWidget);
+  });
+
   testWidgets('the reader\'s Done button completes the surah and closes',
       (tester) async {
     await openMorningWithSurah(tester);
