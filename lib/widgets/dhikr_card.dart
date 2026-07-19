@@ -13,6 +13,20 @@ const arabicTextStyle = TextStyle(
   height: 1.9,
 );
 
+/// Quranic passages carry tashkeel and waqf (pause) marks. They render in the
+/// Amiri Quran face, whose marks sit tightly over their letters (plain Amiri
+/// parks them high, so they'd crowd the line above); a little extra, evenly
+/// spread leading gives the ayah roundels room. Applied wherever a dhikr's
+/// Arabic is drawn (card + focus flight) so the shared-element animation stays
+/// aligned.
+TextStyle arabicStyleFor(DhikrForm form) => form == DhikrForm.quran
+    ? arabicTextStyle.copyWith(
+        fontFamily: 'Amiri Quran',
+        height: 2.0,
+        leadingDistribution: TextLeadingDistribution.even,
+      )
+    : arabicTextStyle;
+
 /// Tap-to-count card. Renders a thin greyed title-only row when [collapsed].
 class DhikrCard extends StatelessWidget {
   final Dhikr dhikr;
@@ -114,7 +128,7 @@ class DhikrCard extends StatelessWidget {
                   child: Text(
                     dhikr.arabic,
                     key: arabicKey,
-                    style: arabicTextStyle.copyWith(
+                    style: arabicStyleFor(dhikr.form).copyWith(
                       color: done
                           ? colors.onSurfaceVariant.withValues(alpha: .75)
                           : colors.onSurface,

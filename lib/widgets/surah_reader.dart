@@ -127,7 +127,7 @@ class _SurahReaderState extends State<SurahReader> {
                       _basmala,
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontFamily: 'Amiri',
+                        fontFamily: 'Amiri Quran',
                         fontSize: fontSize - 1,
                         height: 1.8,
                         color: colors.onSurfaceVariant,
@@ -140,9 +140,13 @@ class _SurahReaderState extends State<SurahReader> {
                       ),
                       textAlign: TextAlign.justify,
                       style: TextStyle(
-                        fontFamily: 'Amiri',
+                        // Amiri Quran keeps tashkeel and waqf marks tight over
+                        // their letters; a little evenly-spread leading gives
+                        // the ayah roundels room without stranding the marks.
+                        fontFamily: 'Amiri Quran',
                         fontSize: fontSize,
-                        height: 2,
+                        height: 2.0,
+                        leadingDistribution: TextLeadingDistribution.even,
                         color: colors.onSurface,
                       ),
                     ),
