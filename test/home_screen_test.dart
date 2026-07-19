@@ -60,7 +60,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('1 / 3'), findsNothing);
-    expect(find.text('0 / 3'), findsNWidgets(5));
+    expect(find.text('0 / 3'), findsNWidgets(4));
   });
 
   testWidgets('don\'t-show-again mutes the dialog on later long-presses',
@@ -72,7 +72,7 @@ void main() {
     await tester.pump();
     await tester.tap(find.text('Reset'));
     await tester.pumpAndSettle();
-    expect(find.text('0 / 3'), findsNWidgets(5));
+    expect(find.text('0 / 3'), findsNWidgets(4));
 
     // Next long-press resets straight away, no dialog.
     await longPressMorning(tester);

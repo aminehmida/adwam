@@ -4,7 +4,7 @@ enum DhikrForm { quran, short, long, surah }
 
 enum BenefitTier { protection, reward, none }
 
-enum SessionType { morning, evening, postPrayer, sleep, waking }
+enum SessionType { morning, evening, postPrayer, sleep }
 
 const _formNames = {
   'quran': DhikrForm.quran,
@@ -42,7 +42,6 @@ const _sessionNames = {
   'evening': SessionType.evening,
   'post_prayer': SessionType.postPrayer,
   'sleep': SessionType.sleep,
-  'waking': SessionType.waking,
 };
 
 /// Ids of user-created dhikrs (see ListConfigController.addCustom); the

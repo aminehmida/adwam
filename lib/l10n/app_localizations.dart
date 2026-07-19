@@ -128,12 +128,6 @@ abstract class AppLocalizations {
   /// **'Bedtime adhkar'**
   String get sessionSleep;
 
-  /// No description provided for @sessionWaking.
-  ///
-  /// In en, this message translates to:
-  /// **'Wake-up adhkar'**
-  String get sessionWaking;
-
   /// No description provided for @editList.
   ///
   /// In en, this message translates to:

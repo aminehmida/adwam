@@ -24,9 +24,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get sessionSleep => 'أذكار النوم';
 
   @override
-  String get sessionWaking => 'أذكار الاستيقاظ';
-
-  @override
   String get editList => 'تعديل القائمة';
 
   @override
