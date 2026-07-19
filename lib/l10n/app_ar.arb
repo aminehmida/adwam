@@ -77,6 +77,8 @@
   "themeDark": "داكن",
   "volumeKeyCounting": "العدّ بزر الصوت",
   "volumeKeyCountingBody": "الضغط على زر خفض الصوت يعدّ الذكر الحالي، ولن يتغيّر مستوى الصوت أثناء العدّ.",
+  "bundleThreeQuls": "جمع المعوّذات الثلاث",
+  "bundleThreeQulsBody": "عرض الإخلاص والفلق والناس في بطاقة واحدة تُقرأ ثلاث مرات بدل بطاقة لكل سورة.",
   "showTranslation": "عرض الترجمة",
   "showTranslationBody": "عرض معنى الذكر بالإنجليزية داخل قسم الترجمة.",
   "showTransliteration": "عرض النطق بالحروف اللاتينية",

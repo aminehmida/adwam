@@ -177,6 +177,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Pressing volume down counts the current dhikr; the volume itself won\'t change while counting.';
 
   @override
+  String get bundleThreeQuls => 'Combine the three Quls';
+
+  @override
+  String get bundleThreeQulsBody =>
+      'Show al-Ikhlas, al-Falaq and an-Nas as one card read three times instead of a separate card for each.';
+
+  @override
   String get showTranslation => 'Show translation';
 
   @override

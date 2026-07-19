@@ -136,11 +136,14 @@ void main() {
       );
     });
 
-    test('user order wins; unknown ids dropped; missing ids appended', () {
+    test('user order wins; unknown ids dropped; missing ids merge in by sort',
+        () {
+      // 'a' is missing from the stored order, so it merges into its
+      // default-sorted slot (ahead of the high-rep 'c') rather than the end.
       expect(
         repo.orderedList(SessionType.morning, ['c', 'deleted-id', 'b'])
             .map((x) => x.id),
-        ['c', 'b', 'a'],
+        ['a', 'c', 'b'],
       );
     });
   });

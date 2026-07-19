@@ -416,6 +416,18 @@ abstract class AppLocalizations {
   /// **'Pressing volume down counts the current dhikr; the volume itself won\'t change while counting.'**
   String get volumeKeyCountingBody;
 
+  /// No description provided for @bundleThreeQuls.
+  ///
+  /// In en, this message translates to:
+  /// **'Combine the three Quls'**
+  String get bundleThreeQuls;
+
+  /// No description provided for @bundleThreeQulsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Show al-Ikhlas, al-Falaq and an-Nas as one card read three times instead of a separate card for each.'**
+  String get bundleThreeQulsBody;
+
   /// No description provided for @showTranslation.
   ///
   /// In en, this message translates to:

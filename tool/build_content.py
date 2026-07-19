@@ -43,9 +43,17 @@ NO_HINT = 1 << 20
 # full from the mushaf. Their id must have a full entry in curation.json.
 SPLIT = {"sl-110": [("sl-110a", "sleep"), ("sl-110b", "sleep")]}
 
-# In the printed Hisn al-Muslim but missing from the hisnmuslim.com API dump;
-# text, English and metadata live entirely in curation.json.
-EXTRA = {"pp-74": ["post_prayer"], "pp-75": ["post_prayer"]}
+# In the printed Hisn al-Muslim but missing from the hisnmuslim.com API dump,
+# or a curated variant of an existing card: metadata (and, for non-Quran
+# cards, the Arabic) live in curation.json; Quran-form entries still render
+# their Arabic from the scaffold. me-quls / pp-70a..c are the "read all three
+# together" vs "each on its own card" variants of the three Quls (see the
+# qul_variant field and ListConfigController).
+EXTRA = {
+    "pp-74": ["post_prayer"], "pp-75": ["post_prayer"],
+    "me-quls": ["morning", "evening"],
+    "pp-70a": ["post_prayer"], "pp-70b": ["post_prayer"], "pp-70c": ["post_prayer"],
+}
 
 # English rendering of the short hadith citations used for pp-*/sl-* sources,
 # applied when curation carries no explicit benefit_source_en.
@@ -175,6 +183,7 @@ def build():
                                 or (en.get("transliteration") or "")
                                 .replace('"', "").strip() or None),
             **({"sort_hint": cur["sort_hint"]} if "sort_hint" in cur else {}),
+            **({"qul_variant": cur["qul_variant"]} if "qul_variant" in cur else {}),
         })
 
     # Post-prayer + sleep (hisnmuslim.com); *_en.json carries the English
@@ -202,7 +211,7 @@ def build():
 
     for did, contexts in EXTRA.items():
         cur = curation[did]
-        dhikrs.append(_hisn_entry(did, contexts, cur["arabic"], cur, {}))
+        dhikrs.append(_hisn_entry(did, contexts, quran.get(did) or cur["arabic"], cur, {}))
 
     missing = [d["id"] for d in dhikrs
                if not d["translation"] or not d["transliteration"]]
@@ -255,6 +264,7 @@ def _hisn_entry(did, contexts, arabic, cur, en, body=None):
         **({"fixed_order": cur["fixed_order"]} if "fixed_order" in cur else {}),
         **({"prayers": cur["prayers"]} if "prayers" in cur else {}),
         **({"prayers_reps": cur["prayers_reps"]} if "prayers_reps" in cur else {}),
+        **({"qul_variant": cur["qul_variant"]} if "qul_variant" in cur else {}),
     }
 
 

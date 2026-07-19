@@ -5,6 +5,7 @@ import 'package:adwam/data/content_repository.dart';
 import 'package:adwam/data/prefs_store.dart';
 import 'package:adwam/models/dhikr.dart';
 import 'package:adwam/state/list_config_controller.dart';
+import 'package:adwam/state/settings_controller.dart';
 
 Dhikr d(String id, BenefitTier tier) => Dhikr(
       id: id,
@@ -27,7 +28,8 @@ void main() {
       d('n1', BenefitTier.none),
       d('n2', BenefitTier.none),
     ]);
-    controller = ListConfigController(await PrefsStore.open(), repo);
+    final store = await PrefsStore.open();
+    controller = ListConfigController(store, repo, SettingsController(store));
   });
 
   List<String> ids() =>

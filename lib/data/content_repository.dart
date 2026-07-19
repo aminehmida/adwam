@@ -69,13 +69,26 @@ class ContentRepository {
 }
 
 /// [defaults] rearranged by [userOrder]. Ids in [userOrder] that no longer
-/// exist are dropped; dhikrs missing from [userOrder] (e.g. added by a
-/// content update) are appended in default order.
+/// exist are dropped; dhikrs missing from [userOrder] — new content, or the
+/// counterpart that a setting swaps in (e.g. the combined three-Quls card) —
+/// are merged into their default-sorted slot rather than appended at the end,
+/// so a swap or content update lands where it belongs instead of at the bottom.
 List<Dhikr> applyUserOrder(List<Dhikr> defaults, List<String> userOrder) {
   if (userOrder.isEmpty) return defaults;
   final byId = {for (final d in defaults) d.id: d};
-  final result = <Dhikr>[
+  final ordered = <Dhikr>[
     for (final id in userOrder) ?byId.remove(id),
   ];
-  return result..addAll(byId.values);
+  final defaultIndex = {
+    for (var i = 0; i < defaults.length; i++) defaults[i].id: i,
+  };
+  // byId now holds only the unplaced dhikrs, in default order; drop each into
+  // the first slot whose neighbour default-sorts after it.
+  for (final leftover in byId.values) {
+    final rank = defaultIndex[leftover.id]!;
+    var at = ordered.indexWhere((d) => defaultIndex[d.id]! > rank);
+    if (at == -1) at = ordered.length;
+    ordered.insert(at, leftover);
+  }
+  return ordered;
 }

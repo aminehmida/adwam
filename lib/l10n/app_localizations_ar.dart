@@ -175,6 +175,13 @@ class AppLocalizationsAr extends AppLocalizations {
       'الضغط على زر خفض الصوت يعدّ الذكر الحالي، ولن يتغيّر مستوى الصوت أثناء العدّ.';
 
   @override
+  String get bundleThreeQuls => 'جمع المعوّذات الثلاث';
+
+  @override
+  String get bundleThreeQulsBody =>
+      'عرض الإخلاص والفلق والناس في بطاقة واحدة تُقرأ ثلاث مرات بدل بطاقة لكل سورة.';
+
+  @override
   String get showTranslation => 'عرض الترجمة';
 
   @override
