@@ -173,9 +173,13 @@ class _SessionScreenState extends State<SessionScreen>
   /// count, so you can feel it's done without watching the counter.
   static const _longBuzzReps = 10;
 
-  /// Haptic for a finished dhikr: a medium tap normally, a strong sustained
-  /// buzz for the many-repetition ones ([_longBuzzReps]+) so you can feel it's
-  /// done without watching the counter. The built-in haptic primitives are all
+  /// Amplitude of the completion buzz (1-255). Tuned below full strength to
+  /// match a typical notification vibration rather than a jarring max buzz.
+  static const _longBuzzAmplitude = 128;
+
+  /// Haptic for a finished dhikr: a medium tap normally, a sustained buzz for
+  /// the many-repetition ones ([_longBuzzReps]+) so you can feel it's done
+  /// without watching the counter. The built-in haptic primitives are all
   /// brief low-amplitude taps, so the long buzz uses the device vibrator
   /// (cross-platform via the `vibration` plugin), falling back to a heavy tap
   /// where no vibrator is available.
@@ -185,7 +189,7 @@ class _SessionScreenState extends State<SessionScreen>
       return;
     }
     if (await Vibration.hasVibrator()) {
-      Vibration.vibrate(duration: 400, amplitude: 255);
+      Vibration.vibrate(duration: 400, amplitude: _longBuzzAmplitude);
     } else {
       HapticFeedback.heavyImpact();
     }
