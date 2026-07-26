@@ -115,10 +115,7 @@ class DhikrCard extends StatelessWidget {
               if (dhikr.prayers.isNotEmpty) ...[
                 Align(
                   alignment: AlignmentDirectional.centerStart,
-                  child: _PrayerPill(
-                    prayers: dhikr.prayers,
-                    reps: dhikr.prayersReps,
-                  ),
+                  child: _PrayerPill(prayers: dhikr.prayers),
                 ),
                 const SizedBox(height: 10),
               ],
@@ -245,13 +242,11 @@ class DhikrCard extends StatelessWidget {
 }
 
 /// Pill flagging a dhikr said only after specific prayers (e.g. Fajr &
-/// Maghrib), so it stands out from the adhkar of every prayer. With [reps]
-/// the dhikr isn't restricted; it's repeated more after those prayers.
+/// Maghrib), so it stands out from the adhkar of every prayer.
 class _PrayerPill extends StatelessWidget {
   final List<String> prayers;
-  final int? reps;
 
-  const _PrayerPill({required this.prayers, this.reps});
+  const _PrayerPill({required this.prayers});
 
   @override
   Widget build(BuildContext context) {
@@ -266,9 +261,7 @@ class _PrayerPill extends StatelessWidget {
           _ => key,
         };
     final names = prayers.map(name).join(l10n.prayerJoiner);
-    final label = reps == null
-        ? l10n.afterPrayers(names)
-        : l10n.timesAfterPrayers(reps!, names);
+    final label = l10n.afterPrayers(names);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 4),
       decoration: BoxDecoration(

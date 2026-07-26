@@ -41,11 +41,6 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String timesAfterPrayers(int count, String prayers) {
-    return '$count مرات بعد $prayers';
-  }
-
-  @override
   String get prayerJoiner => ' و';
 
   @override

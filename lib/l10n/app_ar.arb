@@ -17,17 +17,6 @@
       }
     }
   },
-  "timesAfterPrayers": "{count} مرات بعد {prayers}",
-  "@timesAfterPrayers": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      },
-      "prayers": {
-        "type": "String"
-      }
-    }
-  },
   "prayerJoiner": " و",
   "prayerFajr": "الفجر",
   "prayerDhuhr": "الظهر",

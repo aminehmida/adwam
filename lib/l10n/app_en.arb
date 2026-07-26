@@ -17,17 +17,6 @@
       }
     }
   },
-  "timesAfterPrayers": "{count}× after {prayers}",
-  "@timesAfterPrayers": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      },
-      "prayers": {
-        "type": "String"
-      }
-    }
-  },
   "prayerJoiner": " & ",
   "prayerFajr": "Fajr",
   "prayerDhuhr": "Dhuhr",
