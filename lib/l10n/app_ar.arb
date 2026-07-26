@@ -9,15 +9,11 @@
   "doneEditing": "تم",
   "virtue": "الفضل",
   "translation": "الترجمة",
-  "afterPrayers": "بعد {prayers}",
-  "@afterPrayers": {
-    "placeholders": {
-      "prayers": {
-        "type": "String"
-      }
-    }
-  },
-  "prayerJoiner": " و",
+  "prayerGuessed": "تخمين",
+  "prayerRegion": "منطقة مواقيت الصلاة",
+  "prayerRegionBody": "تُقدَّر المواقيت من المنطقة الزمنية للجهاز دون الوصول إلى الموقع. اضبطها إذا كان تخمين الصلاة خاطئًا غالبًا، أو كنت بعيدًا عن المدينة الرئيسة لمنطقتك الزمنية.",
+  "prayerRegionAuto": "حسب الجهاز",
+  "prayerRegionSearch": "ابحث عن منطقة",
   "prayerFajr": "الفجر",
   "prayerDhuhr": "الظهر",
   "prayerAsr": "العصر",

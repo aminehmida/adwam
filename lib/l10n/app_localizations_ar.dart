@@ -36,12 +36,20 @@ class AppLocalizationsAr extends AppLocalizations {
   String get translation => 'الترجمة';
 
   @override
-  String afterPrayers(String prayers) {
-    return 'بعد $prayers';
-  }
+  String get prayerGuessed => 'تخمين';
 
   @override
-  String get prayerJoiner => ' و';
+  String get prayerRegion => 'منطقة مواقيت الصلاة';
+
+  @override
+  String get prayerRegionBody =>
+      'تُقدَّر المواقيت من المنطقة الزمنية للجهاز دون الوصول إلى الموقع. اضبطها إذا كان تخمين الصلاة خاطئًا غالبًا، أو كنت بعيدًا عن المدينة الرئيسة لمنطقتك الزمنية.';
+
+  @override
+  String get prayerRegionAuto => 'حسب الجهاز';
+
+  @override
+  String get prayerRegionSearch => 'ابحث عن منطقة';
 
   @override
   String get prayerFajr => 'الفجر';

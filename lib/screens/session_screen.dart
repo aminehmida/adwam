@@ -11,6 +11,7 @@ import 'package:vibration/vibration.dart';
 import '../l10n/app_localizations.dart';
 import '../models/dhikr.dart';
 import '../state/list_config_controller.dart';
+import '../state/prayer_controller.dart';
 import '../state/progress_controller.dart';
 import '../state/settings_controller.dart';
 import '../theme.dart';
@@ -18,6 +19,7 @@ import '../widgets/context_card.dart' show sessionTitle;
 import '../widgets/count_progress_ring.dart';
 import '../widgets/custom_dhikr_dialog.dart';
 import '../widgets/dhikr_card.dart';
+import '../widgets/prayer_selector.dart';
 import '../widgets/surah_reader.dart';
 import '../widgets/tier_header.dart';
 
@@ -558,7 +560,9 @@ class _SessionScreenState extends State<SessionScreen>
     ({String id, double delta}) anchor,
     double estimate,
   ) async {
-    final dhikrs = context.read<ListConfigController>().listFor(widget.session);
+    final dhikrs = context
+        .read<ListConfigController>()
+        .listFor(widget.session, allPrayers: true);
     final targetIndex = dhikrs.indexWhere((d) => d.id == anchor.id);
     if (targetIndex == -1) return;
     var jumped = false;
@@ -604,7 +608,9 @@ class _SessionScreenState extends State<SessionScreen>
   /// Swap back to the count list, re-anchored on whichever card is at the
   /// top of the edit list so the switch happens in place.
   void _stopEditing() {
-    final dhikrs = context.read<ListConfigController>().listFor(widget.session);
+    final dhikrs = context
+        .read<ListConfigController>()
+        .listFor(widget.session, allPrayers: true);
     final anchor = _topVisibleItem(_editKeys, dhikrs, _editScrollController);
     setState(() {
       _editing = false;
@@ -649,7 +655,10 @@ class _SessionScreenState extends State<SessionScreen>
   @override
   Widget build(BuildContext context) {
     final config = context.watch<ListConfigController>();
-    final dhikrs = config.listFor(widget.session);
+    final prayer = context.watch<PrayerController>();
+    // Edit mode shows every post-prayer dhikr; counting shows only the ones
+    // belonging to the prayer in force.
+    final dhikrs = config.listFor(widget.session, allPrayers: _editing);
     final l10n = AppLocalizations.of(context)!;
 
     return PopScope(
@@ -705,6 +714,18 @@ class _SessionScreenState extends State<SessionScreen>
                         onPressed: _startEditing,
                       ),
                     ],
+              // Only the post-prayer adhkar vary by prayer, and only while
+              // counting — edit mode shows the full list, so a prayer picker
+              // there would be lying about what is on screen.
+              bottom: widget.session == SessionType.postPrayer &&
+                      !_editing &&
+                      prayer.isAvailable
+                  ? PrayerSelector(
+                      active: prayer.active,
+                      isGuess: prayer.isGuess,
+                      onSelected: prayer.select,
+                    )
+                  : null,
             ),
             body: AnimatedSwitcher(
               duration: const Duration(milliseconds: 220),
