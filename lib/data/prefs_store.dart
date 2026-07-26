@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/daily_progress.dart';
 import '../models/dhikr.dart';
 import '../models/user_list_config.dart';
+import 'prayer_offsets.dart';
 
 /// Thin JSON-string wrapper over shared_preferences.
 class PrefsStore {
@@ -117,6 +118,14 @@ class PrefsStore {
   Future<void> saveZoneOverride(String? zoneId) => zoneId == null
       ? _prefs.remove('prayer.zoneOverride')
       : _prefs.setString('prayer.zoneOverride', zoneId);
+
+  PrayerOffsets loadPrayerOffsets() {
+    final raw = _prefs.getString('prayer.offsets');
+    return raw == null ? PrayerOffsets.empty : PrayerOffsets.fromJsonString(raw);
+  }
+
+  Future<void> savePrayerOffsets(PrayerOffsets offsets) =>
+      _prefs.setString('prayer.offsets', offsets.toJsonString());
 
   Future<void> clearAllConfigs() async {
     for (final s in SessionType.values) {
