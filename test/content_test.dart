@@ -51,10 +51,6 @@ void main() {
       expect(known.containsAll(d.prayers), isTrue, reason: d.id);
       expect(d.contexts, contains(SessionType.postPrayer), reason: d.id);
     }
-    for (final d in repo.all.where((d) => d.prayersReps != null)) {
-      expect(d.prayers, isNotEmpty, reason: d.id);
-      expect(d.prayersReps, greaterThan(d.repetitions), reason: d.id);
-    }
   });
 
   test('every session has content in each display band it relies on', () {

@@ -158,12 +158,6 @@ abstract class AppLocalizations {
   /// **'After {prayers}'**
   String afterPrayers(String prayers);
 
-  /// No description provided for @timesAfterPrayers.
-  ///
-  /// In en, this message translates to:
-  /// **'{count}× after {prayers}'**
-  String timesAfterPrayers(int count, String prayers);
-
   /// No description provided for @prayerJoiner.
   ///
   /// In en, this message translates to:

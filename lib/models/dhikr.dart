@@ -85,11 +85,6 @@ class Dhikr {
   /// Prayers this dhikr is specific to (keys like `fajr`, `maghrib`),
   /// empty for adhkar said after every prayer.
   final List<String> prayers;
-
-  /// When set, [prayers] doesn't restrict the dhikr but raises its count:
-  /// said [prayersReps] times after those prayers (e.g. the three Quls,
-  /// 3x after Fajr and Maghrib), [repetitions] times otherwise.
-  final int? prayersReps;
   final int sortHint;
 
   /// Explicit position in the session list (e.g. the sunnah sequence of
@@ -116,7 +111,6 @@ class Dhikr {
     this.transliteration,
     required this.contexts,
     this.prayers = const [],
-    this.prayersReps,
     this.sortHint = noSortHint,
     this.fixedOrder = noFixedOrder,
     this.qulVariant,
@@ -172,7 +166,6 @@ class Dhikr {
             .map((c) => _sessionNames[c]!)
             .toSet(),
         prayers: (json['prayers'] as List?)?.cast<String>() ?? const [],
-        prayersReps: json['prayers_reps'] as int?,
         sortHint: json['sort_hint'] as int? ?? noSortHint,
         fixedOrder: json['fixed_order'] as int? ?? noFixedOrder,
         qulVariant: _qulVariantNames[json['qul_variant']],
