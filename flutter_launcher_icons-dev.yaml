@@ -1,0 +1,10 @@
+# Launcher icons for the `dev` flavor. Generated into android/app/src/dev/res,
+# which overrides the prod icons in src/main/res for dev builds only.
+# Regenerate with: mise exec -- dart run flutter_launcher_icons
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/icon/dev/icon.png"
+  adaptive_icon_background: "#F3EAD3"
+  adaptive_icon_foreground: "assets/icon/dev/icon_foreground.png"
+  adaptive_icon_monochrome: "assets/icon/dev/icon_monochrome.png"
