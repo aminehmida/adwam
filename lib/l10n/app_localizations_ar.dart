@@ -175,6 +175,13 @@ class AppLocalizationsAr extends AppLocalizations {
       'الضغط على زر خفض الصوت يعدّ الذكر الحالي، أو يُمرّر الصفحة أثناء قراءة سورة، ولن يتغيّر مستوى الصوت.';
 
   @override
+  String get keepScreenOn => 'إبقاء الشاشة مضاءة';
+
+  @override
+  String get keepScreenOnBody =>
+      'تبقى الشاشة مضاءة ما دامت الجلسة مفتوحة، فلا ينقطع الذكر الطويل بانطفائها.';
+
+  @override
   String get bundleThreeQuls => 'جمع المعوّذات الثلاث';
 
   @override

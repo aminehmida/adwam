@@ -1,0 +1,131 @@
+name: Dev build
+
+# The dev channel follows main: every push replaces the rolling `dev`
+# prerelease with a build of that commit. It installs alongside the released
+# app (application id dev.amine.adwam.dev) and keeps its own data.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# A newer push to main supersedes an in-flight dev build.
+concurrency:
+  group: dev-build
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: gradle
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.44.6"
+          channel: stable
+          cache: true
+
+      - uses: actions/cache@v6
+        with:
+          path: ~/.pub-cache
+          key: pub-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
+          restore-keys: pub-${{ runner.os }}-
+
+      # Same upload key as the release channel; the application id differs, so
+      # the two never collide on device. Falls back to debug signing when the
+      # secrets are absent (see android/app/build.gradle.kts).
+      - name: Set up release signing
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+        run: |
+          if [[ -z "$KEYSTORE_BASE64" ]]; then
+            echo "Keystore secrets not set; falling back to debug signing."
+            exit 0
+          fi
+          echo "$KEYSTORE_BASE64" | base64 -d > android/upload-keystore.jks
+          cat > android/key.properties <<EOF
+          storePassword=$KEYSTORE_PASSWORD
+          keyPassword=$KEY_PASSWORD
+          keyAlias=$KEY_ALIAS
+          storeFile=upload-keystore.jks
+          EOF
+
+      - run: flutter pub get
+
+      - run: flutter analyze
+
+      - run: flutter test
+
+      - name: Build dev APK
+        run: |
+          # Own versionCode space (release builds use 3000+); the dev app id is
+          # separate, so these never have to interleave with release numbers.
+          BUILD_NUMBER=$((5000 + GITHUB_RUN_NUMBER))
+          VERSION=$(sed -n 's/^version: *\([0-9.]*\).*/\1/p' pubspec.yaml)
+          BUILD_NAME="$VERSION-dev.$GITHUB_RUN_NUMBER"
+          # arm64 only: the dev channel targets real phones, not emulators.
+          flutter build apk --release --flavor dev --split-per-abi --target-platform android-arm64 \
+            --build-number "$BUILD_NUMBER" --build-name "$BUILD_NAME"
+          cp build/app/outputs/flutter-apk/app-arm64-v8a-dev-release.apk adwam-dev-arm64-v8a.apk
+          echo "BUILD_NAME=$BUILD_NAME" >> "$GITHUB_ENV"
+          echo "BUILD_NUMBER=$BUILD_NUMBER" >> "$GITHUB_ENV"
+
+      - name: Publish dev prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          SHORT_SHA="${GITHUB_SHA::7}"
+          SUBJECT=$(git log -1 --pretty=%s)
+          NOTES=$(cat <<EOF
+          Dev build of \`main\` — not a stable release.
+
+          - Commit: [\`$SHORT_SHA\`]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/commit/$GITHUB_SHA) — $SUBJECT
+          - Version: \`$BUILD_NAME\` ($BUILD_NUMBER), arm64-v8a only
+
+          Installs next to the released app as **Adwam dev** (\`dev.amine.adwam.dev\`); the two keep separate progress data.
+          EOF
+          )
+          # One tag per commit, named exactly like the versionName so update
+          # trackers (Obtainium and friends) see a new, ordered version each
+          # time. Deliberately no `v` prefix: `v*` tags trigger release.yml.
+          gh release create "$BUILD_NAME" \
+            --prerelease \
+            --target "$GITHUB_SHA" \
+            --title "Dev build $BUILD_NAME" \
+            --notes "$NOTES" \
+            adwam-dev-arm64-v8a.apk
+
+      - name: Prune old dev prereleases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Keep the newest KEEP dev builds. The grep is the safety rail: only
+          # `<x.y.z>-dev.<n>` tags can ever match, and release tags (`v1.2.0`)
+          # cannot, so this can never delete a real release.
+          KEEP=5
+          STALE=$(gh release list --limit 100 --json tagName,isPrerelease \
+                    --jq '.[] | select(.isPrerelease) | .tagName' \
+                  | grep -E '^[0-9]+\.[0-9]+\.[0-9]+-dev\.[0-9]+$' \
+                  | sort -t. -k4,4nr \
+                  | tail -n +$((KEEP + 1)) || true)
+          if [[ -z "$STALE" ]]; then
+            echo "Nothing to prune."
+            exit 0
+          fi
+          echo "Pruning:"; echo "$STALE"
+          while read -r tag; do
+            [[ -n "$tag" ]] && gh release delete "$tag" --yes --cleanup-tag
+          done <<< "$STALE"

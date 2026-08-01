@@ -7,6 +7,7 @@ import 'package:flutter/rendering.dart' show RenderAbstractViewport;
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:vibration/vibration.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../l10n/app_localizations.dart';
 import '../models/dhikr.dart';
@@ -117,10 +118,11 @@ class _SessionScreenState extends State<SessionScreen>
       parent: _readerController,
       curve: Curves.easeOutCubic,
     );
+    _settings = context.read<SettingsController>()
+      ..addListener(_onSettingsChanged);
+    _syncWakelock();
     if (_volumeKeysSupported) {
       _volumeChannel.setMethodCallHandler(_onVolumeCall);
-      _settingsForVolume = context.read<SettingsController>()
-        ..addListener(_syncVolumeIntercept);
       _syncVolumeIntercept();
     }
     // Opening a session may be the first interaction after a long gap — clear
@@ -139,12 +141,26 @@ class _SessionScreenState extends State<SessionScreen>
     if (call.method == 'volumeUp') _onVolumeUp(repeat);
   }
 
+  void _onSettingsChanged() {
+    _syncWakelock();
+    _syncVolumeIntercept();
+  }
+
+  /// Hold the screen awake for as long as this session is open — reciting a
+  /// long dhikr can easily outlast the display timeout, and the counter is
+  /// only tapped every few seconds. Released in [dispose], so the wakelock
+  /// never outlives the session route.
+  void _syncWakelock() {
+    // Never let a platform that cannot hold a wakelock break the session.
+    WakelockPlus.toggle(enable: _settings.keepScreenOn).catchError((_) {});
+  }
+
   /// Intercept only while counting makes sense: setting on and not editing.
   /// Everywhere else the button keeps its normal volume behavior. Volume-up
   /// is additionally scoped to the reader, where it pages up.
   void _syncVolumeIntercept() {
     if (!_volumeKeysSupported) return;
-    final enabled = _settingsForVolume?.volumeKeyCounting ?? false;
+    final enabled = _settings.volumeKeyCounting;
     _setIntercept('setIntercept', enabled && !_editing);
     _setIntercept('setInterceptUp', enabled && !_editing && _reading != null);
   }
@@ -181,7 +197,7 @@ class _SessionScreenState extends State<SessionScreen>
   static const _volumeChannel = MethodChannel('dev.amine.adwam/volume');
   static bool get _volumeKeysSupported =>
       !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
-  SettingsController? _settingsForVolume;
+  late final SettingsController _settings;
 
   GlobalKey _keyFor(String id) => _itemKeys.putIfAbsent(id, GlobalKey.new);
 
@@ -635,8 +651,9 @@ class _SessionScreenState extends State<SessionScreen>
 
   @override
   void dispose() {
+    _settings.removeListener(_onSettingsChanged);
+    WakelockPlus.disable().catchError((_) {});
     if (_volumeKeysSupported) {
-      _settingsForVolume?.removeListener(_syncVolumeIntercept);
       _setIntercept('setIntercept', false);
       _setIntercept('setInterceptUp', false);
       _volumeChannel.setMethodCallHandler(null);

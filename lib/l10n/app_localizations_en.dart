@@ -177,6 +177,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Pressing volume down counts the current dhikr, or scrolls the page while reading a surah; the volume itself won\'t change.';
 
   @override
+  String get keepScreenOn => 'Keep the screen on';
+
+  @override
+  String get keepScreenOnBody =>
+      'The display stays awake while a session is open, so a long dhikr isn\'t cut short by the screen timing out.';
+
+  @override
   String get bundleThreeQuls => 'Combine the three Quls';
 
   @override

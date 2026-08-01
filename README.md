@@ -17,6 +17,13 @@ Grab the APK from the **[latest release](https://github.com/aminehmida/adwam/rel
 
 Past versions are on the [releases page](https://github.com/aminehmida/adwam/releases).
 
+Every change on `main` is also built as a dev build — the newest `x.y.z-dev.N`
+prerelease on the [releases page](https://github.com/aminehmida/adwam/releases)
+(`adwam-dev-arm64-v8a.apk`). It installs beside the stable app as **Adwam dev**,
+with its own icon and its own progress, so trying it costs nothing.
+[Obtainium](https://github.com/ImranR98/Obtainium) can follow the repo and keep
+that dev build up to date automatically.
+
 ## Ordering
 
 All of the Prophet's adhkar are beneficial, but on a busy day you may not get through the whole session. Adwam orders each session so that the time you do have counts:

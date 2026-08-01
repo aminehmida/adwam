@@ -34,6 +34,21 @@ android {
         versionName = flutter.versionName
     }
 
+    // Two release channels, installable side by side: `prod` is what ships,
+    // `dev` tracks main and gets its own application id, label and icon.
+    flavorDimensions += "channel"
+    productFlavors {
+        create("prod") {
+            dimension = "channel"
+            manifestPlaceholders["appLabel"] = "Adwam"
+        }
+        create("dev") {
+            dimension = "channel"
+            applicationIdSuffix = ".dev"
+            manifestPlaceholders["appLabel"] = "Adwam dev"
+        }
+    }
+
     signingConfigs {
         if (keystoreProperties.isNotEmpty()) {
             create("release") {

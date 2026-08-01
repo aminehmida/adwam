@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../build_channel.dart';
 import '../l10n/app_localizations.dart';
 import '../models/dhikr.dart';
 import '../state/list_config_controller.dart';
@@ -8,6 +9,7 @@ import '../state/prayer_controller.dart';
 import '../state/progress_controller.dart';
 import '../state/settings_controller.dart';
 import '../widgets/context_card.dart';
+import '../widgets/dev_badge.dart';
 import '../widgets/prayer_selector.dart' show prayerName;
 import 'session_screen.dart';
 import 'settings_screen.dart';
@@ -23,9 +25,15 @@ class HomeScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          AppLocalizations.of(context)!.appTitle,
-          style: const TextStyle(fontFamily: 'Amiri'),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              AppLocalizations.of(context)!.appTitle,
+              style: const TextStyle(fontFamily: 'Amiri'),
+            ),
+            if (isDevChannel) ...[const SizedBox(width: 8), const DevBadge()],
+          ],
         ),
         centerTitle: true,
         actions: [

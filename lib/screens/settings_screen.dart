@@ -79,6 +79,13 @@ class SettingsScreen extends StatelessWidget {
             ),
           ),
           SwitchListTile(
+            secondary: const Icon(Icons.screen_lock_portrait),
+            title: Text(l10n.keepScreenOn),
+            subtitle: Text(l10n.keepScreenOnBody),
+            value: settings.keepScreenOn,
+            onChanged: settings.setKeepScreenOn,
+          ),
+          SwitchListTile(
             secondary: const Icon(Icons.auto_stories),
             title: Text(l10n.bundleThreeQuls),
             subtitle: Text(l10n.bundleThreeQulsBody),
