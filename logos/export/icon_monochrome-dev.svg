@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Dev themed-icon silhouette: alpha only, so the band is drawn as an
+       outline with solid letters instead of knocked-out text. -->
+  <g id="icon" transform="translate(256,250) scale(0.74) translate(-256,-256)">
+    <rect x="388" y="124" width="24" height="24" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0.75"/>
+    <rect x="388" y="172" width="24" height="168" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0.75"/>
+    <rect x="292" y="244" width="72" height="24" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0.75"/>
+    <rect x="340" y="244" width="24" height="96" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0.75"/>
+    <rect x="292" y="316" width="72" height="24" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0.75"/>
+    <rect x="196" y="268" width="72" height="24" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0.75"/>
+    <rect x="196" y="316" width="72" height="24" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0.75"/>
+    <rect x="196" y="292" width="24" height="24" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0.75"/>
+    <rect x="244" y="292" width="24" height="24" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0.75"/>
+    <rect x="196" y="340" width="24" height="48" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0.75"/>
+    <rect x="148" y="364" width="72" height="24" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0.75"/>
+    <rect x="100" y="268" width="72" height="24" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0.75"/>
+    <rect x="100" y="316" width="72" height="24" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0.75"/>
+    <rect x="100" y="292" width="24" height="24" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0.75"/>
+    <rect x="148" y="292" width="24" height="24" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0.75"/>
+    <rect x="100" y="340" width="24" height="48" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0.75"/>
+  </g>
+  <g id="dev-band">
+    <rect x="196" y="364" width="120" height="34" rx="9" fill="none" stroke="#FFFFFF" stroke-width="6"/>
+    <text x="256" y="390" text-anchor="middle" font-family="Helvetica, Arial, sans-serif"
+          font-size="23" font-weight="bold" letter-spacing="4" fill="#FFFFFF">DEV</text>
+  </g>
+</svg>

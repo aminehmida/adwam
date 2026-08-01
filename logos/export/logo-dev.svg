@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Dev-channel variant of logo.svg: the palette is inverted (parchment
+       ground, night-green mark) so the two launcher icons never read as the
+       same tile, and a DEV band sits under the mark. -->
+  <rect id="badge" x="0" y="0" width="512" height="512" rx="112" fill="#F3EAD3"/>
+  <g id="icon" transform="translate(256,232) scale(0.8) translate(-256,-256)">
+    <rect x="432" y="80" width="32" height="32" fill="#D9A441" stroke="#D9A441" stroke-width="0.75"/>
+    <rect x="432" y="144" width="32" height="224" fill="#0B3B32" stroke="#0B3B32" stroke-width="0.75"/>
+    <rect x="304" y="240" width="96" height="32" fill="#0B3B32" stroke="#0B3B32" stroke-width="0.75"/>
+    <rect x="368" y="240" width="32" height="128" fill="#0B3B32" stroke="#0B3B32" stroke-width="0.75"/>
+    <rect x="304" y="336" width="96" height="32" fill="#0B3B32" stroke="#0B3B32" stroke-width="0.75"/>
+    <rect x="176" y="272" width="96" height="32" fill="#0B3B32" stroke="#0B3B32" stroke-width="0.75"/>
+    <rect x="176" y="336" width="96" height="32" fill="#0B3B32" stroke="#0B3B32" stroke-width="0.75"/>
+    <rect x="176" y="304" width="32" height="32" fill="#0B3B32" stroke="#0B3B32" stroke-width="0.75"/>
+    <rect x="240" y="304" width="32" height="32" fill="#0B3B32" stroke="#0B3B32" stroke-width="0.75"/>
+    <rect x="176" y="368" width="32" height="64" fill="#0B3B32" stroke="#0B3B32" stroke-width="0.75"/>
+    <rect x="112" y="400" width="96" height="32" fill="#0B3B32" stroke="#0B3B32" stroke-width="0.75"/>
+    <rect x="48" y="272" width="96" height="32" fill="#0B3B32" stroke="#0B3B32" stroke-width="0.75"/>
+    <rect x="48" y="336" width="96" height="32" fill="#0B3B32" stroke="#0B3B32" stroke-width="0.75"/>
+    <rect x="48" y="304" width="32" height="32" fill="#0B3B32" stroke="#0B3B32" stroke-width="0.75"/>
+    <rect x="112" y="304" width="32" height="32" fill="#0B3B32" stroke="#0B3B32" stroke-width="0.75"/>
+    <rect x="48" y="368" width="32" height="64" fill="#0B3B32" stroke="#0B3B32" stroke-width="0.75"/>
+  </g>
+  <g id="dev-band">
+    <rect x="164" y="396" width="184" height="56" rx="14" fill="#0B3B32"/>
+    <text x="256" y="435" text-anchor="middle" font-family="Helvetica, Arial, sans-serif"
+          font-size="36" font-weight="bold" letter-spacing="6" fill="#F3EAD3">DEV</text>
+  </g>
+</svg>
