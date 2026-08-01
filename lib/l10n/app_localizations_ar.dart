@@ -82,6 +82,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get fullSurahs => 'سور كاملة';
 
   @override
+  String get moveSectionUp => 'نقل القسم لأعلى';
+
+  @override
+  String get moveSectionDown => 'نقل القسم لأسفل';
+
+  @override
+  String get freeOrder => 'ترتيب حر (بلا أقسام)';
+
+  @override
   String get resetOrderTitle => 'استعادة الترتيب الافتراضي؟';
 
   @override

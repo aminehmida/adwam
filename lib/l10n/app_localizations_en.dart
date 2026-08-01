@@ -82,6 +82,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fullSurahs => 'Full surahs';
 
   @override
+  String get moveSectionUp => 'Move section up';
+
+  @override
+  String get moveSectionDown => 'Move section down';
+
+  @override
+  String get freeOrder => 'Free order (no sections)';
+
+  @override
   String get resetOrderTitle => 'Reset to default order?';
 
   @override

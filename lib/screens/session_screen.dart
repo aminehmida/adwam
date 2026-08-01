@@ -716,8 +716,28 @@ class _SessionScreenState extends State<SessionScreen>
                         onPressed: _addCustomDhikr,
                       ),
                       PopupMenuButton<String>(
-                        onSelected: (_) => _confirmReset(context),
+                        onSelected: (value) {
+                          if (value == 'free') {
+                            context.read<ListConfigController>().setFreeOrder(
+                                  widget.session,
+                                  !config.configFor(widget.session).freeOrder,
+                                );
+                          } else {
+                            _confirmReset(context);
+                          }
+                        },
                         itemBuilder: (menuContext) => [
+                          // A fixed-order session (the post-prayer sunnah
+                          // sequence) has no sections to free the order from.
+                          if (hasSectionBands(dhikrs))
+                            CheckedPopupMenuItem(
+                              value: 'free',
+                              checked:
+                                  config.configFor(widget.session).freeOrder,
+                              child: Text(
+                                AppLocalizations.of(menuContext)!.freeOrder,
+                              ),
+                            ),
                           PopupMenuItem(
                             value: 'reset',
                             child: Text(
@@ -1096,7 +1116,10 @@ class _SessionScreenState extends State<SessionScreen>
     final finished = !hidden && done && dhikr.id != _activeId;
     final collapsed = hidden || finished;
     final peeking = collapsed && _peeked.contains(dhikr.id);
-    final newSection = startsSection(dhikrs, index);
+    // A free-ordered session mixes tiers, so its bands are dropped entirely
+    // rather than heading nearly every card.
+    final newSection = !config.configFor(widget.session).freeOrder &&
+        startsSection(dhikrs, index);
     // A peek is a read-only look at a hidden or finished dhikr; a tap
     // collapses it again (hidden peeks also close on scroll — unhide
     // permanently via edit mode). The Opacity wrapper is always present so
@@ -1156,12 +1179,63 @@ class _SessionScreenState extends State<SessionScreen>
     );
   }
 
+  /// Scroll offset that would put [id]'s edit card at the top of the
+  /// viewport, or null while the card is not built.
+  double? _editRevealOffset(String id) {
+    final object = _editKeys[id]?.currentContext?.findRenderObject();
+    final viewport = RenderAbstractViewport.maybeOf(object);
+    if (object == null || !object.attached || viewport == null) return null;
+    return viewport.getOffsetToReveal(object, 0).offset;
+  }
+
+  /// Moves the section whose band sits at [index], keeping that band where
+  /// the finger left it: the block swap shifts it by the whole neighbouring
+  /// section's height, which would otherwise carry it off-screen on a single
+  /// tap. If the band lands too far away to have been built, the list simply
+  /// stays put.
+  void _moveSection(int index, {required bool up}) {
+    final config = context.read<ListConfigController>();
+    final id = config.listFor(widget.session, allPrayers: true)[index].id;
+    final before = _editRevealOffset(id);
+    final delta = before == null
+        ? null
+        : before - _editScrollController.position.pixels;
+    HapticFeedback.selectionClick();
+    config.moveSection(widget.session, index, up: up);
+    if (delta == null) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_editing || !_editScrollController.hasClients) return;
+      final after = _editRevealOffset(id);
+      if (after == null) return;
+      final position = _editScrollController.position;
+      position.jumpTo(
+        (after - delta).clamp(
+          position.minScrollExtent,
+          position.maxScrollExtent,
+        ),
+      );
+    });
+  }
+
   /// Same full cards, plus a drag handle and visibility toggle per card.
   /// Reordering is confined to the card's tier section (see
-  /// ListConfigController.reorder).
+  /// ListConfigController.reorder), and each section band carries the ▲▼
+  /// buttons that move the whole section. On free order there are no
+  /// sections: no bands, and drags go anywhere.
   Widget _editList(ListConfigController config, List<Dhikr> dhikrs) {
     final progress = context.watch<ProgressController>();
     final colors = Theme.of(context).colorScheme;
+    final freeOrder = config.configFor(widget.session).freeOrder;
+    // The last band in the list — its section has nowhere below to go.
+    var lastSectionStart = -1;
+    if (!freeOrder) {
+      for (var i = dhikrs.length - 1; i >= 0; i--) {
+        if (startsSection(dhikrs, i)) {
+          lastSectionStart = i;
+          break;
+        }
+      }
+    }
     return ReorderableListView.builder(
       buildDefaultDragHandles: false,
       scrollController: _editScrollController,
@@ -1197,7 +1271,7 @@ class _SessionScreenState extends State<SessionScreen>
       itemBuilder: (context, index) {
         final dhikr = dhikrs[index];
         final hidden = config.isHidden(widget.session, dhikr.id);
-        final newSection = startsSection(dhikrs, index);
+        final newSection = !freeOrder && startsSection(dhikrs, index);
         final card = Opacity(
           opacity: hidden ? 0.5 : 1,
           child: DhikrCard(
@@ -1251,7 +1325,22 @@ class _SessionScreenState extends State<SessionScreen>
         return KeyedSubtree(
           key: _editKeys.putIfAbsent(dhikr.id, GlobalKey.new),
           child: newSection
-              ? Column(children: [sectionBandFor(context, dhikr), card])
+              ? Column(
+                  children: [
+                    sectionBandFor(
+                      context,
+                      dhikr,
+                      movable: true,
+                      onMoveUp: index == 0
+                          ? null
+                          : () => _moveSection(index, up: true),
+                      onMoveDown: index == lastSectionStart
+                          ? null
+                          : () => _moveSection(index, up: false),
+                    ),
+                    card,
+                  ],
+                )
               : card,
         );
       },
