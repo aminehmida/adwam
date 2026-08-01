@@ -1,6 +1,7 @@
 # Workflow
 
 - Always work in a git worktree (via EnterWorktree) when starting a new feature or fixing an issue — never work directly on `main`. Inside a worktree, edit and build against **worktree-relative paths**: the session's additional working directories (`lib`, `lib/models`, `lib/state`, `test`) point at the *main* checkout, so absolute paths under `/Users/amine/Sources/dhikr/...` silently bypass the worktree and land changes on `main` instead.
+- A fresh worktree branches off the **local** `origin/main` ref, which is stale if `main` moved since the last fetch (e.g. a PR merged on GitHub earlier in the same session). Run `git fetch origin main && git reset --hard origin/main` in a new worktree before starting, or the branch silently omits recent commits.
 - Land every releasable change via a pull request, merged into `main` — don't push feature commits straight to `main`. The release workflow builds change logs from merged PRs (`generate_release_notes: true`), so a clean, descriptive PR title becomes the release-notes line. Keep PRs scoped to one logical change and title them the way you'd want them to read in a release. Trivial non-releasable chores (version bumps, docs typos) may go directly to `main`.
 - **Cross-platform rule: the app currently ships on Android, but iOS is planned and other platforms may follow. Do NOT introduce anything platform-specific (Android or otherwise) — in Dart code, plugins, or design decisions — unless the user explicitly allows it for that case.** Platform-specific build/test tooling below (adb, APKs, emulator) is fine; it's the app itself that must stay portable.
 - After every change, the user usually wants the release APK installed and launched on his Samsung Galaxy S24 Ultra, verified with a screenshot.
@@ -8,7 +9,7 @@
 
 # App
 
-Adwam (أدوَم) — Flutter adhkar app (currently released on Android; iOS planned). Application ID `dev.amine.adwam`, Dart package `adwam`, repo `aminehmida/adwam` (private). Four sessions (morning, evening, post-prayer, sleep), 56 reviewed adhkar. Tap-to-count with haptics, long-press mark-done, auto-scroll to next incomplete, virtue text behind a "الفضل / Virtue" expander, midnight progress rollover. i18n via gen-l10n (ar/en .arb), RTL in Arabic, language toggle on home page only. Theme: hand-built manuscript palette in `lib/theme.dart` (night-green surfaces, muted gold `#D9A441`, Amiri font).
+Adwam (أدوَم) — Flutter adhkar app (currently released on Android; iOS planned). Application ID `dev.amine.adwam`, Dart package `adwam`, repo `aminehmida/adwam` (public). Four sessions (morning, evening, post-prayer, sleep), 56 reviewed adhkar. Tap-to-count with haptics, long-press mark-done, auto-scroll to next incomplete, virtue text behind a "الفضل / Virtue" expander, midnight progress rollover. i18n via gen-l10n (ar/en .arb), RTL in Arabic, language toggle on home page only. Theme: hand-built manuscript palette in `lib/theme.dart` (night-green surfaces, muted gold `#D9A441`, Amiri font).
 
 # Toolchain & environment
 
@@ -40,13 +41,14 @@ Two channels ship from this repo, installable side by side on one phone (separat
 | Launcher label | Adwam | Adwam dev |
 | Icon | night-green (`src/main/res`) | parchment + DEV band (`src/dev/res`) |
 | Trigger | `v*` tag → `release.yml` | every push to `main` → `dev.yml` |
-| GitHub release | one per tag, 2 APKs | rolling `dev` prerelease, arm64 only, deleted and recreated each push (download URL stays constant) |
+| GitHub release | one per tag, 2 APKs | one prerelease per commit, arm64 only, tagged `<version>-dev.<run_number>`; the 5 newest are kept and older ones pruned |
 | versionCode | `3000 + run_number` | `5000 + run_number` |
 
 (`--split-per-abi` adds an ABI offset on top of `--build-number` — arm64-v8a is +2000, so a `3000 + run` prod build ships as versionCode `5000 + run`.)
 
 | versionName | tag (`v1.2.0` → `1.2.0`) | `<pubspec version>-dev.<run_number>` |
 
+- Dev tags deliberately carry **no `v` prefix** (`1.1.0-dev.7`, not `v1.1.0-dev.7`): `release.yml` triggers on `v*`, so a `v`-prefixed dev tag would fire the production release workflow too. The tag string equals the versionName exactly, which is what lets [Obtainium](https://github.com/ImranR98/Obtainium) track the dev channel with no extra configuration.
 - The dev build shows a gold `dev` tag beside the title on the home screen, gated by `isDevChannel` in `lib/build_channel.dart` (a const derived from Flutter's `appFlavor`, so prod tree-shakes it out). Flavors — not `dart-define` or platform checks — carry the channel, which keeps the iOS port a matter of adding schemes.
 - Both channels sign with the same upload key.
 

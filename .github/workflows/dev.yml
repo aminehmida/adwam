@@ -83,14 +83,14 @@ jobs:
           echo "BUILD_NAME=$BUILD_NAME" >> "$GITHUB_ENV"
           echo "BUILD_NUMBER=$BUILD_NUMBER" >> "$GITHUB_ENV"
 
-      - name: Publish rolling dev prerelease
+      - name: Publish dev prerelease
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           SHORT_SHA="${GITHUB_SHA::7}"
           SUBJECT=$(git log -1 --pretty=%s)
           NOTES=$(cat <<EOF
-          Rolling build of \`main\`, replaced on every push — not a stable release.
+          Dev build of \`main\` — not a stable release.
 
           - Commit: [\`$SHORT_SHA\`]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/commit/$GITHUB_SHA) — $SUBJECT
           - Version: \`$BUILD_NAME\` ($BUILD_NUMBER), arm64-v8a only
@@ -98,12 +98,34 @@ jobs:
           Installs next to the released app as **Adwam dev** (\`dev.amine.adwam.dev\`); the two keep separate progress data.
           EOF
           )
-          # Recreate rather than edit, so the `dev` tag points at the commit
-          # that was actually built. The download URL stays constant.
-          gh release delete dev --yes --cleanup-tag || true
-          gh release create dev \
+          # One tag per commit, named exactly like the versionName so update
+          # trackers (Obtainium and friends) see a new, ordered version each
+          # time. Deliberately no `v` prefix: `v*` tags trigger release.yml.
+          gh release create "$BUILD_NAME" \
             --prerelease \
             --target "$GITHUB_SHA" \
-            --title "Dev build $SHORT_SHA" \
+            --title "Dev build $BUILD_NAME" \
             --notes "$NOTES" \
             adwam-dev-arm64-v8a.apk
+
+      - name: Prune old dev prereleases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Keep the newest KEEP dev builds. The grep is the safety rail: only
+          # `<x.y.z>-dev.<n>` tags can ever match, and release tags (`v1.2.0`)
+          # cannot, so this can never delete a real release.
+          KEEP=5
+          STALE=$(gh release list --limit 100 --json tagName,isPrerelease \
+                    --jq '.[] | select(.isPrerelease) | .tagName' \
+                  | grep -E '^[0-9]+\.[0-9]+\.[0-9]+-dev\.[0-9]+$' \
+                  | sort -t. -k4,4nr \
+                  | tail -n +$((KEEP + 1)) || true)
+          if [[ -z "$STALE" ]]; then
+            echo "Nothing to prune."
+            exit 0
+          fi
+          echo "Pruning:"; echo "$STALE"
+          while read -r tag; do
+            [[ -n "$tag" ]] && gh release delete "$tag" --yes --cleanup-tag
+          done <<< "$STALE"
