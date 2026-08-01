@@ -79,6 +79,11 @@ class PrefsStore {
   Future<void> saveVolumeKeyCounting(bool value) =>
       _prefs.setBool('volumeKeyCounting', value);
 
+  bool loadKeepScreenOn() => _prefs.getBool('keepScreenOn') ?? true;
+
+  Future<void> saveKeepScreenOn(bool value) =>
+      _prefs.setBool('keepScreenOn', value);
+
   bool loadBundleThreeQuls() => _prefs.getBool('bundleThreeQuls') ?? false;
 
   Future<void> saveBundleThreeQuls(bool value) =>

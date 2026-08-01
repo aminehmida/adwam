@@ -404,6 +404,18 @@ abstract class AppLocalizations {
   /// **'Pressing volume down counts the current dhikr, or scrolls the page while reading a surah; the volume itself won\'t change.'**
   String get volumeKeyCountingBody;
 
+  /// No description provided for @keepScreenOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep the screen on'**
+  String get keepScreenOn;
+
+  /// No description provided for @keepScreenOnBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The display stays awake while a session is open, so a long dhikr isn\'t cut short by the screen timing out.'**
+  String get keepScreenOnBody;
+
   /// No description provided for @bundleThreeQuls.
   ///
   /// In en, this message translates to:
