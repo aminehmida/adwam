@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 
 import '../data/prayer_classifier.dart';
+import '../data/prayer_offsets.dart';
 import '../data/prayer_time_source.dart';
 import '../data/prefs_store.dart';
 import '../models/daily_progress.dart';
@@ -42,6 +43,11 @@ class PrayerController extends ChangeNotifier {
 
   String? _deviceZoneId;
   String? _overrideZoneId;
+  late PrayerOffsets _offsets;
+
+  /// What the app has learned about when this user actually prays, exposed for
+  /// tests and diagnostics.
+  PrayerOffsets get offsets => _offsets;
 
   PrayerTimetable? _timetable;
   String? _timetableKey;
@@ -55,6 +61,7 @@ class PrayerController extends ChangeNotifier {
   })  : _now = clock ?? DateTime.now,
         _resolveZone = resolveZone ?? deviceZone {
     _overrideZoneId = _store.loadZoneOverride();
+    _offsets = _store.loadPrayerOffsets();
     _lastState = _state;
     _progress.addListener(_onProgressChanged);
   }
@@ -127,10 +134,36 @@ class PrayerController extends ChangeNotifier {
   /// Meaningless once the user has picked; see [isGuess].
   bool get isConfident => _guess?.confident ?? false;
 
-  /// Records the user's own choice. The notification comes back through
-  /// [_onProgressChanged], so there is no second one to fire here.
-  void select(DailyPrayer prayer) =>
-      _progress.selectPrayer(_session, prayer.name);
+  /// Records the user's own choice, and learns from it. The notification comes
+  /// back through [_onProgressChanged], so there is no second one to fire here.
+  void select(DailyPrayer prayer) {
+    _learn(prayer, manual: true);
+    _progress.selectPrayer(_session, prayer.name);
+  }
+
+  /// Called when the user finishes the post-prayer session, to reinforce a
+  /// guess that went uncorrected. Weighted far below an explicit correction.
+  void recordCompletion() {
+    final prayer = active;
+    if (prayer == null) return;
+    _learn(prayer, manual: false);
+  }
+
+  void _learn(DailyPrayer prayer, {required bool manual}) {
+    final zone = zoneId;
+    final table = _currentTimetable();
+    if (zone == null || table == null) return;
+    final updated = _offsets.observe(
+      zoneId: zone,
+      prayer: prayer,
+      observed: _now(),
+      computed: table[prayer],
+      manual: manual,
+    );
+    if (identical(updated, _offsets)) return;
+    _offsets = updated;
+    _store.savePrayerOffsets(updated);
+  }
 
   PrayerGuess? get _guess {
     final table = _currentTimetable();
@@ -138,6 +171,7 @@ class PrayerController extends ChangeNotifier {
     return classifyPrayer(
       timetable: table,
       now: _now(),
+      offsets: _offsets.byPrayer,
       lastConfirmedToday: prayerFromName(_progress.confirmedPrayer),
     );
   }

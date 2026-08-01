@@ -382,7 +382,15 @@ class _SessionScreenState extends State<SessionScreen>
     final afterIndex = dhikrs.indexWhere((d) => d.id == after);
     var targetIndex = dhikrs.indexWhere(isIncomplete, afterIndex + 1);
     if (targetIndex == -1) targetIndex = dhikrs.indexWhere(isIncomplete);
-    if (targetIndex == -1) return;
+    if (targetIndex == -1) {
+      // Nothing left anywhere: the session is finished. Every completion path
+      // (tap, focus counter, surah reader) funnels through here, so this is
+      // the one place that knows it.
+      if (widget.session == SessionType.postPrayer) {
+        context.read<PrayerController>().recordCompletion();
+      }
+      return;
+    }
     final targetId = dhikrs[targetIndex].id;
 
     // ListView.builder only builds items near the viewport, so the target's
