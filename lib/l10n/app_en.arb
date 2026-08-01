@@ -9,15 +9,11 @@
   "doneEditing": "Done",
   "virtue": "Virtue",
   "translation": "Translation",
-  "afterPrayers": "After {prayers}",
-  "@afterPrayers": {
-    "placeholders": {
-      "prayers": {
-        "type": "String"
-      }
-    }
-  },
-  "prayerJoiner": " & ",
+  "prayerGuessed": "guessed",
+  "prayerRegion": "Prayer times region",
+  "prayerRegionBody": "Prayer times are estimated from your device's timezone — no location access. Set this if the guessed prayer is often wrong, or you're far from your timezone's main city.",
+  "prayerRegionAuto": "Follow device",
+  "prayerRegionSearch": "Search regions",
   "prayerFajr": "Fajr",
   "prayerDhuhr": "Dhuhr",
   "prayerAsr": "Asr",

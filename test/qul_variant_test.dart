@@ -7,6 +7,8 @@ import 'package:adwam/models/dhikr.dart';
 import 'package:adwam/state/list_config_controller.dart';
 import 'package:adwam/state/settings_controller.dart';
 
+import 'support/prayer_support.dart';
+
 /// The three Quls ship as both a per-surah set and a combined card; the
 /// bundleThreeQuls setting picks which shape each session shows.
 void main() {
@@ -19,7 +21,7 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     final store = await PrefsStore.open();
     final settings = SettingsController(store);
-    return (ListConfigController(store, repo, settings), settings);
+    return (ListConfigController(store, repo, settings, unlocatedPrayerController(store)), settings);
   }
 
   List<String> ids(ListConfigController c, SessionType s) =>
@@ -70,7 +72,7 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     final store = await PrefsStore.open();
     final settings = SettingsController(store);
-    final config = ListConfigController(store, repo, settings);
+    final config = ListConfigController(store, repo, settings, unlocatedPrayerController(store));
     // Persist a custom order for morning (as a reorder would): the exact
     // current separate-mode order.
     final saved = config.listFor(SessionType.morning).map((d) => d.id).toList();

@@ -152,17 +152,35 @@ abstract class AppLocalizations {
   /// **'Translation'**
   String get translation;
 
-  /// No description provided for @afterPrayers.
+  /// No description provided for @prayerGuessed.
   ///
   /// In en, this message translates to:
-  /// **'After {prayers}'**
-  String afterPrayers(String prayers);
+  /// **'guessed'**
+  String get prayerGuessed;
 
-  /// No description provided for @prayerJoiner.
+  /// No description provided for @prayerRegion.
   ///
   /// In en, this message translates to:
-  /// **' & '**
-  String get prayerJoiner;
+  /// **'Prayer times region'**
+  String get prayerRegion;
+
+  /// No description provided for @prayerRegionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Prayer times are estimated from your device\'s timezone — no location access. Set this if the guessed prayer is often wrong, or you\'re far from your timezone\'s main city.'**
+  String get prayerRegionBody;
+
+  /// No description provided for @prayerRegionAuto.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow device'**
+  String get prayerRegionAuto;
+
+  /// No description provided for @prayerRegionSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Search regions'**
+  String get prayerRegionSearch;
 
   /// No description provided for @prayerFajr.
   ///

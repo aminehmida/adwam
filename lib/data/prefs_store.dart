@@ -110,6 +110,14 @@ class PrefsStore {
   Future<void> saveQuranFontSize(double size) =>
       _prefs.setDouble('quranFontSize', size);
 
+  /// IANA zone the user picked in settings, overriding the device's own.
+  /// Null means "follow the device".
+  String? loadZoneOverride() => _prefs.getString('prayer.zoneOverride');
+
+  Future<void> saveZoneOverride(String? zoneId) => zoneId == null
+      ? _prefs.remove('prayer.zoneOverride')
+      : _prefs.setString('prayer.zoneOverride', zoneId);
+
   Future<void> clearAllConfigs() async {
     for (final s in SessionType.values) {
       await _prefs.remove(_configKey(s));

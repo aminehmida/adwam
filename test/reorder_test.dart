@@ -7,6 +7,8 @@ import 'package:adwam/models/dhikr.dart';
 import 'package:adwam/state/list_config_controller.dart';
 import 'package:adwam/state/settings_controller.dart';
 
+import 'support/prayer_support.dart';
+
 Dhikr d(String id, BenefitTier tier) => Dhikr(
       id: id,
       arabic: id,
@@ -29,7 +31,8 @@ void main() {
       d('n2', BenefitTier.none),
     ]);
     final store = await PrefsStore.open();
-    controller = ListConfigController(store, repo, SettingsController(store));
+    controller = ListConfigController(
+        store, repo, SettingsController(store), unlocatedPrayerController(store));
   });
 
   List<String> ids() =>

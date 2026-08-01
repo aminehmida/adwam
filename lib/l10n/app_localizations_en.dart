@@ -36,12 +36,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get translation => 'Translation';
 
   @override
-  String afterPrayers(String prayers) {
-    return 'After $prayers';
-  }
+  String get prayerGuessed => 'guessed';
 
   @override
-  String get prayerJoiner => ' & ';
+  String get prayerRegion => 'Prayer times region';
+
+  @override
+  String get prayerRegionBody =>
+      'Prayer times are estimated from your device\'s timezone — no location access. Set this if the guessed prayer is often wrong, or you\'re far from your timezone\'s main city.';
+
+  @override
+  String get prayerRegionAuto => 'Follow device';
+
+  @override
+  String get prayerRegionSearch => 'Search regions';
 
   @override
   String get prayerFajr => 'Fajr';

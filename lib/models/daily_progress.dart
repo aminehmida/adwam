@@ -19,11 +19,28 @@ class DailyProgress {
   /// (post-prayer), so it is empty for everything else.
   final Map<String, int> lastTouched;
 
+  /// The prayer the user explicitly picked for a session, keyed by
+  /// [SessionType.name]. Lives here so it dies with the session: clearing the
+  /// post-prayer session (idle expiry or a manual reset) drops the selection
+  /// too, and the next prayer starts from a fresh guess.
+  final Map<String, String> sessionPrayer;
+
+  /// The last prayer confirmed today, whatever session state has since been
+  /// cleared. Prayer order is non-decreasing within a day, so this constrains
+  /// later guesses (see classifyPrayer). Survives session resets on purpose,
+  /// and clears at midnight with everything else.
+  ///
+  /// Replaced rather than maximised: a user correcting a wrong Isha guess down
+  /// to Maghrib must not be immediately promoted back to Isha.
+  final String? confirmedPrayer;
+
   const DailyProgress({
     required this.dateStamp,
     this.counts = const {},
     this.done = const {},
     this.lastTouched = const {},
+    this.sessionPrayer = const {},
+    this.confirmedPrayer,
   });
 
   static String keyFor(SessionType session, String dhikrId) =>
@@ -39,12 +56,24 @@ class DailyProgress {
     Map<String, int>? counts,
     Set<String>? done,
     Map<String, int>? lastTouched,
+    Map<String, String>? sessionPrayer,
+    String? confirmedPrayer,
   }) =>
       DailyProgress(
         dateStamp: dateStamp,
         counts: counts ?? this.counts,
         done: done ?? this.done,
         lastTouched: lastTouched ?? this.lastTouched,
+        sessionPrayer: sessionPrayer ?? this.sessionPrayer,
+        confirmedPrayer: confirmedPrayer ?? this.confirmedPrayer,
+      );
+
+  /// Records [prayer] as the user's explicit pick for [session], and as
+  /// today's latest confirmation.
+  DailyProgress withPrayerSelected(SessionType session, String prayer) =>
+      copyWith(
+        sessionPrayer: {...sessionPrayer, session.name: prayer},
+        confirmedPrayer: prayer,
       );
 
   /// Records [now] as the last interaction with [session].
@@ -65,6 +94,7 @@ class DailyProgress {
       },
       done: done.where((key) => !key.startsWith(prefix)).toSet(),
       lastTouched: {...lastTouched}..remove(session.name),
+      sessionPrayer: {...sessionPrayer}..remove(session.name),
     );
   }
 
@@ -73,6 +103,8 @@ class DailyProgress {
         'counts': counts,
         'done': done.toList(),
         'touched': lastTouched,
+        'sessionPrayer': sessionPrayer,
+        'confirmedPrayer': confirmedPrayer,
       });
 
   factory DailyProgress.fromJsonString(String source) {
@@ -84,6 +116,10 @@ class DailyProgress {
       lastTouched:
           (json['touched'] as Map<String, dynamic>?)?.cast<String, int>() ??
               const {},
+      sessionPrayer: (json['sessionPrayer'] as Map<String, dynamic>?)
+              ?.cast<String, String>() ??
+          const {},
+      confirmedPrayer: json['confirmedPrayer'] as String?,
     );
   }
 }

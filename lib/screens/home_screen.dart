@@ -5,10 +5,12 @@ import '../build_channel.dart';
 import '../l10n/app_localizations.dart';
 import '../models/dhikr.dart';
 import '../state/list_config_controller.dart';
+import '../state/prayer_controller.dart';
 import '../state/progress_controller.dart';
 import '../state/settings_controller.dart';
 import '../widgets/context_card.dart';
 import '../widgets/dev_badge.dart';
+import '../widgets/prayer_selector.dart' show prayerName;
 import 'session_screen.dart';
 import 'settings_screen.dart';
 
@@ -19,6 +21,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final config = context.watch<ListConfigController>();
     final progress = context.watch<ProgressController>();
+    final prayer = context.watch<PrayerController>();
 
     return Scaffold(
       appBar: AppBar(
@@ -50,10 +53,16 @@ class HomeScreen extends StatelessWidget {
             Builder(
               builder: (context) {
                 final visible = config.visibleIds(session);
+                final activePrayer = session == SessionType.postPrayer
+                    ? prayer.active
+                    : null;
                 return ContextCard(
                   session: session,
                   done: progress.doneCount(session, visible),
                   total: visible.length,
+                  subtitle: activePrayer == null
+                      ? null
+                      : prayerName(AppLocalizations.of(context)!, activePrayer),
                   onTap: () => Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (_) => SessionScreen(session: session),

@@ -77,6 +77,30 @@ class ProgressController extends ChangeNotifier {
     _persistAndNotify();
   }
 
+  /// The prayer the user explicitly picked for [session], or null while the
+  /// app's own guess is still in force.
+  String? sessionPrayer(SessionType session) {
+    refresh();
+    return _progress.sessionPrayer[session.name];
+  }
+
+  /// The last prayer confirmed today — the non-decreasing constraint the
+  /// classifier leans on. Outlives session resets, clears at midnight.
+  String? get confirmedPrayer {
+    refresh();
+    return _progress.confirmedPrayer;
+  }
+
+  void selectPrayer(SessionType session, String prayer) {
+    refresh();
+    if (_progress.sessionPrayer[session.name] == prayer &&
+        _progress.confirmedPrayer == prayer) {
+      return;
+    }
+    _progress = _touch(session, _progress.withPrayerSelected(session, prayer));
+    _persistAndNotify();
+  }
+
   /// Clears today's counters and done-marks for one session only.
   void resetSession(SessionType session) {
     refresh();

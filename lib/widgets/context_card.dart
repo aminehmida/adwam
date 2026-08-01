@@ -28,6 +28,10 @@ class ContextCard extends StatelessWidget {
   final VoidCallback onTap;
   final VoidCallback? onLongPress;
 
+  /// Which prayer the post-prayer adhkar are currently for, so a wrong guess
+  /// is visible before opening the session. Null for every other session.
+  final String? subtitle;
+
   const ContextCard({
     super.key,
     required this.session,
@@ -35,6 +39,7 @@ class ContextCard extends StatelessWidget {
     required this.total,
     required this.onTap,
     this.onLongPress,
+    this.subtitle,
   });
 
   @override
@@ -90,6 +95,17 @@ class ContextCard extends StatelessWidget {
                         height: 1.3,
                       ),
                     ),
+                    if (subtitle != null) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        subtitle!,
+                        style: TextStyle(
+                          fontFamily: 'Amiri',
+                          fontSize: 14,
+                          color: colors.tertiary,
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 8),
                     ClipRRect(
                       borderRadius: BorderRadius.circular(4),

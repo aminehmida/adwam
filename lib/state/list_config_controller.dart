@@ -3,7 +3,9 @@ import 'package:flutter/foundation.dart';
 import '../data/content_repository.dart';
 import '../data/prefs_store.dart';
 import '../models/dhikr.dart';
+import '../models/prayer.dart';
 import '../models/user_list_config.dart';
+import 'prayer_controller.dart';
 import 'settings_controller.dart';
 
 /// The edit-mode section a dhikr belongs to; mirrors the visual bands
@@ -23,6 +25,7 @@ class ListConfigController extends ChangeNotifier {
   final PrefsStore _store;
   final ContentRepository _repo;
   final SettingsController _settings;
+  final PrayerController _prayer;
   final Map<SessionType, UserListConfig> _configs;
   final List<Dhikr> _customs;
 
@@ -31,13 +34,14 @@ class ListConfigController extends ChangeNotifier {
   /// unrelated setting changes don't.
   late bool _bundleThreeQuls;
 
-  ListConfigController(this._store, this._repo, this._settings)
+  ListConfigController(this._store, this._repo, this._settings, this._prayer)
       : _configs = {
           for (final s in SessionType.values) s: _store.loadConfig(s),
         },
         _customs = _store.loadCustomDhikrs() {
     _bundleThreeQuls = _settings.bundleThreeQuls;
     _settings.addListener(_onSettingsChanged);
+    _prayer.addListener(_onPrayerChanged);
   }
 
   void _onSettingsChanged() {
@@ -47,9 +51,13 @@ class ListConfigController extends ChangeNotifier {
     }
   }
 
+  /// A different prayer reshapes the post-prayer list, so pass the change on.
+  void _onPrayerChanged() => notifyListeners();
+
   @override
   void dispose() {
     _settings.removeListener(_onSettingsChanged);
+    _prayer.removeListener(_onPrayerChanged);
     super.dispose();
   }
 
@@ -63,9 +71,29 @@ class ListConfigController extends ChangeNotifier {
       d.qulVariant ==
           (_settings.bundleThreeQuls ? QulVariant.bundle : QulVariant.separate);
 
+  /// Whether [d] belongs to the prayer currently in force. Adhkar with no
+  /// prayer tag are said after every prayer and always show; the tagged ones
+  /// (the 10x tahlil, the Fajr dua, the 7x plea for refuge) appear only after
+  /// their own prayers.
+  ///
+  /// When the prayer is unknown — no timezone, unresolved astronomy — nothing
+  /// is filtered. Hiding adhkar because a lookup failed would be worse than
+  /// showing a few that don't apply.
+  bool _matchesPrayer(Dhikr d) {
+    final prayer = _prayer.active;
+    return prayer == null || prayer.matches(d.prayers);
+  }
+
   /// Built-in and custom dhikrs of [session] in default sort order.
-  List<Dhikr> _defaultsFor(SessionType session) {
-    final builtins = _repo.defaultList(session).where(_matchesQulMode);
+  ///
+  /// [allPrayers] keeps every post-prayer dhikr regardless of the active
+  /// prayer. Edit mode needs this: a dhikr filtered out of the list can be
+  /// neither reordered nor unhidden, so editing must see the whole set.
+  List<Dhikr> _defaultsFor(SessionType session, {required bool allPrayers}) {
+    var builtins = _repo.defaultList(session).where(_matchesQulMode);
+    if (session == SessionType.postPrayer && !allPrayers) {
+      builtins = builtins.where(_matchesPrayer);
+    }
     final customs = _customs.where((d) => d.contexts.contains(session));
     if (customs.isEmpty) return builtins.toList();
     return [...builtins, ...customs]..sort(compareDhikrs);
@@ -73,8 +101,11 @@ class ListConfigController extends ChangeNotifier {
 
   /// Effective list for a session: user order if set, else default sort.
   /// Hidden dhikrs are included — the UI renders them collapsed in place.
-  List<Dhikr> listFor(SessionType session) =>
-      applyUserOrder(_defaultsFor(session), configFor(session).order);
+  List<Dhikr> listFor(SessionType session, {bool allPrayers = false}) =>
+      applyUserOrder(
+        _defaultsFor(session, allPrayers: allPrayers),
+        configFor(session).order,
+      );
 
   /// Creates a user dua (read once, like any 1x dhikr) and shows it in
   /// every session of [contexts].
@@ -158,7 +189,9 @@ class ListConfigController extends ChangeNotifier {
   void _placeInOrder(SessionType session, Dhikr dhikr) {
     final config = configFor(session);
     if (config.order.isEmpty) return;
-    final defaults = _defaultsFor(session);
+    // Ordering is structural, so it must cover every dhikr the session can
+    // ever show, not just the ones the current prayer happens to include.
+    final defaults = _defaultsFor(session, allPrayers: true);
     final without = applyUserOrder(
       [for (final d in defaults) if (d.id != dhikr.id) d],
       [for (final id in config.order) if (id != dhikr.id) id],
@@ -204,7 +237,8 @@ class ListConfigController extends ChangeNotifier {
   /// drop beyond the section edge snaps to it, so sections stay contiguous
   /// and the session's category bands keep meaning something.
   void reorder(SessionType session, int oldIndex, int newIndex) {
-    final list = listFor(session);
+    // Indices come from the edit-mode list, which is never prayer-filtered.
+    final list = listFor(session, allPrayers: true);
     final section = _sectionOf(list[oldIndex]);
     var start = oldIndex;
     while (start > 0 && _sectionOf(list[start - 1]) == section) {

@@ -7,6 +7,8 @@ import 'package:adwam/models/dhikr.dart';
 import 'package:adwam/state/list_config_controller.dart';
 import 'package:adwam/state/settings_controller.dart';
 
+import 'support/prayer_support.dart';
+
 Dhikr d(
   String id,
   BenefitTier tier, {
@@ -37,7 +39,8 @@ void main() {
       d('n2', BenefitTier.none, repetitions: 3),
       d('su1', BenefitTier.none, form: DhikrForm.surah),
     ]);
-    controller = ListConfigController(store, repo, SettingsController(store));
+    controller = ListConfigController(
+        store, repo, SettingsController(store), unlocatedPrayerController(store));
   });
 
   List<String> ids() =>
@@ -89,7 +92,8 @@ void main() {
       arabic: 'اللهم اغفر لي',
       contexts: {SessionType.morning},
     );
-    final reloaded = ListConfigController(store, repo, SettingsController(store));
+    final reloaded = ListConfigController(
+        store, repo, SettingsController(store), unlocatedPrayerController(store));
     final custom = reloaded
         .listFor(SessionType.morning)
         .singleWhere((x) => x.isCustom);

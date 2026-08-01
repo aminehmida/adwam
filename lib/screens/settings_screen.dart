@@ -4,8 +4,10 @@ import 'package:provider/provider.dart';
 
 import '../l10n/app_localizations.dart';
 import '../state/list_config_controller.dart';
+import '../state/prayer_controller.dart';
 import '../state/progress_controller.dart';
 import '../state/settings_controller.dart';
+import 'zone_picker_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -14,6 +16,7 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final settings = context.watch<SettingsController>();
+    final prayer = context.watch<PrayerController>();
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.settings)),
@@ -63,6 +66,18 @@ class SettingsScreen extends StatelessWidget {
               value: settings.volumeKeyCounting,
               onChanged: settings.setVolumeKeyCounting,
             ),
+          ListTile(
+            leading: const Icon(Icons.mosque_outlined),
+            title: Text(l10n.prayerRegion),
+            subtitle: Text(l10n.prayerRegionBody),
+            trailing: Text(
+              (prayer.zoneOverride ?? l10n.prayerRegionAuto).replaceAll('_', ' '),
+              style: TextStyle(color: Theme.of(context).colorScheme.tertiary),
+            ),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const ZonePickerScreen()),
+            ),
+          ),
           SwitchListTile(
             secondary: const Icon(Icons.screen_lock_portrait),
             title: Text(l10n.keepScreenOn),
