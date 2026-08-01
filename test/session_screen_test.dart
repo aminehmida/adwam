@@ -8,6 +8,34 @@ import 'package:adwam/data/prefs_store.dart';
 import 'package:adwam/main.dart';
 import 'package:adwam/models/dhikr.dart';
 import 'package:adwam/models/user_list_config.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
+import 'package:wakelock_plus_platform_interface/wakelock_plus_platform_interface.dart';
+
+/// Records the wakelock toggles the session screen asks for. The real
+/// platform instance never completes its calls under `flutter test`, so the
+/// screen's own fire-and-forget calls are invisible without this.
+class FakeWakelock extends WakelockPlusPlatformInterface {
+  final List<bool> toggles = [];
+  bool _enabled = false;
+
+  @override
+  Future<void> toggle({required bool enable}) async {
+    toggles.add(enable);
+    _enabled = enable;
+  }
+
+  @override
+  Future<bool> get enabled async => _enabled;
+}
+
+/// Swaps in [FakeWakelock] for the duration of one test.
+FakeWakelock useFakeWakelock() {
+  final previous = wakelockPlusPlatformInstance;
+  final fake = FakeWakelock();
+  wakelockPlusPlatformInstance = fake;
+  addTearDown(() => wakelockPlusPlatformInstance = previous);
+  return fake;
+}
 
 Dhikr _dhikr(String id) => Dhikr(
       id: id,
@@ -99,6 +127,32 @@ void main() {
     expect(find.text('0 / 2'), findsNWidgets(2)); // only the visible cards
     expect(find.text('ذكر two'), findsOneWidget); // title row still there
     expect(find.byIcon(Icons.visibility_off_outlined), findsOneWidget);
+  });
+
+  testWidgets('a session holds the screen awake and releases it on exit',
+      (tester) async {
+    final wakelock = useFakeWakelock();
+    await openMorning(tester);
+    expect(wakelock.toggles, [true]);
+
+    // Leaving the session must let the display time out again.
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    expect(wakelock.toggles, [true, false]);
+  });
+
+  testWidgets('with the setting off the screen is left to time out',
+      (tester) async {
+    final wakelock = useFakeWakelock();
+    SharedPreferences.setMockInitialValues({'keepScreenOn': false});
+    final repo = ContentRepository([_dhikr('one')]);
+    await tester
+        .pumpWidget(DhikrApp(repo: repo, store: await PrefsStore.open()));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Morning adhkar'));
+    await tester.pumpAndSettle();
+
+    expect(wakelock.toggles, [false]);
   });
 
   testWidgets('peek on tap, collapse again on second tap', (tester) async {

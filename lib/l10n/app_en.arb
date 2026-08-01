@@ -65,6 +65,8 @@
   "themeDark": "Dark",
   "volumeKeyCounting": "Count with volume button",
   "volumeKeyCountingBody": "Pressing volume down counts the current dhikr, or scrolls the page while reading a surah; the volume itself won't change.",
+  "keepScreenOn": "Keep the screen on",
+  "keepScreenOnBody": "The display stays awake while a session is open, so a long dhikr isn't cut short by the screen timing out.",
   "bundleThreeQuls": "Combine the three Quls",
   "bundleThreeQulsBody": "Show al-Ikhlas, al-Falaq and an-Nas as one card read three times instead of a separate card for each.",
   "showTranslation": "Show translation",

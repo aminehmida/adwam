@@ -8,14 +8,16 @@ import '../data/prefs_store.dart';
 /// App-level settings: the locale override (null = follow system), the
 /// theme mode, whether the long-press session-reset confirmation has been
 /// muted, whether the volume-down key counts the current dhikr (Android),
-/// the focus-overlay background variant, and whether the translation /
-/// transliteration texts show on cards (non-Arabic UIs only).
+/// whether the screen stays awake during a session, the focus-overlay
+/// background variant, and whether the translation / transliteration texts
+/// show on cards (non-Arabic UIs only).
 class SettingsController extends ChangeNotifier {
   final PrefsStore _store;
   Locale? _locale;
   ThemeMode _themeMode;
   bool _skipSessionResetConfirm;
   bool _volumeKeyCounting;
+  bool _keepScreenOn;
   int _focusBgVariant;
   bool _showTranslation;
   bool _showTransliteration;
@@ -27,6 +29,7 @@ class SettingsController extends ChangeNotifier {
         _themeMode = _store.loadThemeMode(),
         _skipSessionResetConfirm = _store.loadSkipSessionResetConfirm(),
         _volumeKeyCounting = _store.loadVolumeKeyCounting(),
+        _keepScreenOn = _store.loadKeepScreenOn(),
         _focusBgVariant = _store.loadFocusBgVariant(),
         _showTranslation = _store.loadShowTranslation(),
         _showTransliteration = _store.loadShowTransliteration(),
@@ -62,6 +65,16 @@ class SettingsController extends ChangeNotifier {
   void setVolumeKeyCounting(bool value) {
     _volumeKeyCounting = value;
     _store.saveVolumeKeyCounting(value);
+    notifyListeners();
+  }
+
+  /// When true, the screen is held awake while a session is open, so a long
+  /// dhikr is not interrupted by the display timing out. Default true.
+  bool get keepScreenOn => _keepScreenOn;
+
+  void setKeepScreenOn(bool value) {
+    _keepScreenOn = value;
+    _store.saveKeepScreenOn(value);
     notifyListeners();
   }
 
