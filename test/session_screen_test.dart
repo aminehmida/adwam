@@ -250,22 +250,26 @@ void main() {
       of: find.byType(SectionBand),
       matching: find.text('Other benefits'),
     );
-    // Recited / visible in this section — the hidden 'two' counts in neither.
-    expect(find.text('0/2'), findsOneWidget);
+    // An open section is a plain band: the cards carry their own counts.
+    expect(find.text('0/2'), findsNothing);
 
     await tester.tap(band);
     await tester.pumpAndSettle();
     expect(find.text('ذكر one'), findsNothing);
     expect(find.text('ذكر two'), findsNothing); // the hidden row folds too
     expect(band, findsOneWidget); // the band itself stays
+    // Recited / visible in this section — the hidden 'two' counts in neither.
     expect(find.text('0/2'), findsOneWidget);
 
     await tester.tap(band);
     await tester.pumpAndSettle();
     expect(find.text('ذكر one'), findsOneWidget);
+    expect(find.text('0/2'), findsNothing);
 
-    // Reciting one of the two moves the band's count.
+    // Reciting one of the two moves the folded band's count.
     await tester.longPress(find.text('ذكر one'));
+    await tester.pumpAndSettle();
+    await tester.tap(band);
     await tester.pumpAndSettle();
     expect(find.text('1/2'), findsOneWidget);
   });
