@@ -70,10 +70,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get tierProtection => 'الحماية';
 
   @override
-  String get tierReward => 'الثواب';
+  String get tierReward => 'ثواب مخصوص';
 
   @override
-  String get tierOther => 'فضائل أخرى';
+  String get tierOther => 'ثواب آخر';
 
   @override
   String get tierHighRep => 'الأذكار المكرَّرة';

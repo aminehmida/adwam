@@ -70,10 +70,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tierProtection => 'Protection';
 
   @override
-  String get tierReward => 'Reward';
+  String get tierReward => 'Specific rewards';
 
   @override
-  String get tierOther => 'Other benefits';
+  String get tierOther => 'Other rewards';
 
   @override
   String get tierHighRep => 'High repetitions';
