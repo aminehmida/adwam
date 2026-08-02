@@ -26,6 +26,8 @@
   "fullSurahs": "Full surahs",
   "moveSectionUp": "Move section up",
   "moveSectionDown": "Move section down",
+  "collapseSection": "Collapse section",
+  "expandSection": "Expand section",
   "freeOrder": "Free order (no sections)",
   "resetOrderTitle": "Reset to default order?",
   "resetOrderBody": "This list will be reordered and all adhkar shown again.",

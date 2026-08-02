@@ -8,6 +8,7 @@ import 'package:adwam/data/prefs_store.dart';
 import 'package:adwam/main.dart';
 import 'package:adwam/models/dhikr.dart';
 import 'package:adwam/models/user_list_config.dart';
+import 'package:adwam/widgets/tier_header.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:wakelock_plus_platform_interface/wakelock_plus_platform_interface.dart';
 
@@ -239,6 +240,34 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('2 / 2'), findsOneWidget);
     expect(find.byIcon(Icons.check_circle_rounded), findsOneWidget);
+  });
+
+  testWidgets('tapping a section band folds its adhkar away and counts them',
+      (tester) async {
+    await openMorning(tester);
+    // Every card also carries a tier chip, so the band is found by type.
+    final band = find.descendant(
+      of: find.byType(SectionBand),
+      matching: find.text('Other benefits'),
+    );
+    // Recited / visible in this section — the hidden 'two' counts in neither.
+    expect(find.text('0/2'), findsOneWidget);
+
+    await tester.tap(band);
+    await tester.pumpAndSettle();
+    expect(find.text('ذكر one'), findsNothing);
+    expect(find.text('ذكر two'), findsNothing); // the hidden row folds too
+    expect(band, findsOneWidget); // the band itself stays
+    expect(find.text('0/2'), findsOneWidget);
+
+    await tester.tap(band);
+    await tester.pumpAndSettle();
+    expect(find.text('ذكر one'), findsOneWidget);
+
+    // Reciting one of the two moves the band's count.
+    await tester.longPress(find.text('ذكر one'));
+    await tester.pumpAndSettle();
+    expect(find.text('1/2'), findsOneWidget);
   });
 
   testWidgets('back button exits edit mode instead of leaving the screen',

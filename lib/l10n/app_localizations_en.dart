@@ -88,6 +88,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get moveSectionDown => 'Move section down';
 
   @override
+  String get collapseSection => 'Collapse section';
+
+  @override
+  String get expandSection => 'Expand section';
+
+  @override
   String get freeOrder => 'Free order (no sections)';
 
   @override

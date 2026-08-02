@@ -254,6 +254,18 @@ abstract class AppLocalizations {
   /// **'Move section down'**
   String get moveSectionDown;
 
+  /// No description provided for @collapseSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Collapse section'**
+  String get collapseSection;
+
+  /// No description provided for @expandSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Expand section'**
+  String get expandSection;
+
   /// No description provided for @freeOrder.
   ///
   /// In en, this message translates to:
