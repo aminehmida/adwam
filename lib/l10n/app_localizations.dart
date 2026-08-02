@@ -242,6 +242,24 @@ abstract class AppLocalizations {
   /// **'Full surahs'**
   String get fullSurahs;
 
+  /// No description provided for @moveSectionUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Move section up'**
+  String get moveSectionUp;
+
+  /// No description provided for @moveSectionDown.
+  ///
+  /// In en, this message translates to:
+  /// **'Move section down'**
+  String get moveSectionDown;
+
+  /// No description provided for @freeOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Free order (no sections)'**
+  String get freeOrder;
+
   /// No description provided for @resetOrderTitle.
   ///
   /// In en, this message translates to:

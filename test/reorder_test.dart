@@ -57,4 +57,39 @@ void main() {
     controller.reorder(SessionType.morning, 2, 0);
     expect(ids(), ['p1', 'p2', 'r1', 'n1', 'n2']);
   });
+
+  test('a section moves up as a block, past the whole section above', () {
+    controller.moveSection(SessionType.morning, 2, up: true); // reward up
+    expect(ids(), ['r1', 'p1', 'p2', 'n1', 'n2']);
+  });
+
+  test('a section moves down as a block', () {
+    controller.moveSection(SessionType.morning, 0, up: false); // protection down
+    expect(ids(), ['r1', 'p1', 'p2', 'n1', 'n2']);
+  });
+
+  test('sections at either end of the list do not move', () {
+    controller.moveSection(SessionType.morning, 1, up: true);
+    controller.moveSection(SessionType.morning, 4, up: false);
+    expect(ids(), ['p1', 'p2', 'r1', 'n1', 'n2']);
+  });
+
+  test('free order lets a drag cross sections', () {
+    controller.setFreeOrder(SessionType.morning, true);
+    controller.reorder(SessionType.morning, 0, 4); // p1 to the bottom
+    expect(ids(), ['p2', 'r1', 'n1', 'n2', 'p1']);
+  });
+
+  test('leaving free order regroups sections where their first member is', () {
+    controller.setFreeOrder(SessionType.morning, true);
+    controller.reorder(SessionType.morning, 0, 4);
+    controller.setFreeOrder(SessionType.morning, false);
+    expect(ids(), ['p2', 'p1', 'r1', 'n1', 'n2']);
+  });
+
+  test('toggling free order alone leaves the list on the default sort', () {
+    controller.setFreeOrder(SessionType.morning, true);
+    controller.setFreeOrder(SessionType.morning, false);
+    expect(controller.configFor(SessionType.morning).isDefaultOrder, isTrue);
+  });
 }

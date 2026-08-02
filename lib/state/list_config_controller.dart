@@ -230,28 +230,81 @@ class ListConfigController extends ChangeNotifier {
     _update(session, config.copyWith(hidden: newHidden));
   }
 
+  /// First and last index of the contiguous run of same-section dhikrs
+  /// around [index] — the span one section band covers.
+  (int, int) _runAround(List<Dhikr> list, int index) {
+    final section = _sectionOf(list[index]);
+    var start = index;
+    while (start > 0 && _sectionOf(list[start - 1]) == section) {
+      start--;
+    }
+    var end = index;
+    while (end < list.length - 1 && _sectionOf(list[end + 1]) == section) {
+      end++;
+    }
+    return (start, end);
+  }
+
   /// [newIndex] is the position after removal (ReorderableListView's
   /// onReorderItem convention — already adjusted).
   ///
   /// Movement is confined to the dhikr's own section (see [_sectionOf]): a
   /// drop beyond the section edge snaps to it, so sections stay contiguous
-  /// and the session's category bands keep meaning something.
+  /// and the session's category bands keep meaning something. A session on
+  /// free order has no bands to protect, so its drags go anywhere.
   void reorder(SessionType session, int oldIndex, int newIndex) {
     // Indices come from the edit-mode list, which is never prayer-filtered.
     final list = listFor(session, allPrayers: true);
-    final section = _sectionOf(list[oldIndex]);
-    var start = oldIndex;
-    while (start > 0 && _sectionOf(list[start - 1]) == section) {
-      start--;
-    }
-    var end = oldIndex;
-    while (end < list.length - 1 && _sectionOf(list[end + 1]) == section) {
-      end++;
-    }
     final ids = list.map((d) => d.id).toList();
     final id = ids.removeAt(oldIndex);
-    ids.insert(newIndex.clamp(start, end), id);
+    if (configFor(session).freeOrder) {
+      ids.insert(newIndex, id);
+    } else {
+      final (start, end) = _runAround(list, oldIndex);
+      ids.insert(newIndex.clamp(start, end), id);
+    }
     _update(session, configFor(session).copyWith(order: ids));
+  }
+
+  /// Swaps the whole section containing [index] with its neighbour above
+  /// ([up]) or below — the section bands' ▲▼ move. Sections are contiguous
+  /// runs, so this is a block move within the stored order; a section at the
+  /// edge of the list, or a session that is one single section, doesn't move.
+  void moveSection(SessionType session, int index, {required bool up}) {
+    final list = listFor(session, allPrayers: true);
+    final (start, end) = _runAround(list, index);
+    if (up ? start == 0 : end == list.length - 1) return;
+    final ids = list.map((d) => d.id).toList();
+    final block = ids.sublist(start, end + 1);
+    ids.removeRange(start, end + 1);
+    if (up) {
+      // Above the run that ends where ours began.
+      ids.insertAll(_runAround(list, start - 1).$1, block);
+    } else {
+      // Below the run that starts where ours ended; that run has shifted up
+      // by the block's length now that the block is out.
+      ids.insertAll(_runAround(list, end + 1).$2 - block.length + 1, block);
+    }
+    _update(session, configFor(session).copyWith(order: ids));
+  }
+
+  /// Turns section-crossing drags on or off for [session].
+  ///
+  /// Leaving free order regroups whatever the user interleaved, so the bands
+  /// coming back describe contiguous runs again: each section keeps the place
+  /// its first member held, and members keep their order within it.
+  void setFreeOrder(SessionType session, bool value) {
+    final config = configFor(session);
+    if (config.freeOrder == value) return;
+    var order = config.order;
+    if (!value && order.isNotEmpty) {
+      final groups = <(bool, bool, BenefitTier, bool, bool), List<String>>{};
+      for (final d in listFor(session, allPrayers: true)) {
+        groups.putIfAbsent(_sectionOf(d), () => []).add(d.id);
+      }
+      order = [for (final group in groups.values) ...group];
+    }
+    _update(session, config.copyWith(order: order, freeOrder: value));
   }
 
   void resetToDefault(SessionType session) {
