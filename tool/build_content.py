@@ -116,10 +116,20 @@ def quran_arabic(tanzil, scaffold):
 
 
 def clean_hisn(text):
-    """Strip the (( )) decoration hisnmuslim.com wraps dhikr text in."""
+    """Strip the (( )) decoration hisnmuslim.com wraps dhikr text in.
+
+    Some entries close the quote mid-string and follow it with a usage note
+    ("((...)) عشر مرات بعد صلاة المغرب والصبح.") — that note is not part of
+    the dhikr, so everything past the closing )) is dropped with it.
+
+    The closer is found from the right: a dhikr ending in its own parenthetical
+    closes as ")))", and searching forwards would cut one ) too early.
+    """
     text = text.strip()
     text = re.sub(r"^\(\(", "", text)
-    text = re.sub(r"\)\)\s*\.?\s*$", "", text)
+    end = text.rfind("))")
+    if end != -1:
+        text = text[:end]
     return text.strip()
 
 
