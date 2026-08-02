@@ -1,5 +1,5 @@
 {
-  "_comment": "Claude-drafted classification overlay, reviewed by Amine (morning pass 2026-07-10). form: quran|short|long. benefit_tier: protection|reward|none (3 tiers only). sort_hint: optional int for fine ordering among equal (tier, form, reps) — lower first. For pp-*/sl-* entries, repetitions/benefit_text/benefit_source are also supplied here.",
+  "_comment": "Claude-drafted classification overlay, reviewed by Amine (morning pass 2026-07-10). form: quran|short|long. benefit_tier: protection|reward|none (3 tiers only). sort_hint: optional int for fine ordering among equal (tier, form, reps) — lower first. For pp-*/sl-* entries, repetitions/benefit_text/benefit_source are also supplied here. Voice matching: recite_text overrides the text derived from the card's Arabic when the two differ (a card that opens with a lead-in phrase); recite_segments gives one spoken phrase per entry in segments; recitable false opts a card out entirely (its Arabic is a narration, not a phrase to say).",
   "me-01": {
     "form": "short",
     "benefit_tier": "none",
@@ -194,6 +194,7 @@
     "benefit_tier": "none",
     "benefit_source": "مسلم 591",
     "note": "يبدأ بـ(أستغفر الله) ثلاثًا ثم اللهم أنت السلام — بطاقة واحدة",
+    "recite_text": "اللَّهُمَّ أَنْتَ السَّلاَمُ، وَمِنْكَ السَّلاَمُ، تَبَارَكْتَ يَا ذَا الْجَلاَلِ وَالْإِكْرَامِ",
     "fixed_order": 1
   },
   "pp-67": {
@@ -218,6 +219,12 @@
     "benefit_text": "من سبّح الله دبر كل صلاة ثلاثًا وثلاثين، وحمد الله ثلاثًا وثلاثين، وكبّر الله ثلاثًا وثلاثين، وقال تمام المائة: لا إله إلا الله وحده لا شريك له... غُفرت خطاياه وإن كانت مثل زبد البحر",
     "benefit_source": "مسلم 597",
     "note": "33 تسبيحة + 33 تحميدة + 33 تكبيرة + 1 تهليلة = 100 نقرة",
+    "recite_segments": [
+      "سُبْحَانَ اللَّهِ",
+      "الْحَمْدُ لِلَّهِ",
+      "اللَّهُ أَكْبَرُ",
+      "لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ"
+    ],
     "benefit_text_en": "Whoever glorifies Allah thirty-three times after every prayer, praises Him thirty-three times, magnifies Him thirty-three times, and completes the hundred with 'La ilaha illallah, wahdahu la sharika lah...' — his sins are forgiven even if they are like the foam of the sea.",
     "fixed_order": 4
   },
@@ -343,6 +350,7 @@
     "benefit_text": "كان النبي ﷺ إذا أوى إلى فراشه كل ليلة جمع كفيه ثم نفث فيهما فقرأ فيهما الإخلاص والمعوذتين ثم يمسح بهما ما استطاع من جسده — رقية النوم",
     "benefit_source": "البخاري 5017",
     "note": "الحديث وصفٌ لفعل النبي ﷺ لا وعد صريح — صنّفتها حماية لكونها رقية؛ راجِع. أُزيل نصّ المعوّذات من البطاقة وأُبقي وصف الحديث فقط (بطلب أمين)؛ ليست ضمن إعداد فصل/جمع المعوّذات",
+    "recitable": false,
     "benefit_text_en": "Every night at bedtime the Prophet ﷺ would cup his hands, blow into them, recite al-Ikhlas, al-Falaq and an-Nas, then wipe with them over his body — the bedtime ruqyah.",
     "translation_override": "When retiring to his bed every night, the Prophet ﷺ would cup his palms together, blow into them, and recite Surah al-Ikhlas and the two Mu'awwidhat (al-Falaq and an-Nas), then wipe over as much of his body as he could reach, beginning with his head and face and the front of his body — doing that three times.",
     "transliteration_override": "Kaana idhaa awaa ilaa firaashihi kulla laylatin jamaʿa kaffayhi thumma nafatha feehimaa fa-qara-a feehimaa sooratal-Ikhlaasi wal-muʿawwidhatayn (al-Falaqi wan-Naas), thumma yamsahu bihimaa mas-tataʿa min jasadihi, yabda-u bihimaa ʿalaa ra-sihi wa wajhihi wa maa aqbala min jasadihi, yafʿalu dhaalika thalaatha marraat."
@@ -397,6 +405,11 @@
     "benefit_text": "أوصى بها النبي ﷺ فاطمة وعليًا رضي الله عنهما عند النوم وقال: فهو خير لكما من خادم",
     "benefit_source": "البخاري 3705، مسلم 2727",
     "note": "33 تسبيحة + 33 تحميدة + 34 تكبيرة = 100 نقرة؛ خير لكما من خادم — ثواب",
+    "recite_segments": [
+      "سُبْحَانَ اللَّهِ",
+      "الْحَمْدُ لِلَّهِ",
+      "اللَّهُ أَكْبَرُ"
+    ],
     "benefit_text_en": "The Prophet ﷺ recommended it to Fatimah and Ali (may Allah be pleased with them) at bedtime, saying: it is better for you than a servant."
   },
   "sl-107": {

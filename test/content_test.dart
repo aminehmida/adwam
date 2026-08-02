@@ -73,6 +73,41 @@ void main() {
     }
   });
 
+  test('every recitable dhikr carries spoken text free of unspoken marks', () {
+    for (final d in repo.all.where((d) => d.isRecitable)) {
+      expect(d.spokenText.trim(), isNotEmpty, reason: d.id);
+      // Counting parentheticals, ayah roundels and ornate brackets are
+      // written but never said, so they must not reach the matcher.
+      expect(d.spokenText, isNot(contains('(')), reason: d.id);
+      expect(d.spokenText, isNot(contains('۝')), reason: d.id);
+      expect(d.spokenText, isNot(contains('﴿')), reason: d.id);
+      // ﷺ stands for words that *are* said, so it is expanded, not dropped.
+      expect(d.spokenText, isNot(contains('ﷺ')), reason: d.id);
+    }
+  });
+
+  test('cards whose Arabic is not a phrase to say opt out of voice matching',
+      () {
+    // A narration describing the Prophet's action, and the two surahs shown
+    // by name only. Everything else is something you recite.
+    expect(
+      repo.all.where((d) => !d.isRecitable).map((d) => d.id).toSet(),
+      {'sl-99', 'sl-110a', 'sl-110b'},
+    );
+    for (final d in repo.all.where((d) => d.form == DhikrForm.surah)) {
+      expect(d.isRecitable, isFalse, reason: d.id);
+    }
+  });
+
+  test('a compound count names the phrase each of its runs is said with', () {
+    for (final d in repo.all.where((d) => d.isRecitable)) {
+      expect(d.reciteSegments.length, d.segments?.length ?? 0, reason: d.id);
+      for (final phrase in d.reciteSegments) {
+        expect(phrase.trim(), isNotEmpty, reason: d.id);
+      }
+    }
+  });
+
   test('full surahs really are at the end of every session list', () {
     for (final session in SessionType.values) {
       final list = repo.defaultList(session);

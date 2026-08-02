@@ -115,6 +115,39 @@ def quran_arabic(tanzil, scaffold):
     return out
 
 
+# ﷺ stands for words that are actually pronounced, so voice matching expands
+# it rather than dropping it like the other non-spoken marks.
+SALLA = "صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ"
+
+
+def spoken_text(arabic):
+    """The dhikr as it is said, for voice matching: the card's text minus
+    everything written but not pronounced — the counting parentheticals
+    ("(ثلاثاً وثلاثين)"), the ornate Quran brackets, and the ۝ ayah roundels
+    with their Arabic-Indic numbers.
+    """
+    text = arabic.replace("ﷺ", f" {SALLA} ")
+    text = re.sub(r"\([^)]*\)", " ", text)
+    text = re.sub(r"[﴿﴾]", " ", text)
+    text = re.sub(r"۝[٠-٩]+", " ", text)
+    return " ".join(text.split())
+
+
+def recite_fields(arabic, cur):
+    """Voice-matching fields for one dhikr. A card whose Arabic is not a phrase
+    you say — a narration describing what the Prophet ﷺ did (sl-99), or a surah
+    shown by name and read from the mushaf (sl-110a/b) — has nothing to match
+    against and opts out instead of carrying misleading text.
+    """
+    if cur["form"] == "surah" or not cur.get("recitable", True):
+        return {"recitable": False}
+    return {
+        "recite_text": cur.get("recite_text") or spoken_text(arabic),
+        **({"recite_segments": cur["recite_segments"]}
+           if "recite_segments" in cur else {}),
+    }
+
+
 def clean_hisn(text):
     """Strip the (( )) decoration hisnmuslim.com wraps dhikr text in.
 
@@ -171,10 +204,11 @@ def build():
             continue
         en = en_by_order.get(item["order"], {})
         benefit = cur.get("benefit_text_override") or (item.get("fadl") or "").strip() or None
+        arabic = quran.get(did) or item["content"].strip()
         dhikrs.append({
             "id": did,
             "contexts": contexts,
-            "arabic": quran.get(did) or item["content"].strip(),
+            "arabic": arabic,
             "repetitions": item["count"],
             "form": cur["form"],
             "benefit_tier": cur["benefit_tier"],
@@ -191,6 +225,7 @@ def build():
             "transliteration": (cur.get("transliteration_override")
                                 or (en.get("transliteration") or "")
                                 .replace('"', "").strip() or None),
+            **recite_fields(arabic, cur),
             **({"sort_hint": cur["sort_hint"]} if "sort_hint" in cur else {}),
             **({"qul_variant": cur["qul_variant"]} if "qul_variant" in cur else {}),
         })
@@ -240,6 +275,22 @@ def build():
     if bodyless:
         raise SystemExit(f"surah-form entries missing body: {bodyless}")
 
+    # Voice matching: a dhikr either opts out or carries text to match, and a
+    # compound count must name the phrase each of its runs is said with —
+    # otherwise the matcher cannot tell that the words change mid-run.
+    speechless = [d["id"] for d in dhikrs
+                  if d.get("recitable", True) and not d.get("recite_text")]
+    if speechless:
+        raise SystemExit(f"recitable entries without recite_text: {speechless}")
+
+    mismatched = [d["id"] for d in dhikrs
+                  if d.get("recitable", True)
+                  and len(d.get("recite_segments", d.get("segments", [])))
+                  != len(d.get("segments", []))]
+    if mismatched:
+        raise SystemExit("recite_segments must have one phrase per segment: "
+                         f"{mismatched}")
+
     out = {"version": 1, "dhikrs": dhikrs}
     assets = ROOT / "assets"
     assets.mkdir(exist_ok=True)
@@ -269,6 +320,7 @@ def _hisn_entry(did, contexts, arabic, cur, en, body=None):
                         or clean_hisn_en(en.get("TRANSLATED_TEXT"))),
         "transliteration": (cur.get("transliteration_override")
                             or clean_hisn_en(en.get("LANGUAGE_ARABIC_TRANSLATED_TEXT"))),
+        **recite_fields(arabic, cur),
         **({"sort_hint": cur["sort_hint"]} if "sort_hint" in cur else {}),
         **({"fixed_order": cur["fixed_order"]} if "fixed_order" in cur else {}),
         **({"prayers": cur["prayers"]} if "prayers" in cur else {}),
