@@ -1213,27 +1213,26 @@ class _SessionScreenState extends State<SessionScreen>
               },
       ),
     );
+    if (!newSection) {
+      return KeyedSubtree(key: _keyFor(dhikr.id), child: card);
+    }
+    final key = sectionKey!; // a band only heads a section, never a bare card
     return KeyedSubtree(
       key: _keyFor(dhikr.id),
-      child: newSection
-          ? Column(
-              children: [
-                sectionBandFor(
-                  context,
-                  dhikr,
-                  progress: _sectionProgress(
-                    config,
-                    progress,
-                    dhikrs,
-                    sectionKey!,
-                  ),
-                  collapsed: sectionCollapsed,
-                  onToggle: () => _toggleSection(sectionKey, dhikr.id),
-                ),
-                if (!sectionCollapsed) card,
-              ],
-            )
-          : card,
+      child: Column(
+        children: [
+          sectionBandFor(
+            context,
+            dhikr,
+            progress: sectionCollapsed
+                ? _sectionProgress(config, progress, dhikrs, key)
+                : null,
+            collapsed: sectionCollapsed,
+            onToggle: () => _toggleSection(key, dhikr.id),
+          ),
+          if (!sectionCollapsed) card,
+        ],
+      ),
     );
   }
 

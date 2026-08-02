@@ -33,8 +33,8 @@ String? sectionKeyFor(Dhikr dhikr) {
 ///
 /// In edit mode [onMoveUp] / [onMoveDown] add the ▲▼ buttons that move the
 /// whole section; a null callback renders its arrow disabled (the section is
-/// already at that end of the list). While counting, [progress] shows how
-/// much of the section is recited and [onToggle] folds it away.
+/// already at that end of the list). While counting, [onToggle] folds the
+/// section away and [progress] summarises it once folded.
 Widget sectionBandFor(
   BuildContext context,
   Dhikr dhikr, {
@@ -106,7 +106,8 @@ class SectionBand extends StatelessWidget {
   final VoidCallback? onMoveUp;
   final VoidCallback? onMoveDown;
 
-  /// Recited / total for this section, shown at the end of the band.
+  /// Recited / total for this section, shown at the end of the band while
+  /// it is folded — an open section shows the same thing on its cards.
   final ({int done, int total})? progress;
 
   /// Whether the section's cards are folded away behind this band.
@@ -191,32 +192,28 @@ class SectionBand extends StatelessWidget {
               child: Text('✦', style: TextStyle(fontSize: 9, color: color)),
             ),
             line(true),
-            if (progress != null)
-              Padding(
-                padding: const EdgeInsetsDirectional.only(start: 10),
-                child: Text(
-                  '${progress!.done}/${progress!.total}',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    fontFeatures: const [FontFeature.tabularFigures()],
-                    color: color.withValues(alpha: .8),
+            // Only a folded section carries the summary: an open one already
+            // shows its adhkar, and the band stays a plain ornament.
+            if (collapsed) ...[
+              if (progress != null)
+                Padding(
+                  padding: const EdgeInsetsDirectional.only(start: 10),
+                  child: Text(
+                    '${progress!.done}/${progress!.total}',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      fontFeatures: const [FontFeature.tabularFigures()],
+                      color: color.withValues(alpha: .8),
+                    ),
                   ),
                 ),
+              Icon(
+                Icons.expand_more,
+                size: 20,
+                color: color.withValues(alpha: .8),
               ),
-            if (onToggle != null)
-              // Points down while folded (tap to open), up while the cards
-              // are showing (tap to fold).
-              AnimatedRotation(
-                turns: collapsed ? 0 : .5,
-                duration: const Duration(milliseconds: 200),
-                curve: Curves.easeOut,
-                child: Icon(
-                  Icons.expand_more,
-                  size: 20,
-                  color: color.withValues(alpha: .8),
-                ),
-              ),
+            ],
             if (movable) ...[
               _arrow(Icons.arrow_upward, l10n.moveSectionUp, onMoveUp),
               _arrow(Icons.arrow_downward, l10n.moveSectionDown, onMoveDown),
