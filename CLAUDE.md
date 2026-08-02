@@ -13,7 +13,7 @@ Adwam (أدوَم) — Flutter adhkar app (currently released on Android; iOS pl
 
 # Toolchain & environment
 
-- All dev tools (flutter, dart, java) are mise-managed and NOT on PATH in non-interactive shells: run via `mise exec -- <cmd>` (alias `mise x --`), pinned in `mise.toml` (Flutter 3.44.6, temurin-17). A fresh git worktree needs `mise trust` before `mise exec` works in it.
+- All dev tools (flutter, dart, java) are mise-managed and NOT on PATH in non-interactive shells: run via `mise exec -- <cmd>` (alias `mise x --`), pinned in `mise.toml` (Flutter 3.44.6, temurin-17). Fresh worktrees need no `mise trust`: this repo's root is in mise's `trusted_config_paths`, which covers everything under it (`mise settings add trusted_config_paths <repo>` to restore on a new machine).
 - Android SDK: `/opt/homebrew/share/android-commandlinetools` (brew cask). For sdkmanager/keytool: `export JAVA_HOME="$(mise where java)/Contents/Home"`.
 - The Galaxy S24 Ultra drops off USB regularly: usually cable/charge-only mode; diagnose with `system_profiler SPUSBDataType | grep -i samsung`. Two adb binaries exist (brew vs platform-tools) — if they fight, kill and restart the adb server.
 - Interrupted `sdkmanager` downloads hang on retry: kill the process and `rm -rf $SDK/.temp` first. A first Gradle build downloads a ~2.8GB NDK and is very slow — run it in background, never start a second build concurrently; if killed mid-download, delete the partial `ndk/<version>` dir.
