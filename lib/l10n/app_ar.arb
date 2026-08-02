@@ -26,6 +26,8 @@
   "fullSurahs": "سور كاملة",
   "moveSectionUp": "نقل القسم لأعلى",
   "moveSectionDown": "نقل القسم لأسفل",
+  "collapseSection": "طي القسم",
+  "expandSection": "فتح القسم",
   "freeOrder": "ترتيب حر (بلا أقسام)",
   "resetOrderTitle": "استعادة الترتيب الافتراضي؟",
   "resetOrderBody": "سيُعاد ترتيب هذه القائمة وإظهار جميع الأذكار.",

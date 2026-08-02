@@ -13,19 +13,37 @@ String tierLabel(BuildContext context, BenefitTier tier) {
   };
 }
 
+/// Stable identity of the section [dhikr] belongs to, or null for a
+/// fixed-order dhikr (the post-prayer sunnah sequence is unbanded).
+///
+/// Every card of a run shares these properties — that is exactly what
+/// [startsSection] tests — so the key can be read off any member without
+/// walking back to the band. Kept in step with [sectionBandFor]'s labels.
+String? sectionKeyFor(Dhikr dhikr) {
+  if (dhikr.hasFixedOrder) return null;
+  if (dhikr.isCustom) return 'custom';
+  if (dhikr.isHighRep) return 'high-rep';
+  if (dhikr.form == DhikrForm.surah) return 'surah';
+  return 'tier:${dhikr.tier.name}';
+}
+
 /// Section band for a list run. The user's own duas, high-repetition runs
 /// and the full-surah band each get their own label; every other run is
 /// labeled by tier.
 ///
 /// In edit mode [onMoveUp] / [onMoveDown] add the ▲▼ buttons that move the
 /// whole section; a null callback renders its arrow disabled (the section is
-/// already at that end of the list).
+/// already at that end of the list). While counting, [progress] shows how
+/// much of the section is recited and [onToggle] folds it away.
 Widget sectionBandFor(
   BuildContext context,
   Dhikr dhikr, {
   bool movable = false,
   VoidCallback? onMoveUp,
   VoidCallback? onMoveDown,
+  ({int done, int total})? progress,
+  bool collapsed = false,
+  VoidCallback? onToggle,
 }) {
   final (label, color) = switch (dhikr) {
     _ when dhikr.isCustom => (
@@ -48,6 +66,9 @@ Widget sectionBandFor(
     movable: movable,
     onMoveUp: onMoveUp,
     onMoveDown: onMoveDown,
+    progress: progress,
+    collapsed: collapsed,
+    onToggle: onToggle,
   );
 }
 
@@ -85,6 +106,15 @@ class SectionBand extends StatelessWidget {
   final VoidCallback? onMoveUp;
   final VoidCallback? onMoveDown;
 
+  /// Recited / total for this section, shown at the end of the band.
+  final ({int done, int total})? progress;
+
+  /// Whether the section's cards are folded away behind this band.
+  final bool collapsed;
+
+  /// Tapping the band folds the section away; null makes it inert.
+  final VoidCallback? onToggle;
+
   const SectionBand({
     super.key,
     required this.label,
@@ -92,6 +122,9 @@ class SectionBand extends StatelessWidget {
     this.movable = false,
     this.onMoveUp,
     this.onMoveDown,
+    this.progress,
+    this.collapsed = false,
+    this.onToggle,
   });
 
   Widget _arrow(IconData icon, String tooltip, VoidCallback? onPressed) =>
@@ -122,39 +155,81 @@ class SectionBand extends StatelessWidget {
         );
 
     final l10n = AppLocalizations.of(context)!;
-    return Padding(
+    final band = Padding(
       // The arrows are taller than the label, so their band trims the
       // vertical padding to keep both variants about the same height.
       padding: movable
           ? const EdgeInsets.fromLTRB(20, 14, 6, 4)
           : const EdgeInsets.fromLTRB(20, 22, 20, 10),
-      child: Row(
-        children: [
-          line(false),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Text('✦', style: TextStyle(fontSize: 9, color: color)),
-          ),
-          Text(
-            label,
-            style: TextStyle(
-              fontFamily: 'Amiri',
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: color,
+      child: LayoutBuilder(
+        builder: (context, constraints) => Row(
+          children: [
+            line(false),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: Text('✦', style: TextStyle(fontSize: 9, color: color)),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Text('✦', style: TextStyle(fontSize: 9, color: color)),
-          ),
-          line(true),
-          if (movable) ...[
-            _arrow(Icons.arrow_upward, l10n.moveSectionUp, onMoveUp),
-            _arrow(Icons.arrow_downward, l10n.moveSectionDown, onMoveDown),
+            // The lines are the only elastic part of the row, so the label is
+            // capped at half the band: a long one (or a large system font
+            // scale) ellipsizes instead of pushing the count off the edge.
+            ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: constraints.maxWidth / 2),
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontFamily: 'Amiri',
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: color,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: Text('✦', style: TextStyle(fontSize: 9, color: color)),
+            ),
+            line(true),
+            if (progress != null)
+              Padding(
+                padding: const EdgeInsetsDirectional.only(start: 10),
+                child: Text(
+                  '${progress!.done}/${progress!.total}',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    fontFeatures: const [FontFeature.tabularFigures()],
+                    color: color.withValues(alpha: .8),
+                  ),
+                ),
+              ),
+            if (onToggle != null)
+              // Points down while folded (tap to open), up while the cards
+              // are showing (tap to fold).
+              AnimatedRotation(
+                turns: collapsed ? 0 : .5,
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeOut,
+                child: Icon(
+                  Icons.expand_more,
+                  size: 20,
+                  color: color.withValues(alpha: .8),
+                ),
+              ),
+            if (movable) ...[
+              _arrow(Icons.arrow_upward, l10n.moveSectionUp, onMoveUp),
+              _arrow(Icons.arrow_downward, l10n.moveSectionDown, onMoveDown),
+            ],
           ],
-        ],
+        ),
       ),
+    );
+    if (onToggle == null) return band;
+    return Semantics(
+      button: true,
+      label: collapsed ? l10n.expandSection : l10n.collapseSection,
+      child: InkWell(onTap: onToggle, child: band),
     );
   }
 }

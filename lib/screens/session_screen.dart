@@ -178,6 +178,11 @@ class _SessionScreenState extends State<SessionScreen>
   /// until tapped closed or its count is reset by long-press.
   final Set<String> _peeked = {};
 
+  /// Sections folded away by tapping their band (keys from [sectionKeyFor]).
+  /// Deliberately not persisted: folding is a way to skim the list right now,
+  /// so every visit to the session opens on the full list.
+  final Set<String> _collapsedSections = {};
+
   /// Last dhikr the user tapped or long-pressed. A finished dhikr stays
   /// expanded while it is the active one — some people tap the count before
   /// reciting — and only collapses once another dhikr is tapped.
@@ -336,9 +341,11 @@ class _SessionScreenState extends State<SessionScreen>
   /// Make [id]'s card the viewport origin (and the active card) without any
   /// visible change: the scroll offset is corrected in the same frame by
   /// exactly the distance the origin moved.
-  void _anchorTo(String id) {
+  /// [activate] off re-origins the viewport without touching the active
+  /// card — folding a section moves the list, but nothing was recited.
+  void _anchorTo(String id, {bool activate = true}) {
     if (_anchorId == id) {
-      if (_activeId != id) setState(() => _activeId = id);
+      if (activate && _activeId != id) setState(() => _activeId = id);
       return;
     }
     final renderObject = _keyFor(id).currentContext?.findRenderObject();
@@ -347,7 +354,7 @@ class _SessionScreenState extends State<SessionScreen>
         !_scrollController.hasClients) {
       // Not laid out (shouldn't happen for a just-tapped card): keep the old
       // anchor rather than re-origin the viewport blind.
-      setState(() => _activeId = id);
+      if (activate) setState(() => _activeId = id);
       return;
     }
     final position = _scrollController.position;
@@ -362,7 +369,29 @@ class _SessionScreenState extends State<SessionScreen>
     position.correctBy(-reveal);
     setState(() {
       _anchorId = id;
-      _activeId = id;
+      if (activate) _activeId = id;
+    });
+  }
+
+  /// Whether [dhikr]'s section is folded away. A free-ordered session has no
+  /// sections at all, so nothing there can be folded.
+  bool _isSectionCollapsed(ListConfigController config, Dhikr dhikr) {
+    if (_collapsedSections.isEmpty ||
+        config.configFor(widget.session).freeOrder) {
+      return false;
+    }
+    final key = sectionKeyFor(dhikr);
+    return key != null && _collapsedSections.contains(key);
+  }
+
+  /// Fold [key]'s section away, or unfold it. The band is pinned first so it
+  /// stays under the finger while the cards below it appear or vanish —
+  /// [first] is the section's own leading dhikr, whose item carries the band.
+  void _toggleSection(String key, String first) {
+    HapticFeedback.selectionClick();
+    _anchorTo(first, activate: false);
+    setState(() {
+      if (!_collapsedSections.remove(key)) _collapsedSections.add(key);
     });
   }
 
@@ -377,16 +406,21 @@ class _SessionScreenState extends State<SessionScreen>
     bool isIncomplete(Dhikr d) =>
         !config.isHidden(widget.session, d.id) &&
         !progress.isDone(widget.session, d.id);
+    // A dhikr inside a folded section is not on screen to scroll to.
+    bool isReachable(Dhikr d) =>
+        isIncomplete(d) && !_isSectionCollapsed(config, d);
     // Search forward from the finished dhikr so a deliberately skipped
     // earlier one isn't snapped back to; wrap only when nothing is ahead.
     final afterIndex = dhikrs.indexWhere((d) => d.id == after);
-    var targetIndex = dhikrs.indexWhere(isIncomplete, afterIndex + 1);
-    if (targetIndex == -1) targetIndex = dhikrs.indexWhere(isIncomplete);
+    var targetIndex = dhikrs.indexWhere(isReachable, afterIndex + 1);
+    if (targetIndex == -1) targetIndex = dhikrs.indexWhere(isReachable);
     if (targetIndex == -1) {
       // Nothing left anywhere: the session is finished. Every completion path
       // (tap, focus counter, surah reader) funnels through here, so this is
-      // the one place that knows it.
-      if (widget.session == SessionType.postPrayer) {
+      // the one place that knows it. Folded-away adhkar still count as left
+      // to do — only the scroll target ignores them.
+      if (widget.session == SessionType.postPrayer &&
+          !dhikrs.any(isIncomplete)) {
         context.read<PrayerController>().recordCompletion();
       }
       return;
@@ -482,7 +516,8 @@ class _SessionScreenState extends State<SessionScreen>
     final dhikrs = config.listFor(widget.session);
     bool isIncomplete(Dhikr d) =>
         !config.isHidden(widget.session, d.id) &&
-        !progress.isDone(widget.session, d.id);
+        !progress.isDone(widget.session, d.id) &&
+        !_isSectionCollapsed(config, d);
     Dhikr? target;
     final activeIndex = dhikrs.indexWhere((d) => d.id == _activeId);
     if (activeIndex != -1 &&
@@ -1111,15 +1146,22 @@ class _SessionScreenState extends State<SessionScreen>
     int index,
   ) {
     final dhikr = dhikrs[index];
+    // A free-ordered session mixes tiers, so its bands are dropped entirely
+    // rather than heading nearly every card.
+    final banded = !config.configFor(widget.session).freeOrder;
+    final newSection = banded && startsSection(dhikrs, index);
+    final sectionKey = banded ? sectionKeyFor(dhikr) : null;
+    final sectionCollapsed =
+        sectionKey != null && _collapsedSections.contains(sectionKey);
+    // Folded section: only its band survives, standing in for every card.
+    if (sectionCollapsed && !newSection) {
+      return KeyedSubtree(key: _keyFor(dhikr.id), child: const SizedBox());
+    }
     final hidden = config.isHidden(widget.session, dhikr.id);
     final done = progress.isDone(widget.session, dhikr.id);
     final finished = !hidden && done && dhikr.id != _activeId;
     final collapsed = hidden || finished;
     final peeking = collapsed && _peeked.contains(dhikr.id);
-    // A free-ordered session mixes tiers, so its bands are dropped entirely
-    // rather than heading nearly every card.
-    final newSection = !config.configFor(widget.session).freeOrder &&
-        startsSection(dhikrs, index);
     // A peek is a read-only look at a hidden or finished dhikr; a tap
     // collapses it again (hidden peeks also close on scroll — unhide
     // permanently via edit mode). The Opacity wrapper is always present so
@@ -1174,9 +1216,44 @@ class _SessionScreenState extends State<SessionScreen>
     return KeyedSubtree(
       key: _keyFor(dhikr.id),
       child: newSection
-          ? Column(children: [sectionBandFor(context, dhikr), card])
+          ? Column(
+              children: [
+                sectionBandFor(
+                  context,
+                  dhikr,
+                  progress: _sectionProgress(
+                    config,
+                    progress,
+                    dhikrs,
+                    sectionKey!,
+                  ),
+                  collapsed: sectionCollapsed,
+                  onToggle: () => _toggleSection(sectionKey, dhikr.id),
+                ),
+                if (!sectionCollapsed) card,
+              ],
+            )
           : card,
     );
+  }
+
+  /// How much of [sectionKey]'s run is recited. Hidden adhkar are left out of
+  /// both halves, like the home screen's session badge.
+  ({int done, int total}) _sectionProgress(
+    ListConfigController config,
+    ProgressController progress,
+    List<Dhikr> dhikrs,
+    String sectionKey,
+  ) {
+    var done = 0;
+    var total = 0;
+    for (final dhikr in dhikrs) {
+      if (sectionKeyFor(dhikr) != sectionKey) continue;
+      if (config.isHidden(widget.session, dhikr.id)) continue;
+      total++;
+      if (progress.isDone(widget.session, dhikr.id)) done++;
+    }
+    return (done: done, total: total);
   }
 
   /// Scroll offset that would put [id]'s edit card at the top of the

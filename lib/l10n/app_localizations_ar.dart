@@ -88,6 +88,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get moveSectionDown => 'نقل القسم لأسفل';
 
   @override
+  String get collapseSection => 'طي القسم';
+
+  @override
+  String get expandSection => 'فتح القسم';
+
+  @override
   String get freeOrder => 'ترتيب حر (بلا أقسام)';
 
   @override
