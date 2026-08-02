@@ -248,7 +248,7 @@ void main() {
     // Every card also carries a tier chip, so the band is found by type.
     final band = find.descendant(
       of: find.byType(SectionBand),
-      matching: find.text('Other benefits'),
+      matching: find.text('Other rewards'),
     );
     // An open section is a plain band: the cards carry their own counts.
     expect(find.text('0/2'), findsNothing);

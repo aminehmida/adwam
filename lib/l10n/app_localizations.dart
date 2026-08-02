@@ -221,13 +221,13 @@ abstract class AppLocalizations {
   /// No description provided for @tierReward.
   ///
   /// In en, this message translates to:
-  /// **'Reward'**
+  /// **'Specific rewards'**
   String get tierReward;
 
   /// No description provided for @tierOther.
   ///
   /// In en, this message translates to:
-  /// **'Other benefits'**
+  /// **'Other rewards'**
   String get tierOther;
 
   /// No description provided for @tierHighRep.
