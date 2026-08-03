@@ -151,17 +151,47 @@ void main() {
       expect(matcher.match('$single $single')?.repetitions, anyOf(isNull, 1));
     });
 
-    test('Quran passages stay out of voice matching', () {
-      final candidates = PhraseMatcher.forDhikrs(
-          repo.defaultList(SessionType.morning)).candidates;
-      final quranIds = repo
-          .defaultList(SessionType.morning)
-          .where((d) => d.form == DhikrForm.quran)
-          .map((d) => d.id);
-      expect(quranIds, isNotEmpty);
-      for (final id in quranIds) {
-        expect(candidates.map((c) => c.dhikrId), isNot(contains(id)));
+    test('a near miss is reported even though it is not counted', () {
+      // What the debug bar needs: "heard you, scored 0.4" has to be
+      // distinguishable from "heard nothing at all".
+      final matcher = matcherFor(SessionType.morning);
+      const heard = 'ما رأيك في الطقس اليوم';
+      expect(matcher.match(heard), isNull);
+      final closest = matcher.best(heard);
+      expect(closest, isNotNull);
+      expect(closest!.score, lessThan(PhraseMatcher.defaultThreshold));
+      expect(closest.score, greaterThan(0));
+      // Nothing at all still yields nothing.
+      expect(matcher.best(''), isNull);
+    });
+
+    test('ayat and short surahs are matched like any other phrase', () {
+      // A short Quranic passage is a fixed phrase; only the full-surah reading
+      // is a different problem.
+      final ids = PhraseMatcher.forDhikrs(repo.defaultList(SessionType.morning))
+          .candidates
+          .map((c) => c.dhikrId);
+      expect(ids, contains('me-02')); // Ayat al-Kursi
+      expect(ids, contains('me-04')); // al-Ikhlas
+    });
+
+    test('reciting a short surah counts it', () {
+      final matcher = matcherFor(SessionType.morning);
+      expect(matcher.match(byId['me-04']!.spokenText)?.dhikrId, 'me-04');
+      expect(matcher.match(byId['me-06']!.spokenText)?.dhikrId, 'me-06');
+    });
+
+    test('the full bedtime surahs and the narration stay out', () {
+      // sl-110a/b are read from the mushaf by name, and sl-99 describes an
+      // action rather than being a phrase to say.
+      final ids = PhraseMatcher.forDhikrs(repo.defaultList(SessionType.sleep))
+          .candidates
+          .map((c) => c.dhikrId);
+      for (final id in ['sl-110a', 'sl-110b', 'sl-99']) {
+        expect(ids, isNot(contains(id)), reason: id);
       }
+      // But the bedtime ayat do take part.
+      expect(ids, contains('sl-100')); // Ayat al-Kursi
     });
   });
 }

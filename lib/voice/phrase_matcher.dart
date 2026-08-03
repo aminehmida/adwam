@@ -64,14 +64,15 @@ class PhraseMatcher {
   /// The phrases [dhikrs] can be recited as, in the order given — which must
   /// be the session's own order, holding only what is left to do.
   ///
-  /// Quran passages are left out: following recitation of an ayah against the
-  /// mushaf is a different problem from recognising a fixed dhikr phrase, and
-  /// those cards stay tap-driven. Cards whose Arabic is not something you say
-  /// have already opted out via [Dhikr.isRecitable].
+  /// Short Quranic passages take part: an ayah or a short surah is a fixed
+  /// phrase like any other dhikr. The two full surahs read from the mushaf at
+  /// bedtime do not — following a thirty-ayah recitation is a different problem
+  /// — and they have already opted out via [Dhikr.isRecitable], along with the
+  /// narration card whose text is not something you say.
   factory PhraseMatcher.forDhikrs(Iterable<Dhikr> dhikrs) {
     final candidates = <PhraseCandidate>[];
     for (final dhikr in dhikrs) {
-      if (!dhikr.isRecitable || dhikr.form == DhikrForm.quran) continue;
+      if (!dhikr.isRecitable) continue;
       final segmented = dhikr.reciteSegments.isNotEmpty;
       final phrases = segmented ? dhikr.reciteSegments : [dhikr.spokenText];
       for (var i = 0; i < phrases.length; i++) {
@@ -92,10 +93,20 @@ class PhraseMatcher {
   /// [threshold] — a cough, a passing conversation, or a dhikr from another
   /// session. Silence is the right answer to those.
   PhraseMatch? match(String transcript, {double threshold = defaultThreshold}) {
+    final candidate = best(transcript);
+    return candidate != null && candidate.score > threshold ? candidate : null;
+  }
+
+  /// The closest candidate whatever its score, even a hopeless one.
+  ///
+  /// [match] throws this away, which is right for counting and useless for
+  /// diagnosis: a near miss and never having heard anything look identical
+  /// from the outside. The debug bar shows this so the two can be told apart.
+  PhraseMatch? best(String transcript) {
     final heard = normalizeArabic(transcript);
     if (heard.isEmpty) return null;
     String? bestId;
-    var bestScore = threshold;
+    var bestScore = 0.0;
     var bestRun = 1;
     for (final candidate in candidates) {
       if (candidate.normalized.isEmpty) continue;

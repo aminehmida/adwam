@@ -6,6 +6,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
 
+import '../build_channel.dart';
 import 'model_store.dart';
 import 'phrase_matcher.dart';
 import 'speech_engine.dart';
@@ -31,6 +32,51 @@ enum VoiceStatus {
   failed,
 }
 
+/// A running account of what voice mode is actually doing, for the dev-flavour
+/// debug bar.
+///
+/// The pipeline has four places it can quietly stop — the microphone delivering
+/// nothing, the detector finding no speech in it, the recogniser rendering no
+/// words, the matcher rejecting the words it did get — and from the outside all
+/// four look the same: a counter that will not move. These fields tell them
+/// apart.
+class VoiceDiagnostics {
+  /// Bytes of audio off the microphone, and the loudest sample in the last
+  /// chunk. A level pinned at zero means the microphone, not the recogniser.
+  int bytes = 0;
+  double level = 0;
+
+  /// Chunks the detector has taken, and stretches of speech it cut from them.
+  int chunks = 0;
+  int segments = 0;
+
+  /// Utterances the recogniser rendered into words.
+  int utterances = 0;
+
+  String? lastTranscript;
+
+  /// The closest dhikr to the last utterance and how close it was, whether or
+  /// not it cleared the bar.
+  String? lastMatchId;
+  double? lastScore;
+  bool accepted = false;
+
+  String? error;
+
+  void reset() {
+    bytes = 0;
+    level = 0;
+    chunks = 0;
+    segments = 0;
+    utterances = 0;
+    lastTranscript = null;
+    lastMatchId = null;
+    lastScore = null;
+    accepted = false;
+    error = null;
+  }
+}
+
 /// Where the phrases still worth listening for come from. Read afresh for
 /// every utterance, so finishing a dhikr takes it out of contention and the
 /// identical one below it starts filling instead.
@@ -51,16 +97,16 @@ class VoiceSessionController extends ChangeNotifier {
   final _matches = StreamController<PhraseMatch>.broadcast();
   Transcriber? _transcriber;
   StreamSubscription<Uint8List>? _microphone;
-  StreamSubscription<String>? _heard;
+  StreamSubscription<TranscriberEvent>? _heard;
 
   VoiceStatus _status = VoiceStatus.off;
   VoiceStatus get status => _status;
 
   Object? failure;
 
-  /// The last thing the recogniser rendered, matched or not. Only used by the
-  /// dev-flavour harness; the app itself never shows a transcript.
-  String? lastTranscript;
+  /// Everything the debug bar shows. Kept up to date whatever the channel —
+  /// it costs a handful of fields — but only ever displayed on the dev build.
+  final diagnostics = VoiceDiagnostics();
 
   /// Dhikrs recognised, in the order they were said.
   Stream<PhraseMatch> get matches => _matches.stream;
@@ -76,6 +122,7 @@ class VoiceSessionController extends ChangeNotifier {
 
   Future<void> start(MatcherSource source) async {
     if (isOn) return;
+    diagnostics.reset();
     _set(VoiceStatus.starting);
 
     if (!await modelStore.isInstalled(spec)) {
@@ -92,11 +139,7 @@ class VoiceSessionController extends ChangeNotifier {
         modelDirectory: directory.path,
         vadModelPath: await _extractVadModel(),
       );
-      _heard = _transcriber!.utterances.listen((text) {
-        lastTranscript = text;
-        final match = source().match(text);
-        if (match != null) _matches.add(match);
-      });
+      _heard = _transcriber!.events.listen(_onTranscriberEvent(source));
 
       final stream = await _recorder.startStream(
         RecordConfig(
@@ -113,7 +156,14 @@ class VoiceSessionController extends ChangeNotifier {
         ),
       );
       _microphone = stream.listen(
-        (chunk) => _transcriber?.addAudio(chunk),
+        (chunk) {
+          // Measured here rather than in the isolate so the bar can tell a
+          // silent microphone from a busy one that nothing matches.
+          diagnostics.level = _loudnessOf(chunk);
+          diagnostics.bytes += chunk.length;
+          _transcriber?.addAudio(chunk);
+          notifyListeners();
+        },
         onError: (Object error) => _fail(error),
       );
       _set(VoiceStatus.listening);
@@ -127,6 +177,47 @@ class VoiceSessionController extends ChangeNotifier {
     if (_status == VoiceStatus.off) return;
     await _teardown();
     _set(VoiceStatus.off);
+  }
+
+  /// Records what the isolate reports and, for an utterance, decides whether
+  /// it was a dhikr. The closest candidate is kept even when it is rejected:
+  /// "heard you, scored 0.41" and "heard nothing" are different problems.
+  void Function(TranscriberEvent) _onTranscriberEvent(MatcherSource source) {
+    return (event) {
+      if (event.chunks > 0) diagnostics.chunks = event.chunks;
+      if (event.segments > 0) diagnostics.segments = event.segments;
+      if (event.error != null) {
+        _fail(event.error!);
+        return;
+      }
+      final text = event.transcript;
+      if (text != null) {
+        diagnostics.utterances++;
+        diagnostics.lastTranscript = text;
+        final candidate = source().best(text);
+        diagnostics.lastMatchId = candidate?.dhikrId;
+        diagnostics.lastScore = candidate?.score;
+        diagnostics.accepted =
+            candidate != null && candidate.score > PhraseMatcher.defaultThreshold;
+        _log('heard "$text" -> ${candidate?.dhikrId ?? "nothing"} '
+            '${candidate?.score.toStringAsFixed(2) ?? ""} '
+            '${diagnostics.accepted ? "counted" : "rejected"}');
+        if (diagnostics.accepted) _matches.add(candidate!);
+      }
+      notifyListeners();
+    };
+  }
+
+  /// Peak sample of a 16-bit PCM chunk, 0..1.
+  static double _loudnessOf(Uint8List pcm16) {
+    var peak = 0;
+    for (var i = 0; i + 1 < pcm16.length; i += 2) {
+      var sample = pcm16[i] | (pcm16[i + 1] << 8);
+      if (sample > 32767) sample -= 65536;
+      final magnitude = sample.abs();
+      if (magnitude > peak) peak = magnitude;
+    }
+    return peak / 32768.0;
   }
 
   /// An external microphone sits centimetres from the mouth, which is worth
@@ -178,13 +269,25 @@ class VoiceSessionController extends ChangeNotifier {
 
   void _fail(Object error) {
     failure = error;
+    diagnostics.error = error.toString();
     _set(VoiceStatus.failed);
+    // A failure mid-listening leaves the microphone open; nothing downstream
+    // will use what it hears.
+    unawaited(_teardown());
   }
 
   void _set(VoiceStatus status) {
     if (_status == status) return;
     _status = status;
+    _log('status: ${status.name}');
     notifyListeners();
+  }
+
+  /// Mirrors the debug bar into logcat, so a session can be diagnosed from
+  /// `adb logcat` without watching the screen while reciting. Dev builds only;
+  /// [isDevChannel] is a const, so prod drops these calls entirely.
+  static void _log(String message) {
+    if (isDevChannel) debugPrint('[voice] $message');
   }
 
   @override
