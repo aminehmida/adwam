@@ -132,6 +132,25 @@ void main() {
       }
     });
 
+    test('a quick run of tasbih in one breath counts every repetition', () {
+      // The detector cuts on silence, so saying سبحان الله four times without
+      // pausing arrives as a single utterance — worth four, not one.
+      final matcher = matcherFor(SessionType.morning);
+      final once = byId['me-34']!.spokenText;
+      final match = matcher.match(List.filled(4, once).join(' '));
+      expect(match?.dhikrId, 'me-34');
+      expect(match?.repetitions, 4);
+    });
+
+    test('a dhikr said once is never counted as a run', () {
+      // sl-105 is recited once, so no repeat search happens for it at all.
+      final matcher = matcherFor(SessionType.sleep);
+      final single = byId['sl-105']!.spokenText;
+      expect(matcher.match(single)?.repetitions, 1);
+      // Even hearing it twice cannot count it twice.
+      expect(matcher.match('$single $single')?.repetitions, anyOf(isNull, 1));
+    });
+
     test('Quran passages stay out of voice matching', () {
       final candidates = PhraseMatcher.forDhikrs(
           repo.defaultList(SessionType.morning)).candidates;

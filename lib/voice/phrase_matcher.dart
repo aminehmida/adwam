@@ -6,12 +6,25 @@ import 'arabic_normalizer.dart';
 /// A dhikr can contribute several candidates: a compound count says different
 /// words in each of its runs (33 × سبحان الله, then 33 × الحمد لله, …), and
 /// any of them counts as reciting that dhikr — exactly as any tap does.
+/// Beyond this the audio is cut by the detector's own speech-length limit, so
+/// searching for longer runs inside one utterance finds nothing.
+const maxRunInOneSegment = 12;
+
 class PhraseCandidate {
   final String dhikrId;
   final String normalized;
 
-  PhraseCandidate({required this.dhikrId, required String text})
-      : normalized = normalizeArabic(text);
+  /// How many times in a row this phrase could legitimately be said. A run of
+  /// quick tasbih comes back as one segment rather than one per repetition, so
+  /// the matcher looks for the phrase repeated — but only as far as the dhikr
+  /// itself asks for, which is 1 for an ordinary dua and no search at all.
+  final int maxRun;
+
+  PhraseCandidate({
+    required this.dhikrId,
+    required String text,
+    this.maxRun = 1,
+  }) : normalized = normalizeArabic(text);
 }
 
 class PhraseMatch {
@@ -21,7 +34,11 @@ class PhraseMatch {
   /// evaluation harness; the app itself only cares that it cleared the bar.
   final double score;
 
-  const PhraseMatch(this.dhikrId, this.score);
+  /// How many recitations the utterance was worth — more than one when the
+  /// phrase was repeated without a long enough pause to split the audio.
+  final int repetitions;
+
+  const PhraseMatch(this.dhikrId, this.score, {this.repetitions = 1});
 }
 
 /// Decides which dhikr an utterance was, out of the ones still left to recite.
@@ -55,11 +72,17 @@ class PhraseMatcher {
     final candidates = <PhraseCandidate>[];
     for (final dhikr in dhikrs) {
       if (!dhikr.isRecitable || dhikr.form == DhikrForm.quran) continue;
-      final phrases = dhikr.reciteSegments.isEmpty
-          ? [dhikr.spokenText]
-          : dhikr.reciteSegments;
-      for (final phrase in phrases) {
-        candidates.add(PhraseCandidate(dhikrId: dhikr.id, text: phrase));
+      final segmented = dhikr.reciteSegments.isNotEmpty;
+      final phrases = segmented ? dhikr.reciteSegments : [dhikr.spokenText];
+      for (var i = 0; i < phrases.length; i++) {
+        // Each run of a compound count has its own length: 33 tasbihat, then
+        // 33 tahmidat, then a single tahlil to round out the hundred.
+        final wanted = segmented ? dhikr.segments![i] : dhikr.repetitions;
+        candidates.add(PhraseCandidate(
+          dhikrId: dhikr.id,
+          text: phrases[i],
+          maxRun: wanted < maxRunInOneSegment ? wanted : maxRunInOneSegment,
+        ));
       }
     }
     return PhraseMatcher(candidates);
@@ -73,17 +96,40 @@ class PhraseMatcher {
     if (heard.isEmpty) return null;
     String? bestId;
     var bestScore = threshold;
+    var bestRun = 1;
     for (final candidate in candidates) {
       if (candidate.normalized.isEmpty) continue;
-      // Only a strict improvement displaces the incumbent, which is what
-      // makes the earliest of several equal candidates win.
-      final score = similarity(heard, candidate.normalized, floor: bestScore);
-      if (score > bestScore) {
-        bestScore = score;
-        bestId = candidate.dhikrId;
+      for (final run in _runsToTry(heard, candidate)) {
+        final phrase = run == 1
+            ? candidate.normalized
+            : List.filled(run, candidate.normalized).join(' ');
+        // Only a strict improvement displaces the incumbent, which is what
+        // makes the earliest of several equal candidates win.
+        final score = similarity(heard, phrase, floor: bestScore);
+        if (score > bestScore) {
+          bestScore = score;
+          bestId = candidate.dhikrId;
+          bestRun = run;
+        }
       }
     }
-    return bestId == null ? null : PhraseMatch(bestId, bestScore);
+    return bestId == null
+        ? null
+        : PhraseMatch(bestId, bestScore, repetitions: bestRun);
+  }
+
+  /// Repetition counts worth testing for [candidate] against [heard]: the one
+  /// its length implies, and its neighbours in case a word was lost or gained.
+  /// Never more than the dhikr actually asks for.
+  static Iterable<int> _runsToTry(String heard, PhraseCandidate candidate) {
+    if (candidate.maxRun <= 1) return const [1];
+    final unit = candidate.normalized.length + 1;
+    final estimate = ((heard.length + 1) / unit).round();
+    return {
+      for (var run = estimate - 1; run <= estimate + 1; run++)
+        if (run >= 1 && run <= candidate.maxRun) run,
+      1,
+    };
   }
 }
 
