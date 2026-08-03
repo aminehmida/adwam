@@ -46,7 +46,7 @@ class SessionScreen extends StatefulWidget {
 }
 
 class _SessionScreenState extends State<SessionScreen>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin, WidgetsBindingObserver {
   final Map<String, GlobalKey> _itemKeys = {};
   final ScrollController _scrollController = ScrollController();
   bool _editing = false;
@@ -137,6 +137,7 @@ class _SessionScreenState extends State<SessionScreen>
         )
       ..addListener(_onVoiceStatusChanged);
     _recognised = _voice.matches.listen(_onRecognised);
+    WidgetsBinding.instance.addObserver(this);
     _settings = context.read<SettingsController>()
       ..addListener(_onSettingsChanged);
     _syncWakelock();
@@ -307,6 +308,25 @@ class _SessionScreenState extends State<SessionScreen>
   StreamSubscription<PhraseMatch>? _recognised;
 
   void _onVoiceStatusChanged() => setState(() {});
+
+  /// Locking the phone or leaving for another app closes the microphone.
+  ///
+  /// Nothing recited elsewhere could be counted anyway, and an app that keeps
+  /// listening once you have put it away is not one to trust with a
+  /// microphone. It stays off on return: reopening a microphone is the user's
+  /// decision to make, not something to resume behind their back.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // `inactive` is deliberately not in this list — it fires for a pulled-down
+    // notification shade and for the permission dialog voice mode itself
+    // raises, and stopping there would cancel the very thing being started.
+    const gone = {
+      AppLifecycleState.hidden,
+      AppLifecycleState.paused,
+      AppLifecycleState.detached,
+    };
+    if (gone.contains(state) && _voice.isOn) unawaited(_voice.stop());
+  }
 
   /// The phrases still worth listening for: everything in the session that is
   /// neither hidden nor already done, in the session's own order. Rebuilt for
@@ -824,6 +844,7 @@ class _SessionScreenState extends State<SessionScreen>
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _recognised?.cancel();
     _voice.removeListener(_onVoiceStatusChanged);
     _voice.dispose();
