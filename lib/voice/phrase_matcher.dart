@@ -10,6 +10,28 @@ import 'arabic_normalizer.dart';
 /// searching for longer runs inside one utterance finds nothing.
 const maxRunInOneSegment = 12;
 
+/// Closing words used to tell that a one-time dhikr has been finished.
+///
+/// Four, from the corpus: at two words `me-11` and `me-16` end identically
+/// ("إلا أنت"), as do `pp-70` and `pp-71` ("كل صلاة"); at three they still
+/// score 0.71–0.76 against each other. At four no pair anywhere comes within
+/// 0.7 of another.
+const endingWords = 4;
+
+/// How closely the closing words must match. Well above the whole-phrase bar:
+/// four words carry far less evidence than a whole dua, so they have to be
+/// nearly right.
+const endingThreshold = 0.8;
+
+/// Shorter than this and a dhikr matches whole anyway, and its "ending" would
+/// be most of it rather than the end of it.
+///
+/// Twelve because the corpus divides there: the one-time duas run 4, 6, 7, 9,
+/// 9, 10, 11 words — each a single breath that no pause will cut — and then
+/// jump to 14 and upwards. Only the long ones need rescuing, and at 14 words a
+/// four-word ending is the last quarter rather than half the dua.
+const endingMinWords = 12;
+
 class PhraseCandidate {
   final String dhikrId;
   final String normalized;
@@ -20,11 +42,36 @@ class PhraseCandidate {
   /// itself asks for, which is 1 for an ordinary dua and no search at all.
   final int maxRun;
 
-  PhraseCandidate({
+  /// The last [endingWords] words, for a long dhikr said once. Hearing them is
+  /// taken as having finished it, which rescues a long dua whose middle the
+  /// recogniser mangled or whose recitation the detector cut in two. Null for
+  /// anything repeated or short enough to match whole.
+  final String? ending;
+
+  PhraseCandidate._({
     required this.dhikrId,
+    required this.normalized,
+    required this.maxRun,
+    required this.ending,
+  });
+
+  factory PhraseCandidate({
+    required String dhikrId,
     required String text,
-    this.maxRun = 1,
-  }) : normalized = normalizeArabic(text);
+    int maxRun = 1,
+    bool canFinishEarly = false,
+  }) {
+    final normalized = stripOptionalOpeners(normalizeArabic(text));
+    final words = normalized.isEmpty ? const <String>[] : normalized.split(' ');
+    return PhraseCandidate._(
+      dhikrId: dhikrId,
+      normalized: normalized,
+      maxRun: maxRun,
+      ending: canFinishEarly && words.length > endingMinWords
+          ? words.sublist(words.length - endingWords).join(' ')
+          : null,
+    );
+  }
 }
 
 class PhraseMatch {
@@ -38,7 +85,16 @@ class PhraseMatch {
   /// phrase was repeated without a long enough pause to split the audio.
   final int repetitions;
 
-  const PhraseMatch(this.dhikrId, this.score, {this.repetitions = 1});
+  /// True when this was recognised by its closing words rather than as a
+  /// whole. Surfaced in the debug bar, since it is a weaker kind of evidence.
+  final bool byEnding;
+
+  const PhraseMatch(
+    this.dhikrId,
+    this.score, {
+    this.repetitions = 1,
+    this.byEnding = false,
+  });
 }
 
 /// Decides which dhikr an utterance was, out of the ones still left to recite.
@@ -83,18 +139,54 @@ class PhraseMatcher {
           dhikrId: dhikr.id,
           text: phrases[i],
           maxRun: wanted < maxRunInOneSegment ? wanted : maxRunInOneSegment,
+          // Only something said once can be finished by reaching its end; a
+          // count has to be reached repetition by repetition.
+          canFinishEarly: !segmented && dhikr.repetitions == 1,
         ));
       }
     }
     return PhraseMatcher(candidates);
   }
 
-  /// The best candidate for [transcript], or null if nothing cleared
-  /// [threshold] — a cough, a passing conversation, or a dhikr from another
+  /// The dhikr [transcript] should count for, or null when nothing cleared
+  /// [threshold] — a cough, a passing conversation, a dhikr from another
   /// session. Silence is the right answer to those.
   PhraseMatch? match(String transcript, {double threshold = defaultThreshold}) {
     final candidate = best(transcript);
-    return candidate != null && candidate.score > threshold ? candidate : null;
+    if (candidate != null && candidate.score > threshold) return candidate;
+    // Nothing matched as a whole. A long dua said once may still have been
+    // finished — its middle mangled, or its recitation cut in two — so look
+    // for its closing words.
+    return _finishedByEnding(transcript);
+  }
+
+  /// A one-time dhikr whose closing words were just said.
+  ///
+  /// Reached only after every whole-phrase comparison has already failed,
+  /// which is what keeps it safe: a short dhikr recited properly matches whole
+  /// and never gets here.
+  PhraseMatch? _finishedByEnding(String transcript) {
+    final heard = stripOptionalOpeners(normalizeArabic(transcript));
+    if (heard.isEmpty) return null;
+    final words = heard.split(' ');
+    final tail = words.length <= endingWords
+        ? heard
+        : words.sublist(words.length - endingWords).join(' ');
+
+    String? bestId;
+    var bestScore = endingThreshold;
+    for (final candidate in candidates) {
+      final ending = candidate.ending;
+      if (ending == null) continue;
+      final score = similarity(tail, ending, floor: bestScore);
+      if (score > bestScore) {
+        bestScore = score;
+        bestId = candidate.dhikrId;
+      }
+    }
+    return bestId == null
+        ? null
+        : PhraseMatch(bestId, bestScore, byEnding: true);
   }
 
   /// The closest candidate whatever its score, even a hopeless one.
@@ -103,7 +195,7 @@ class PhraseMatcher {
   /// diagnosis: a near miss and never having heard anything look identical
   /// from the outside. The debug bar shows this so the two can be told apart.
   PhraseMatch? best(String transcript) {
-    final heard = normalizeArabic(transcript);
+    final heard = stripOptionalOpeners(normalizeArabic(transcript));
     if (heard.isEmpty) return null;
     String? bestId;
     var bestScore = 0.0;

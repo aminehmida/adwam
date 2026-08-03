@@ -76,10 +76,12 @@ class VoiceDebugBar extends StatelessWidget {
     final transcript = diagnostics.lastTranscript;
     if (transcript == null) return 'nothing recognised yet';
     final score = diagnostics.lastScore;
+    final mark = diagnostics.accepted
+        ? (diagnostics.byEnding ? '✓end' : '✓')
+        : '✗';
     final verdict = score == null
         ? 'no candidate'
-        : '${diagnostics.lastMatchId} ${score.toStringAsFixed(2)}'
-            ' ${diagnostics.accepted ? "✓" : "✗"}';
+        : '${diagnostics.lastMatchId} ${score.toStringAsFixed(2)} $mark';
     return '$verdict · $transcript';
   }
 }

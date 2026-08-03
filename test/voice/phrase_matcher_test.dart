@@ -151,6 +151,67 @@ void main() {
       expect(matcher.match('$single $single')?.repetitions, anyOf(isNull, 1));
     });
 
+    test('the isti\'adha and basmala may be said, or left out, or both', () {
+      final matcher = matcherFor(SessionType.morning);
+      // me-02 is written with the isti'adha in front of Ayat al-Kursi.
+      final written = normalizeArabic(byId['me-02']!.spokenText);
+      final ayahOnly = stripOptionalOpeners(written);
+      expect(ayahOnly, isNot(written), reason: 'me-02 should carry an opener');
+
+      for (final spoken in [
+        written, // as written
+        ayahOnly, // straight into the ayah
+        'بسم الله الرحمن الرحيم $ayahOnly', // basmala instead
+        'اعوذ بالله من الشيطان الرجيم بسم الله الرحمن الرحيم $ayahOnly', // both
+      ]) {
+        final match = matcher.match(spoken);
+        expect(match?.dhikrId, 'me-02', reason: spoken);
+        expect(match!.score, 1, reason: spoken);
+      }
+    });
+
+    test('a dhikr that merely begins "bismillah" keeps its words', () {
+      // me-20 opens بسم الله الذي لا يضر — the basmala's first two words but
+      // not the basmala, so nothing may be stripped from it.
+      final matcher = matcherFor(SessionType.morning);
+      final match = matcher.match(byId['me-20']!.spokenText);
+      expect(match?.dhikrId, 'me-20');
+      expect(match!.score, 1);
+    });
+
+    test('hearing the closing words finishes a long one-time dua', () {
+      // me-11 (sayyid al-istighfar) ends فإنه لا يغفر الذنوب إلا أنت. Its
+      // middle may be mangled or cut away; the ending still finishes it.
+      final matcher = matcherFor(SessionType.morning);
+      final words = normalizeArabic(byId['me-11']!.spokenText).split(' ');
+      final tail = words.sublist(words.length - endingWords).join(' ');
+
+      final match = matcher.match(tail);
+      expect(match?.dhikrId, 'me-11');
+      expect(match?.byEnding, isTrue);
+    });
+
+    test('a whole recitation is never credited to the ending shortcut', () {
+      final matcher = matcherFor(SessionType.morning);
+      final match = matcher.match(byId['me-11']!.spokenText);
+      expect(match?.dhikrId, 'me-11');
+      expect(match?.byEnding, isFalse);
+    });
+
+    test('the ending shortcut is only for dhikrs said once', () {
+      // me-17 is 7×: reaching its end says nothing about having done seven.
+      final matcher = matcherFor(SessionType.morning);
+      final repeated = matcher.candidates.firstWhere((c) => c.dhikrId == 'me-17');
+      expect(repeated.ending, isNull);
+      // And a one-breath dua has no ending either — nothing will cut it in
+      // half, and it matches whole.
+      final short = matcher.candidates.firstWhere((c) => c.dhikrId == 'me-27');
+      expect(short.ending, isNull);
+      // A long one does.
+      final long = matcher.candidates.firstWhere((c) => c.dhikrId == 'me-11');
+      expect(long.ending, isNotNull);
+    });
+
     test('a near miss is reported even though it is not counted', () {
       // What the debug bar needs: "heard you, scored 0.4" has to be
       // distinguishable from "heard nothing at all".
