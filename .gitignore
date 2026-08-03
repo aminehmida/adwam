@@ -47,3 +47,8 @@ app.*.map.json
 # Release signing (local only)
 android/key.properties
 android/upload-keystore.jks
+
+# NeMo/PyTorch toolchain used only to export the speech model to ONNX.
+# Several GB, rebuilt on demand — see tool/export_speech_model.py.
+tool/.venv-nemo/
+tool/model-export/

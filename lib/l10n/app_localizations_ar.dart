@@ -248,4 +248,45 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get quranFontSizeBody => 'حجم النص عند قراءة سورة كاملة.';
+
+  @override
+  String get voiceListen => 'العدّ بالصوت';
+
+  @override
+  String get voiceStopListening => 'إيقاف الاستماع';
+
+  @override
+  String get voiceListening => 'يستمع';
+
+  @override
+  String get voiceSetupTitle => 'العدّ بالصوت';
+
+  @override
+  String voiceSetupBody(String size) {
+    return 'اقرأ الذكر بصوتك ويُحسب لك. يحتاج هذا إلى تنزيل لمرة واحدة بحجم $size ميغابايت.\n\nيتم التعرّف على الصوت داخل جهازك وحده — ولا يغادر التسجيل جهازك أبدًا.';
+  }
+
+  @override
+  String get voiceSetupDownload => 'تنزيل';
+
+  @override
+  String get voiceDownloading => 'جارٍ التنزيل…';
+
+  @override
+  String get voiceDownloadFailed => 'لم يكتمل التنزيل. حاول مرة أخرى.';
+
+  @override
+  String get voiceMicDenied => 'يحتاج أدوَم إلى إذن الميكروفون لسماع قراءتك.';
+
+  @override
+  String get voiceHoldClose =>
+      'أمسك الهاتف قريبًا منك أو استعمل سمّاعة، ليُسمع الذكر الخافت.';
+
+  @override
+  String get voiceModelDelete => 'حذف نموذج الصوت';
+
+  @override
+  String voiceModelDeleteBody(String size) {
+    return 'يوفّر $size ميغابايت. سيطلب العدّ بالصوت تنزيله من جديد.';
+  }
 }

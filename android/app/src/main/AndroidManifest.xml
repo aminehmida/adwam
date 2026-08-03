@@ -1,5 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- Voice mode listens for which dhikr is being recited. Recognition runs
+         wholly on the device; the recording never leaves it. -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- Only ever used to fetch the speech model, once, on request. -->
+    <uses-permission android:name="android.permission.INTERNET" />
     <application
         android:label="${appLabel}"
         android:name="${applicationName}"

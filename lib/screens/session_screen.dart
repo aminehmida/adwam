@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui' show ImageFilter, lerpDouble;
 
@@ -16,6 +17,10 @@ import '../state/prayer_controller.dart';
 import '../state/progress_controller.dart';
 import '../state/settings_controller.dart';
 import '../theme.dart';
+import '../voice/model_catalog.dart';
+import '../voice/model_store.dart';
+import '../voice/phrase_matcher.dart';
+import '../voice/voice_session_controller.dart';
 import '../widgets/context_card.dart' show sessionTitle;
 import '../widgets/count_progress_ring.dart';
 import '../widgets/custom_dhikr_dialog.dart';
@@ -23,11 +28,16 @@ import '../widgets/dhikr_card.dart';
 import '../widgets/prayer_selector.dart';
 import '../widgets/surah_reader.dart';
 import '../widgets/tier_header.dart';
+import '../widgets/voice_model_sheet.dart';
 
 class SessionScreen extends StatefulWidget {
   final SessionType session;
 
-  const SessionScreen({super.key, required this.session});
+  /// Supplied only by tests, which drive the voice path without a microphone.
+  @visibleForTesting
+  final VoiceSessionController? voice;
+
+  const SessionScreen({super.key, required this.session, this.voice});
 
   @override
   State<SessionScreen> createState() => _SessionScreenState();
@@ -118,6 +128,13 @@ class _SessionScreenState extends State<SessionScreen>
       parent: _readerController,
       curve: Curves.easeOutCubic,
     );
+    _voice = widget.voice ??
+        VoiceSessionController(
+          modelStore: ModelStore(),
+          spec: fastConformerArabic,
+        )
+      ..addListener(_onVoiceStatusChanged);
+    _recognised = _voice.matches.listen(_onRecognised);
     _settings = context.read<SettingsController>()
       ..addListener(_onSettingsChanged);
     _syncWakelock();
@@ -282,6 +299,117 @@ class _SessionScreenState extends State<SessionScreen>
       return;
     }
     if (completed && mounted) await _scrollToNextIncomplete(after: dhikr.id);
+  }
+
+  late final VoiceSessionController _voice;
+  StreamSubscription<PhraseMatch>? _recognised;
+
+  void _onVoiceStatusChanged() => setState(() {});
+
+  /// The phrases still worth listening for: everything in the session that is
+  /// neither hidden nor already done, in the session's own order. Rebuilt for
+  /// every utterance, so finishing a dhikr hands its words to the identical
+  /// one below it (me-28's ten, then me-32's hundred).
+  PhraseMatcher _voiceCandidates() {
+    final config = context.read<ListConfigController>();
+    final progress = context.read<ProgressController>();
+    return PhraseMatcher.forDhikrs(
+      config.listFor(widget.session).where((dhikr) =>
+          !config.isHidden(widget.session, dhikr.id) &&
+          !progress.isDone(widget.session, dhikr.id)),
+    );
+  }
+
+  Future<void> _toggleVoice() async {
+    if (_voice.isOn) {
+      await _voice.stop();
+      return;
+    }
+    await _voice.start(_voiceCandidates);
+    if (!mounted) return;
+    switch (_voice.status) {
+      case VoiceStatus.needsModel:
+        final store = ModelStore();
+        if (await showVoiceModelSheet(context, store, fastConformerArabic) &&
+            mounted) {
+          await _voice.start(_voiceCandidates);
+          if (mounted) _showVoiceHint();
+        }
+      case VoiceStatus.needsMicPermission:
+        _showVoiceMessage(AppLocalizations.of(context)!.voiceMicDenied);
+      case VoiceStatus.failed:
+        _showVoiceMessage(AppLocalizations.of(context)!.voiceDownloadFailed);
+      case VoiceStatus.listening:
+        _showVoiceHint();
+      default:
+        break;
+    }
+  }
+
+  /// A quiet dhikr only reaches the microphone if the microphone is close, and
+  /// that is the one thing the app cannot arrange for itself.
+  void _showVoiceHint() =>
+      _showVoiceMessage(AppLocalizations.of(context)!.voiceHoldClose);
+
+  void _showVoiceMessage(String message) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  /// A dhikr was heard. This deliberately walks the same path a tap does —
+  /// count, feel it, re-anchor, move on — so voice mode and thumb mode can
+  /// never drift apart.
+  Future<void> _onRecognised(PhraseMatch match) async {
+    if (!mounted || _editing) return;
+    final config = context.read<ListConfigController>();
+    Dhikr? dhikr;
+    for (final candidate in config.listFor(widget.session)) {
+      if (candidate.id == match.dhikrId) {
+        dhikr = candidate;
+        break;
+      }
+    }
+    if (dhikr == null) return;
+
+    final progress = context.read<ProgressController>();
+    // One utterance can be worth several counts: a quick run of tasbih comes
+    // back as a single stretch of speech.
+    var completed = false;
+    var crossedSegment = false;
+    for (var i = 0; i < match.repetitions && !completed; i++) {
+      completed = progress.increment(widget.session, dhikr);
+      if (!completed &&
+          dhikr.segmentStops.contains(
+            progress.countFor(widget.session, dhikr.id),
+          )) {
+        crossedSegment = true;
+      }
+    }
+
+    // Heard-and-counted is a distinct event from a tap, so it gets a sound as
+    // well as the usual buzz — the whole point is that you are not looking.
+    unawaited(SystemSound.play(SystemSoundType.click));
+    if (completed) {
+      _completionHaptic(dhikr);
+    } else if (crossedSegment) {
+      _segmentTransitionHaptic();
+    } else {
+      HapticFeedback.lightImpact();
+    }
+
+    _anchorTo(dhikr.id);
+    if (completed && mounted) {
+      await _scrollToNextIncomplete(after: dhikr.id);
+      await _stopVoiceIfSessionDone();
+    }
+  }
+
+  /// Nothing left to recite means nothing left to listen for, and a microphone
+  /// left open costs battery for no reason.
+  Future<void> _stopVoiceIfSessionDone() async {
+    if (!mounted || !_voice.isOn) return;
+    if (_voiceCandidates().candidates.isEmpty) await _voice.stop();
   }
 
   Rect? _globalRect(GlobalKey? key) {
@@ -694,6 +822,9 @@ class _SessionScreenState extends State<SessionScreen>
 
   @override
   void dispose() {
+    _recognised?.cancel();
+    _voice.removeListener(_onVoiceStatusChanged);
+    _voice.dispose();
     _settings.removeListener(_onSettingsChanged);
     WakelockPlus.disable().catchError((_) {});
     if (_volumeKeysSupported) {
@@ -788,6 +919,20 @@ class _SessionScreenState extends State<SessionScreen>
                       ),
                     ]
                   : [
+                      // Deliberately just an icon in the bar: it stays put
+                      // however far the list is scrolled, and costs no layout.
+                      IconButton(
+                        icon: Icon(
+                          _voice.isOn ? Icons.mic : Icons.mic_none_outlined,
+                        ),
+                        color: _voice.status == VoiceStatus.listening
+                            ? Theme.of(context).colorScheme.primary
+                            : null,
+                        tooltip: _voice.isOn
+                            ? l10n.voiceStopListening
+                            : l10n.voiceListen,
+                        onPressed: _toggleVoice,
+                      ),
                       IconButton(
                         icon: const Icon(Icons.tune),
                         tooltip: l10n.editList,

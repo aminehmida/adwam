@@ -83,5 +83,23 @@
   "tapAnywhereToCount": "انقر في أي مكان للعدّ · اسحب للإغلاق",
   "doneReading": "تم",
   "quranFontSize": "حجم خط القرآن",
-  "quranFontSizeBody": "حجم النص عند قراءة سورة كاملة."
+  "quranFontSizeBody": "حجم النص عند قراءة سورة كاملة.",
+  "voiceListen": "العدّ بالصوت",
+  "voiceStopListening": "إيقاف الاستماع",
+  "voiceListening": "يستمع",
+  "voiceSetupTitle": "العدّ بالصوت",
+  "voiceSetupBody": "اقرأ الذكر بصوتك ويُحسب لك. يحتاج هذا إلى تنزيل لمرة واحدة بحجم {size} ميغابايت.\n\nيتم التعرّف على الصوت داخل جهازك وحده — ولا يغادر التسجيل جهازك أبدًا.",
+  "@voiceSetupBody": {
+    "placeholders": { "size": { "type": "String" } }
+  },
+  "voiceSetupDownload": "تنزيل",
+  "voiceDownloading": "جارٍ التنزيل…",
+  "voiceDownloadFailed": "لم يكتمل التنزيل. حاول مرة أخرى.",
+  "voiceMicDenied": "يحتاج أدوَم إلى إذن الميكروفون لسماع قراءتك.",
+  "voiceHoldClose": "أمسك الهاتف قريبًا منك أو استعمل سمّاعة، ليُسمع الذكر الخافت.",
+  "voiceModelDelete": "حذف نموذج الصوت",
+  "voiceModelDeleteBody": "يوفّر {size} ميغابايت. سيطلب العدّ بالصوت تنزيله من جديد.",
+  "@voiceModelDeleteBody": {
+    "placeholders": { "size": { "type": "String" } }
+  }
 }
