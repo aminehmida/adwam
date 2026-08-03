@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import 'package:vibration/vibration.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
+import '../build_channel.dart';
 import '../l10n/app_localizations.dart';
 import '../models/dhikr.dart';
 import '../state/list_config_controller.dart';
@@ -28,6 +29,7 @@ import '../widgets/dhikr_card.dart';
 import '../widgets/prayer_selector.dart';
 import '../widgets/surah_reader.dart';
 import '../widgets/tier_header.dart';
+import '../widgets/voice_debug_bar.dart';
 import '../widgets/voice_model_sheet.dart';
 
 class SessionScreen extends StatefulWidget {
@@ -952,17 +954,29 @@ class _SessionScreenState extends State<SessionScreen>
                     )
                   : null,
             ),
-            body: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 220),
-              child: _editing
-                  ? KeyedSubtree(
-                      key: const ValueKey('edit'),
-                      child: _editList(config, dhikrs),
-                    )
-                  : KeyedSubtree(
-                      key: const ValueKey('count'),
-                      child: _countList(config, dhikrs),
-                    ),
+            body: Column(
+              children: [
+                // Dev channel only, and only once voice mode has been asked
+                // for: a strip of counters showing which stage of the pipeline
+                // has stopped. `isDevChannel` is a const, so prod tree-shakes
+                // the bar and its diagnostics out entirely.
+                if (isDevChannel && _voice.status != VoiceStatus.off)
+                  VoiceDebugBar(voice: _voice),
+                Expanded(
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 220),
+                    child: _editing
+                        ? KeyedSubtree(
+                            key: const ValueKey('edit'),
+                            child: _editList(config, dhikrs),
+                          )
+                        : KeyedSubtree(
+                            key: const ValueKey('count'),
+                            child: _countList(config, dhikrs),
+                          ),
+                  ),
+                ),
+              ],
             ),
           ),
           if (_focused != null) _focusOverlay(context),
