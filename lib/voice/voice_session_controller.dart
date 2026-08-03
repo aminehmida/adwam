@@ -61,6 +61,10 @@ class VoiceDiagnostics {
   double? lastScore;
   bool accepted = false;
 
+  /// Whether the last acceptance came from hearing a dhikr's closing words
+  /// rather than the whole of it — weaker evidence, worth seeing.
+  bool byEnding = false;
+
   String? error;
 
   void reset() {
@@ -73,6 +77,7 @@ class VoiceDiagnostics {
     lastMatchId = null;
     lastScore = null;
     accepted = false;
+    byEnding = false;
     error = null;
   }
 }
@@ -194,15 +199,19 @@ class VoiceSessionController extends ChangeNotifier {
       if (text != null) {
         diagnostics.utterances++;
         diagnostics.lastTranscript = text;
-        final candidate = source().best(text);
-        diagnostics.lastMatchId = candidate?.dhikrId;
-        diagnostics.lastScore = candidate?.score;
-        diagnostics.accepted =
-            candidate != null && candidate.score > PhraseMatcher.defaultThreshold;
-        _log('heard "$text" -> ${candidate?.dhikrId ?? "nothing"} '
-            '${candidate?.score.toStringAsFixed(2) ?? ""} '
-            '${diagnostics.accepted ? "counted" : "rejected"}');
-        if (diagnostics.accepted) _matches.add(candidate!);
+        final matcher = source();
+        final counted = matcher.match(text);
+        // What to show when nothing was counted: how close the nearest dhikr
+        // came, rather than a bare "no".
+        final closest = counted ?? matcher.best(text);
+        diagnostics.lastMatchId = closest?.dhikrId;
+        diagnostics.lastScore = closest?.score;
+        diagnostics.accepted = counted != null;
+        diagnostics.byEnding = counted?.byEnding ?? false;
+        _log('heard "$text" -> ${closest?.dhikrId ?? "nothing"} '
+            '${closest?.score.toStringAsFixed(2) ?? ""} '
+            '${counted == null ? "rejected" : counted.byEnding ? "finished" : "counted"}');
+        if (counted != null) _matches.add(counted);
       }
       notifyListeners();
     };
