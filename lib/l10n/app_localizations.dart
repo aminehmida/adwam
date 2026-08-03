@@ -559,6 +559,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Text size when reading a full surah.'**
   String get quranFontSizeBody;
+
+  /// No description provided for @voiceListen.
+  ///
+  /// In en, this message translates to:
+  /// **'Count by voice'**
+  String get voiceListen;
+
+  /// No description provided for @voiceStopListening.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop listening'**
+  String get voiceStopListening;
+
+  /// No description provided for @voiceListening.
+  ///
+  /// In en, this message translates to:
+  /// **'Listening'**
+  String get voiceListening;
+
+  /// No description provided for @voiceSetupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Count by voice'**
+  String get voiceSetupTitle;
+
+  /// No description provided for @voiceSetupBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Recite aloud and the adhkar are counted for you. This needs a one-time {size} MB download.\n\nRecognition runs entirely on your device — the recording never leaves it.'**
+  String voiceSetupBody(String size);
+
+  /// No description provided for @voiceSetupDownload.
+  ///
+  /// In en, this message translates to:
+  /// **'Download'**
+  String get voiceSetupDownload;
+
+  /// No description provided for @voiceDownloading.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading…'**
+  String get voiceDownloading;
+
+  /// No description provided for @voiceDownloadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The download did not finish. Please try again.'**
+  String get voiceDownloadFailed;
+
+  /// No description provided for @voiceMicDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Adwam needs microphone access to hear your recitation.'**
+  String get voiceMicDenied;
+
+  /// No description provided for @voiceHoldClose.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold the phone near you, or use a headset, so a quiet recitation is heard.'**
+  String get voiceHoldClose;
+
+  /// No description provided for @voiceModelDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete voice model'**
+  String get voiceModelDelete;
+
+  /// No description provided for @voiceModelDeleteBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Frees {size} MB. Voice counting will ask to download it again.'**
+  String voiceModelDeleteBody(String size);
 }
 
 class _AppLocalizationsDelegate

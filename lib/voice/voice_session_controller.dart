@@ -65,6 +65,12 @@ class VoiceSessionController extends ChangeNotifier {
   /// Dhikrs recognised, in the order they were said.
   Stream<PhraseMatch> get matches => _matches.stream;
 
+  /// Reports a match as though it had been heard. The recogniser lives on
+  /// another isolate behind native code, so this is how a test drives the
+  /// screen's voice path without a microphone.
+  @visibleForTesting
+  void emitMatch(PhraseMatch match) => _matches.add(match);
+
   bool get isOn => _status == VoiceStatus.listening ||
       _status == VoiceStatus.starting;
 

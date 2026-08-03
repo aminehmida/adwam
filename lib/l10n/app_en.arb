@@ -83,5 +83,23 @@
   "tapAnywhereToCount": "Tap anywhere to count · swipe to close",
   "doneReading": "Done",
   "quranFontSize": "Quran font size",
-  "quranFontSizeBody": "Text size when reading a full surah."
+  "quranFontSizeBody": "Text size when reading a full surah.",
+  "voiceListen": "Count by voice",
+  "voiceStopListening": "Stop listening",
+  "voiceListening": "Listening",
+  "voiceSetupTitle": "Count by voice",
+  "voiceSetupBody": "Recite aloud and the adhkar are counted for you. This needs a one-time {size} MB download.\n\nRecognition runs entirely on your device — the recording never leaves it.",
+  "@voiceSetupBody": {
+    "placeholders": { "size": { "type": "String" } }
+  },
+  "voiceSetupDownload": "Download",
+  "voiceDownloading": "Downloading…",
+  "voiceDownloadFailed": "The download did not finish. Please try again.",
+  "voiceMicDenied": "Adwam needs microphone access to hear your recitation.",
+  "voiceHoldClose": "Hold the phone near you, or use a headset, so a quiet recitation is heard.",
+  "voiceModelDelete": "Delete voice model",
+  "voiceModelDeleteBody": "Frees {size} MB. Voice counting will ask to download it again.",
+  "@voiceModelDeleteBody": {
+    "placeholders": { "size": { "type": "String" } }
+  }
 }

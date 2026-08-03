@@ -250,4 +250,47 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get quranFontSizeBody => 'Text size when reading a full surah.';
+
+  @override
+  String get voiceListen => 'Count by voice';
+
+  @override
+  String get voiceStopListening => 'Stop listening';
+
+  @override
+  String get voiceListening => 'Listening';
+
+  @override
+  String get voiceSetupTitle => 'Count by voice';
+
+  @override
+  String voiceSetupBody(String size) {
+    return 'Recite aloud and the adhkar are counted for you. This needs a one-time $size MB download.\n\nRecognition runs entirely on your device — the recording never leaves it.';
+  }
+
+  @override
+  String get voiceSetupDownload => 'Download';
+
+  @override
+  String get voiceDownloading => 'Downloading…';
+
+  @override
+  String get voiceDownloadFailed =>
+      'The download did not finish. Please try again.';
+
+  @override
+  String get voiceMicDenied =>
+      'Adwam needs microphone access to hear your recitation.';
+
+  @override
+  String get voiceHoldClose =>
+      'Hold the phone near you, or use a headset, so a quiet recitation is heard.';
+
+  @override
+  String get voiceModelDelete => 'Delete voice model';
+
+  @override
+  String voiceModelDeleteBody(String size) {
+    return 'Frees $size MB. Voice counting will ask to download it again.';
+  }
 }
