@@ -18,10 +18,17 @@ enum VoiceEngine {
   /// register the adhkar are written and recited in.
   fastConformer,
 
-  /// Vosk's `vosk-model-ar-mgb2-0.4`: broadcast Modern Standard Arabic. Its
-  /// grammar-constraint feature is unavailable here — the model ships a
-  /// precompiled static HCLG graph — so it decodes freely and the closed set
-  /// is applied afterwards, exactly as for the other engine.
+  /// Vosk's `vosk-model-ar-mgb2-0.4`: broadcast Modern Standard Arabic.
+  ///
+  /// Not currently reachable. `vosk_flutter_service` 0.1.2 fails to build on
+  /// Android under Flutter 3.44.6 — its Android module never produces the
+  /// `org.vosk.vosk_flutter` package its own registration names, and the
+  /// failure takes the sibling plugins' compilation down with it. Two other
+  /// marks against it had already turned up: the Arabic model ships a
+  /// precompiled static HCLG graph, so the grammar constraint that made Vosk
+  /// attractive cannot bind to it, and the model unpacks to roughly 700 MB.
+  /// The value stays here because the comparison is still worth making if a
+  /// working binding appears.
   vosk,
 }
 
