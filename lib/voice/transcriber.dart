@@ -13,6 +13,11 @@ class TranscriberEvent {
   /// Text heard, when this event is an utterance.
   final String? transcript;
 
+  /// True when [transcript] is a speculative read of speech still in flight
+  /// rather than a segment the detector has finished. A partial that matches
+  /// lets a short dhikr count without waiting out the detector's silence.
+  final bool partial;
+
   /// A failure the isolate could not continue past. Recognition has stopped.
   final String? error;
 
@@ -24,6 +29,7 @@ class TranscriberEvent {
 
   const TranscriberEvent({
     this.transcript,
+    this.partial = false,
     this.error,
     this.chunks = 0,
     this.segments = 0,
@@ -124,6 +130,10 @@ class Transcriber {
   /// the microphone.
   void addAudio(Uint8List pcm16) => _audio.send(pcm16);
 
+  /// Tells the isolate that a speculative read was counted, so the audio it
+  /// covered is dropped rather than recognised again as a finished segment.
+  void consumePartial() => _audio.send(_consumeSignal);
+
   Future<void> stop() async {
     _audio.send(_stopSignal);
     await _events.close();
@@ -134,6 +144,7 @@ class Transcriber {
 }
 
 const _stopSignal = 'stop';
+const _consumeSignal = 'consume';
 
 class _Setup {
   final SendPort reply;
@@ -153,6 +164,85 @@ class _Setup {
 /// small buffers a second and the bar only has to look alive.
 const _reportEvery = 15;
 
+/// How much recent audio the speculative reader holds on to: two seconds of
+/// raw sound plus the padding Silero VAD wraps a segment with.
+const _partialTailSeconds = 2.5;
+
+/// New speech that has to arrive between speculative reads. Recognising takes
+/// tens of milliseconds for audio this short, so half a second of cadence
+/// costs nothing next to the count it can land early.
+const _speculateEverySeconds = 0.5;
+
+/// Speech shorter than this is not worth a speculative pass — the recogniser
+/// would mostly render noise, and the finished segment is close behind anyway.
+const _speculateAfterSeconds = 0.3;
+
+/// Speech longer than this is a long dua, where the answer is the detector's
+/// full segment or the matcher's closing words rather than a partial read.
+const _speculateUpToSeconds = 4.0;
+
+/// The speculation state of the detector, as its own values: how many seconds
+/// of audio have been seen since speech started, and how many since the last
+/// speculative read. Keeping them here rather than asking the detector lets
+/// [Transcriber.consumePartial] restart both from zero when it throws the
+/// underlying audio away.
+class _Speculation {
+  /// The audio a speculative read covers, oldest first. Raw PCM, because the
+  /// same bytes go to the detector; they are converted only when read.
+  final tail = <Uint8List>[];
+  var tailSeconds = 0.0;
+
+  /// Audio seen since speech started — zero means the detector is quiet.
+  var sinceSpeechStart = 0.0;
+
+  /// Audio seen since the last speculative read.
+  var sinceLastRead = 0.0;
+
+  void addChunk(Uint8List pcm16, bool speaking) {
+    final seconds = pcm16.length / 2 / speechSampleRate;
+    tail.add(pcm16);
+    tailSeconds += seconds;
+    while (tailSeconds > _partialTailSeconds && tail.length > 1) {
+      tailSeconds -= tail.removeAt(0).length / 2 / speechSampleRate;
+    }
+    if (speaking) {
+      sinceSpeechStart += seconds;
+      sinceLastRead += seconds;
+    } else {
+      sinceSpeechStart = 0;
+      sinceLastRead = 0;
+    }
+  }
+
+  /// True when a speculative read is due: enough new speech since the last
+  /// one, inside the window where a short dhikr is still being said.
+  bool get due =>
+      sinceSpeechStart >= _speculateAfterSeconds &&
+      sinceSpeechStart <= _speculateUpToSeconds &&
+      sinceLastRead >= _speculateEverySeconds;
+
+  Float32List takeRead() {
+    sinceLastRead = 0;
+    final total = tail.fold<int>(0, (sum, chunk) => sum + chunk.length);
+    final joined = Uint8List(total);
+    var at = 0;
+    for (final chunk in tail) {
+      joined.setRange(at, at + chunk.length, chunk);
+      at += chunk.length;
+    }
+    return _toFloat32(joined);
+  }
+
+  /// A counted partial's audio is out of play: the detector starts over and
+  /// so does the speculation window.
+  void reset() {
+    tail.clear();
+    tailSeconds = 0;
+    sinceSpeechStart = 0;
+    sinceLastRead = 0;
+  }
+}
+
 Future<void> _transcriberMain(_Setup setup) async {
   late final sherpa.VoiceActivityDetector detector;
   late final SpeechEngine engine;
@@ -169,8 +259,8 @@ Future<void> _transcriberMain(_Setup setup) async {
           // Short enough to cut between repetitions of a quick tasbih, but long
           // enough not to split a phrase at its internal pauses. Runs that do
           // get glued together are counted by the matcher instead.
-          minSilenceDuration: 0.35,
-          minSpeechDuration: 0.2,
+          minSilenceDuration: 0.25,
+          minSpeechDuration: 0.15,
           // A long dua runs far past the 5s default, and being cut mid-phrase
           // would leave nothing matchable.
           maxSpeechDuration: 30,
@@ -192,12 +282,22 @@ Future<void> _transcriberMain(_Setup setup) async {
 
   var chunks = 0;
   var segments = 0;
+  final speculation = _Speculation();
   try {
     await for (final message in audio) {
       if (message == _stopSignal) break;
+      if (message == _consumeSignal) {
+        // A speculative read was counted: its audio must not be recognised
+        // again, so the speech in flight — and any segment the detector had
+        // already finished from it — is thrown away wholesale.
+        detector.reset();
+        speculation.reset();
+        continue;
+      }
       if (message is! Uint8List) continue;
       chunks++;
       detector.acceptWaveform(_toFloat32(message));
+      speculation.addChunk(message, detector.isDetected());
       while (!detector.isEmpty()) {
         final segment = detector.front();
         detector.pop();
@@ -208,6 +308,17 @@ Future<void> _transcriberMain(_Setup setup) async {
           chunks: chunks,
           segments: segments,
         ));
+      }
+      if (speculation.due) {
+        final text = await engine.transcribe(speculation.takeRead());
+        if (text.trim().isNotEmpty) {
+          setup.reply.send(TranscriberEvent(
+            transcript: text,
+            partial: true,
+            chunks: chunks,
+            segments: segments,
+          ));
+        }
       }
       if (chunks % _reportEvery == 0) {
         setup.reply.send(
