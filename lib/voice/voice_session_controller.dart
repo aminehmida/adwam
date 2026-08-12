@@ -16,6 +16,11 @@ import 'transcriber.dart';
 /// there is nothing to segment the microphone with.
 const _vadAsset = 'assets/voice/silero_vad.onnx';
 
+/// How sure a speculative read has to be to count early. Well above the
+/// finished-segment bar: a partial may be a phrase cut mid-word, and the cost
+/// of a wrong early count is a dhikr marked done that was never said.
+const _partialThreshold = 0.7;
+
 enum VoiceStatus {
   off,
 
@@ -65,6 +70,10 @@ class VoiceDiagnostics {
   /// rather than the whole of it — weaker evidence, worth seeing.
   bool byEnding = false;
 
+  /// Whether the last transcript was a speculative read of speech still in
+  /// flight, counted early rather than after the detector's silence.
+  bool partial = false;
+
   String? error;
 
   void reset() {
@@ -78,6 +87,7 @@ class VoiceDiagnostics {
     lastScore = null;
     accepted = false;
     byEnding = false;
+    partial = false;
     error = null;
   }
 }
@@ -200,7 +210,17 @@ class VoiceSessionController extends ChangeNotifier {
         diagnostics.utterances++;
         diagnostics.lastTranscript = text;
         final matcher = source();
-        final counted = matcher.match(text);
+        // A partial is a guess at speech still in flight, so it is held to a
+        // higher bar than a finished segment — a near miss on a truncated
+        // phrase must not count. When it does clear, the audio it covered is
+        // consumed so the finished segment cannot count it a second time.
+        final counted = matcher.match(text,
+            threshold: event.partial
+                ? _partialThreshold
+                : PhraseMatcher.defaultThreshold);
+        if (counted != null && event.partial) {
+          _transcriber?.consumePartial();
+        }
         // What to show when nothing was counted: how close the nearest dhikr
         // came, rather than a bare "no".
         final closest = counted ?? matcher.best(text);
@@ -208,7 +228,9 @@ class VoiceSessionController extends ChangeNotifier {
         diagnostics.lastScore = closest?.score;
         diagnostics.accepted = counted != null;
         diagnostics.byEnding = counted?.byEnding ?? false;
-        _log('heard "$text" -> ${closest?.dhikrId ?? "nothing"} '
+        diagnostics.partial = event.partial;
+        _log('heard ${event.partial ? "~" : ""}"$text" -> '
+            '${closest?.dhikrId ?? "nothing"} '
             '${closest?.score.toStringAsFixed(2) ?? ""} '
             '${counted == null ? "rejected" : counted.byEnding ? "finished" : "counted"}');
         if (counted != null) _matches.add(counted);
