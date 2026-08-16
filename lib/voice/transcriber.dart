@@ -22,11 +22,30 @@ class TranscriberEvent {
   /// Stretches of speech the detector has cut out of them.
   final int segments;
 
+  /// What this utterance cost the recogniser, and how much audio it was given.
+  /// Their ratio is the real-time factor: at 1.0 the pipeline only just keeps
+  /// up with someone reciting, and above it falls steadily further behind.
+  final int decodeMs;
+  final int audioMs;
+
+  /// Audio that arrived between this utterance's speech ending and the
+  /// recogniser being handed it — the detector's silence wait, plus whatever
+  /// the isolate was already behind by.
+  ///
+  /// Measured on the audio's own clock rather than the wall, so isolate
+  /// scheduling cannot flatter it. [lagMs] + [decodeMs] is the delay actually
+  /// felt between finishing a dhikr and seeing it counted, and which of the
+  /// two dominates decides where making voice mode faster has to start.
+  final int lagMs;
+
   const TranscriberEvent({
     this.transcript,
     this.error,
     this.chunks = 0,
     this.segments = 0,
+    this.decodeMs = 0,
+    this.audioMs = 0,
+    this.lagMs = 0,
   });
 }
 
@@ -192,21 +211,35 @@ Future<void> _transcriberMain(_Setup setup) async {
 
   var chunks = 0;
   var segments = 0;
+  // Everything the detector has been fed, in samples. The detector indexes its
+  // segments against the same running total, so the two together say how much
+  // audio went by while a finished segment waited to be recognised.
+  var samplesFed = 0;
   try {
     await for (final message in audio) {
       if (message == _stopSignal) break;
       if (message is! Uint8List) continue;
       chunks++;
-      detector.acceptWaveform(_toFloat32(message));
+      final samples = _toFloat32(message);
+      samplesFed += samples.length;
+      detector.acceptWaveform(samples);
       while (!detector.isEmpty()) {
         final segment = detector.front();
         detector.pop();
         segments++;
+        // Read before the decode, so the wait to be recognised and the decode
+        // itself stay separable.
+        final waited = samplesFed - (segment.start + segment.samples.length);
+        final watch = Stopwatch()..start();
         final text = await engine.transcribe(segment.samples);
+        watch.stop();
         setup.reply.send(TranscriberEvent(
           transcript: text.trim().isEmpty ? null : text,
           chunks: chunks,
           segments: segments,
+          decodeMs: watch.elapsedMilliseconds,
+          audioMs: _millis(segment.samples.length),
+          lagMs: _millis(waited < 0 ? 0 : waited),
         ));
       }
       if (chunks % _reportEvery == 0) {
@@ -223,6 +256,9 @@ Future<void> _transcriberMain(_Setup setup) async {
   await engine.dispose();
   audio.close();
 }
+
+/// A count of samples at [speechSampleRate] as milliseconds.
+int _millis(int samples) => samples * 1000 ~/ speechSampleRate;
 
 /// 16-bit little-endian PCM as the -1..1 floats the models expect.
 Float32List _toFloat32(Uint8List pcm16) {

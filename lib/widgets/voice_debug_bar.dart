@@ -54,6 +54,10 @@ class VoiceDebugBar extends StatelessWidget {
                         ' · txt ${diagnostics.utterances}'),
                   ],
                 ),
+                if (diagnostics.audioMs > 0) ...[
+                  const SizedBox(height: 2),
+                  Text(_timingLine(diagnostics)),
+                ],
                 const SizedBox(height: 2),
                 Text(
                   _lastLine(diagnostics),
@@ -69,6 +73,17 @@ class VoiceDebugBar extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  /// Where the delay between finishing a dhikr and seeing it counted went:
+  /// waiting for the detector to call the silence, or decoding once it had.
+  /// The two have entirely different fixes, so they are shown apart.
+  String _timingLine(VoiceDiagnostics diagnostics) {
+    final rtf = diagnostics.realTimeFactor;
+    return 'felt ${diagnostics.feltMs}ms'
+        ' = wait ${diagnostics.lagMs} + decode ${diagnostics.decodeMs}'
+        ' · audio ${diagnostics.audioMs}ms'
+        ' · rtf ${rtf == null ? "-" : rtf.toStringAsFixed(2)}';
   }
 
   String _lastLine(VoiceDiagnostics diagnostics) {
