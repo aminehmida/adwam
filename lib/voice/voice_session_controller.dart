@@ -16,11 +16,6 @@ import 'transcriber.dart';
 /// there is nothing to segment the microphone with.
 const _vadAsset = 'assets/voice/silero_vad.onnx';
 
-/// How sure a speculative read has to be to count early. Well above the
-/// finished-segment bar: a partial may be a phrase cut mid-word, and the cost
-/// of a wrong early count is a dhikr marked done that was never said.
-const _partialThreshold = 0.7;
-
 enum VoiceStatus {
   off,
 
@@ -70,9 +65,26 @@ class VoiceDiagnostics {
   /// rather than the whole of it — weaker evidence, worth seeing.
   bool byEnding = false;
 
-  /// Whether the last transcript was a speculative read of speech still in
-  /// flight, counted early rather than after the detector's silence.
-  bool partial = false;
+  /// What the last utterance cost: how long the recogniser took, how much
+  /// audio that was, and how much audio went by between the speech ending and
+  /// the recogniser being handed it.
+  ///
+  /// Voice mode can feel slow for two reasons whose fixes have nothing in
+  /// common: [lagMs] dominating means the detector's silence wait is the delay
+  /// and shortening it would be felt, while [decodeMs] dominating means the
+  /// model is too heavy for the phone and no amount of tuning will help. These
+  /// are here so that question is settled by measurement rather than guessed.
+  int decodeMs = 0;
+  int audioMs = 0;
+  int lagMs = 0;
+
+  /// Real-time factor of the last decode. Above 1 the recogniser cannot keep
+  /// pace with continuous recitation and falls further behind the longer it
+  /// goes on.
+  double? get realTimeFactor => audioMs == 0 ? null : decodeMs / audioMs;
+
+  /// The delay actually felt between finishing a dhikr and seeing it counted.
+  int get feltMs => lagMs + decodeMs;
 
   String? error;
 
@@ -87,7 +99,9 @@ class VoiceDiagnostics {
     lastScore = null;
     accepted = false;
     byEnding = false;
-    partial = false;
+    decodeMs = 0;
+    audioMs = 0;
+    lagMs = 0;
     error = null;
   }
 }
@@ -205,22 +219,23 @@ class VoiceSessionController extends ChangeNotifier {
         _fail(event.error!);
         return;
       }
+      // Recorded even when the recogniser rendered nothing: a decode that
+      // produced no words still cost what it cost.
+      if (event.audioMs > 0) {
+        diagnostics.decodeMs = event.decodeMs;
+        diagnostics.audioMs = event.audioMs;
+        diagnostics.lagMs = event.lagMs;
+        _log('decode ${event.decodeMs}ms for ${event.audioMs}ms audio '
+            '(rtf ${(event.decodeMs / event.audioMs).toStringAsFixed(2)}) '
+            'after ${event.lagMs}ms wait '
+            '-> felt ${event.lagMs + event.decodeMs}ms');
+      }
       final text = event.transcript;
       if (text != null) {
         diagnostics.utterances++;
         diagnostics.lastTranscript = text;
         final matcher = source();
-        // A partial is a guess at speech still in flight, so it is held to a
-        // higher bar than a finished segment — a near miss on a truncated
-        // phrase must not count. When it does clear, the audio it covered is
-        // consumed so the finished segment cannot count it a second time.
-        final counted = matcher.match(text,
-            threshold: event.partial
-                ? _partialThreshold
-                : PhraseMatcher.defaultThreshold);
-        if (counted != null && event.partial) {
-          _transcriber?.consumePartial();
-        }
+        final counted = matcher.match(text);
         // What to show when nothing was counted: how close the nearest dhikr
         // came, rather than a bare "no".
         final closest = counted ?? matcher.best(text);
@@ -228,9 +243,7 @@ class VoiceSessionController extends ChangeNotifier {
         diagnostics.lastScore = closest?.score;
         diagnostics.accepted = counted != null;
         diagnostics.byEnding = counted?.byEnding ?? false;
-        diagnostics.partial = event.partial;
-        _log('heard ${event.partial ? "~" : ""}"$text" -> '
-            '${closest?.dhikrId ?? "nothing"} '
+        _log('heard "$text" -> ${closest?.dhikrId ?? "nothing"} '
             '${closest?.score.toStringAsFixed(2) ?? ""} '
             '${counted == null ? "rejected" : counted.byEnding ? "finished" : "counted"}');
         if (counted != null) _matches.add(counted);
